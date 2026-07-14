@@ -1,0 +1,11 @@
+{
+  "name": "layanan-papanbinangun",
+  "private": true,
+  "scripts": {
+    "dev": "tailwindcss -i ./src/input.css -o ./public/assets/css/app.css --watch",
+    "build": "tailwindcss -i ./src/input.css -o ./public/assets/css/app.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
+  }
+}
