@@ -22,7 +22,7 @@
   </div>
   <div class="form-group"><label>Gambar cover</label><input type="file" name="gambar_cover" accept="image/*" class="form-control"></div>
   <?php if (! empty($paket['gambar_cover'])): ?>
-    <img src="<?= base_url($paket['gambar_cover']) ?>" style="max-width:200px;margin-bottom:1rem">
+    <img src="<?= media_url($paket['gambar_cover']) ?>" style="max-width:200px;margin-bottom:1rem">
   <?php endif; ?>
   <button class="btn btn-primary" type="submit">Simpan</button>
   <a href="<?= site_url('admin/paket-wisata') ?>" class="btn btn-outline">Batal</a>

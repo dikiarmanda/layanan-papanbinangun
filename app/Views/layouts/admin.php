@@ -3,15 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><?= esc($title ?? 'Admin') ?> — Admin Layanan</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Lora:wght@400;600&display=swap" rel="stylesheet">
+  <title><?= esc($title ?? 'Admin') ?> — Admin <?= esc(pengaturan()['nama_desa'] ?? 'Wisata Binangun') ?></title>
+  <link rel="icon" type="image/x-icon" href="<?= base_url('assets/images/favicon.ico') ?>">
+  <link rel="apple-touch-icon" href="<?= base_url('assets/images/apple-touch-icon.png') ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/vendor/fonts/fonts.css') ?>">
   <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
 </head>
 <body class="admin-body">
   <div class="admin-layout">
     <aside class="admin-sidebar">
-      <div class="brand">Admin Layanan</div>
+      <div class="admin-brand">
+        <img src="<?= brand_logo_url() ?>" alt="" class="admin-brand-logo">
+        <span><strong>Panel Admin</strong><small><?= esc(pengaturan()['nama_desa'] ?? 'Wisata Binangun') ?></small></span>
+      </div>
       <a href="<?= site_url('admin/dashboard') ?>">Dashboard</a>
       <a href="<?= site_url('admin/paket-wisata') ?>">Paket Wisata</a>
       <a href="<?= site_url('admin/produk') ?>">Produk</a>

@@ -9,7 +9,7 @@
       <?php foreach ($paket as $p): ?>
         <a class="card" href="<?= site_url('paket-wisata/' . $p['slug']) ?>">
           <?php if (! empty($p['gambar_cover'])): ?>
-            <img class="card-img" src="<?= base_url($p['gambar_cover']) ?>" alt="<?= esc($p['nama']) ?>">
+            <img class="card-img" src="<?= media_url($p['gambar_cover']) ?>" alt="<?= esc($p['nama']) ?>">
           <?php else: ?>
             <div class="card-img" style="display:flex;align-items:center;justify-content:center;color:var(--sepia)">Paket</div>
           <?php endif; ?>

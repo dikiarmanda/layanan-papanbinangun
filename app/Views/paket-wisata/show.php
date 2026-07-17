@@ -4,7 +4,7 @@
   <div style="display:grid;grid-template-columns:1fr;gap:2rem">
     <div>
       <?php if (! empty($paket['gambar_cover'])): ?>
-        <img src="<?= base_url($paket['gambar_cover']) ?>" alt="<?= esc($paket['nama']) ?>" style="width:100%;max-height:420px;object-fit:cover;border-radius:6px">
+        <img src="<?= media_url($paket['gambar_cover']) ?>" alt="<?= esc($paket['nama']) ?>" style="width:100%;max-height:420px;object-fit:cover;border-radius:6px">
       <?php endif; ?>
       <h1 style="margin-top:1.25rem"><?= esc($paket['nama']) ?></h1>
       <div class="price" style="margin-bottom:1rem"><?= format_rupiah($paket['harga']) ?> / <?= esc(str_replace('_', ' ', $paket['satuan_harga'])) ?></div>

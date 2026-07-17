@@ -51,6 +51,33 @@ class Database extends Config
         ],
     ];
 
+    public array $master = [
+        'DSN'          => '',
+        'hostname'     => 'localhost',
+        'username'     => '',
+        'password'     => '',
+        'database'     => '',
+        'DBDriver'     => 'MySQLi',
+        'DBPrefix'     => '',
+        'pConnect'     => false,
+        'DBDebug'      => true,
+        'charset'      => 'utf8mb4',
+        'DBCollat'     => 'utf8mb4_general_ci',
+        'swapPre'      => '',
+        'encrypt'      => false,
+        'compress'     => false,
+        'strictOn'     => false,
+        'failover'     => [],
+        'port'         => 3306,
+        'numberNative' => false,
+        'foundRows'    => false,
+        'dateFormat'   => [
+            'date'     => 'Y-m-d',
+            'datetime' => 'Y-m-d H:i:s',
+            'time'     => 'H:i:s',
+        ],
+    ];
+
     //    /**
     //     * Sample database connection for SQLite3.
     //     *
@@ -200,5 +227,14 @@ class Database extends Config
         if (ENVIRONMENT === 'testing') {
             $this->defaultGroup = 'tests';
         }
+
+        // Pastikan grup master terisi dari .env (database master landing page).
+        $this->master['hostname'] = env('database.master.hostname', $this->master['hostname']) ?? 'localhost';
+        $this->master['username'] = env('database.master.username', $this->master['username']) ?? '';
+        $this->master['password'] = env('database.master.password', $this->master['password']) ?? '';
+        $this->master['database'] = env('database.master.database', $this->master['database']) ?? '';
+        $this->master['DBDriver'] = env('database.master.DBDriver', $this->master['DBDriver']) ?? 'MySQLi';
+        $this->master['DBPrefix'] = env('database.master.DBPrefix', $this->master['DBPrefix']) ?? '';
+        $this->master['port']     = (int) (env('database.master.port', $this->master['port']) ?? 3306);
     }
 }

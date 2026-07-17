@@ -1,5 +1,78 @@
 <?php
 
+use App\Models\PengaturanMasterModel;
+
+if (! function_exists('pengaturan')) {
+    /**
+     * Data situs dari database master (desa_wisata.pengaturan_situs).
+     *
+     * @return array<string, mixed>
+     */
+    function pengaturan(): array
+    {
+        static $data = null;
+
+        if ($data === null) {
+            $data = (new PengaturanMasterModel())->get();
+        }
+
+        return $data;
+    }
+}
+
+if (! function_exists('landing_url')) {
+    /**
+     * Base URL website profil (untuk logo upload di master, dll).
+     */
+    function landing_url(string $path = ''): string
+    {
+        $base = rtrim((string) (env('app.landingURL') ?: 'http://localhost/papanbinangun/public/'), '/');
+
+        if ($path === '') {
+            return $base . '/';
+        }
+
+        return $base . '/' . ltrim($path, '/');
+    }
+}
+
+if (! function_exists('brand_logo_url')) {
+    /**
+     * Logo dari master (jika ada), fallback ke aset lokal layanan.
+     */
+    function brand_logo_url(): string
+    {
+        $logo = pengaturan()['logo'] ?? null;
+
+        if (is_string($logo) && $logo !== '') {
+            if (preg_match('#^https?://#i', $logo) === 1) {
+                return $logo;
+            }
+
+            return landing_url($logo);
+        }
+
+        return base_url('assets/images/brand-logo.png');
+    }
+}
+
+if (! function_exists('wa_link')) {
+    function wa_link(?string $number, string $message = ''): string
+    {
+        $number = preg_replace('/[^0-9]/', '', $number ?? '') ?? '';
+        if (str_starts_with($number, '0')) {
+            $number = '62' . substr($number, 1);
+        }
+
+        $url = 'https://wa.me/' . $number;
+        if ($message !== '') {
+            $url .= '?text=' . rawurlencode($message);
+        }
+
+        return $url;
+    }
+}
+
 if (! function_exists('format_rupiah')) {
     function format_rupiah(float|int|string $amount): string
     {
@@ -31,6 +104,24 @@ if (! function_exists('badge_status')) {
         $class = 'badge badge-' . esc($status, 'attr');
 
         return '<span class="' . $class . '">' . esc($status) . '</span>';
+    }
+}
+
+if (! function_exists('media_url')) {
+    /**
+     * URL lokal (uploads/...) atau absolut (https://images.unsplash.com/...).
+     */
+    function media_url(?string $path): string
+    {
+        if ($path === null || $path === '') {
+            return '';
+        }
+
+        if (preg_match('#^https?://#i', $path) === 1) {
+            return $path;
+        }
+
+        return base_url($path);
     }
 }
 

@@ -3,7 +3,7 @@
 <section class="section container">
   <div style="display:grid;gap:2rem;grid-template-columns:1fr">
     <?php if (! empty($produk['gambar'])): ?>
-      <img src="<?= base_url($produk['gambar']) ?>" alt="<?= esc($produk['nama']) ?>" style="width:100%;max-height:420px;object-fit:cover;border-radius:6px">
+      <img src="<?= media_url($produk['gambar']) ?>" alt="<?= esc($produk['nama']) ?>" style="width:100%;max-height:420px;object-fit:cover;border-radius:6px">
     <?php endif; ?>
     <div>
       <h1><?= esc($produk['nama']) ?></h1>

@@ -1,12 +1,17 @@
 <?= $this->extend('layouts/public') ?>
 <?= $this->section('content') ?>
 
-<section class="hero-section container">
-  <h1>Layanan Desa Wisata Papanbinangun</h1>
-  <p>Pesan paket wisata &amp; homestay, atau belanja produk UMKM desa — bayar online, tanpa wajib buat akun.</p>
-  <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
-    <a class="btn btn-primary" href="<?= site_url('paket-wisata') ?>">Lihat Paket Wisata</a>
-    <a class="btn btn-outline" href="<?= site_url('toko') ?>">Belanja Toko UMKM</a>
+<section class="service-hero">
+  <div class="service-hero-pattern" aria-hidden="true"></div>
+  <div class="container service-hero-inner">
+    <?php $site = pengaturan(); ?>
+    <span class="stamp">Layanan <?= esc($site['nama_desa']) ?></span>
+    <h1><?= esc($site['tagline'] ?: 'Jelajahi Desa, Bawa Pulang Ceritanya') ?></h1>
+    <p><?= esc(strip_tags((string) ($site['deskripsi_singkat'] ?: 'Pesan pengalaman wisata dan homestay, lalu temukan karya terbaik UMKM desa dalam satu layanan.'))) ?></p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="<?= site_url('paket-wisata') ?>">Lihat Paket Wisata</a>
+      <a class="btn btn-cream" href="<?= site_url('toko') ?>">Belanja Produk UMKM</a>
+    </div>
   </div>
 </section>
 
@@ -19,7 +24,7 @@
       <?php foreach ($paket as $p): ?>
         <a class="card" href="<?= site_url('paket-wisata/' . $p['slug']) ?>">
           <?php if (! empty($p['gambar_cover'])): ?>
-            <img class="card-img" src="<?= base_url($p['gambar_cover']) ?>" alt="<?= esc($p['nama']) ?>">
+            <img class="card-img" src="<?= media_url($p['gambar_cover']) ?>" alt="<?= esc($p['nama']) ?>">
           <?php else: ?>
             <div class="card-img" style="display:flex;align-items:center;justify-content:center;color:var(--sepia)">Paket</div>
           <?php endif; ?>
@@ -42,7 +47,7 @@
       <?php foreach ($produk as $pr): ?>
         <a class="card" href="<?= site_url('toko/' . $pr['slug']) ?>">
           <?php if (! empty($pr['gambar'])): ?>
-            <img class="card-img" src="<?= base_url($pr['gambar']) ?>" alt="<?= esc($pr['nama']) ?>">
+            <img class="card-img" src="<?= media_url($pr['gambar']) ?>" alt="<?= esc($pr['nama']) ?>">
           <?php else: ?>
             <div class="card-img" style="display:flex;align-items:center;justify-content:center;color:var(--sepia)">Produk</div>
           <?php endif; ?>

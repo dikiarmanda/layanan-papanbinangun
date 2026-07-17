@@ -25,7 +25,7 @@
   </div>
   <div class="form-group"><label>Gambar</label><input type="file" name="gambar" accept="image/*" class="form-control"></div>
   <?php if (! empty($produk['gambar'])): ?>
-    <img src="<?= base_url($produk['gambar']) ?>" style="max-width:200px;margin-bottom:1rem">
+    <img src="<?= media_url($produk['gambar']) ?>" style="max-width:200px;margin-bottom:1rem">
   <?php endif; ?>
   <button class="btn btn-primary" type="submit">Simpan</button>
 </form>

@@ -19,7 +19,7 @@
       <?php foreach ($produk as $pr): ?>
         <a class="card" href="<?= site_url('toko/' . $pr['slug']) ?>">
           <?php if (! empty($pr['gambar'])): ?>
-            <img class="card-img" src="<?= base_url($pr['gambar']) ?>" alt="<?= esc($pr['nama']) ?>">
+            <img class="card-img" src="<?= media_url($pr['gambar']) ?>" alt="<?= esc($pr['nama']) ?>">
           <?php else: ?>
             <div class="card-img" style="display:flex;align-items:center;justify-content:center;color:var(--sepia)">Produk</div>
           <?php endif; ?>

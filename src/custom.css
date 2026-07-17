@@ -69,53 +69,102 @@ h3 { font-size: 1.35rem; }
 }
 
 .site-header {
-  background: rgba(255, 251, 245, 0.92);
-  border-bottom: 1px solid var(--cream-dark);
+  background: rgba(244, 233, 216, 0.95);
+  border-bottom: 1px solid var(--gold);
   position: sticky;
   top: 0;
-  z-index: 40;
-  backdrop-filter: blur(8px);
+  z-index: 50;
+  backdrop-filter: blur(6px);
 }
 
-.site-header .inner {
+.header-inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
   padding: 0.85rem 0;
-  flex-wrap: wrap;
 }
 
 .brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   font-family: var(--font-heading);
-  font-size: 1.5rem;
   font-weight: 700;
   color: var(--deep);
-  letter-spacing: 0.02em;
 }
 
-.nav-links {
+.brand:hover {
+  color: var(--deep);
+}
+
+.brand-logo {
+  width: 42px;
+  height: 42px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid var(--gold);
+}
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.brand-text strong {
+  font-size: 1.25rem;
+}
+
+.brand-tagline {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--sepia);
+}
+
+.site-nav {
   display: flex;
   gap: 1.25rem;
-  flex-wrap: wrap;
   align-items: center;
 }
 
-.nav-links a {
-  color: var(--sepia);
+.site-nav a {
+  color: var(--deep);
   font-size: 0.95rem;
+  position: relative;
 }
 
-.nav-links a:hover,
-.nav-links a.active {
+.site-nav a:hover,
+.site-nav a.active {
   color: var(--terracotta);
+}
+
+.site-nav a.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -4px;
+  height: 2px;
+  background: var(--gold);
+}
+
+.nav-toggle {
+  display: none;
+  padding: 0.25rem 0.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--deep);
+  font: 1.6rem/1 var(--font-body);
+  cursor: pointer;
 }
 
 .btn {
   display: inline-block;
   padding: 0.65rem 1.35rem;
   border-radius: 4px;
-  border: none;
+  border: 2px solid transparent;
   cursor: pointer;
   font-family: var(--font-body);
   font-size: 0.95rem;
@@ -128,6 +177,7 @@ h3 { font-size: 1.35rem; }
 
 .btn-primary {
   background: var(--terracotta);
+  border-color: var(--terracotta);
   color: #fff;
 }
 
@@ -138,8 +188,8 @@ h3 { font-size: 1.35rem; }
 
 .btn-outline {
   background: transparent;
-  border: 1.5px solid var(--sepia);
-  color: var(--sepia);
+  border-color: var(--deep);
+  color: var(--deep);
 }
 
 .btn-outline:hover {
@@ -154,7 +204,19 @@ h3 { font-size: 1.35rem; }
 
 .btn-danger {
   background: #9b2c2c;
+  border-color: #9b2c2c;
   color: #fff;
+}
+
+.btn-cream {
+  background: transparent;
+  border-color: var(--cream);
+  color: var(--cream);
+}
+
+.btn-cream:hover {
+  background: var(--cream);
+  color: var(--deep);
 }
 
 .card-grid {
@@ -165,7 +227,7 @@ h3 { font-size: 1.35rem; }
 
 .card {
   background: var(--white);
-  border: 1px solid var(--cream-dark);
+  border: 1px solid var(--gold);
   border-radius: 6px;
   overflow: hidden;
   box-shadow: 0 4px 16px var(--shadow);
@@ -182,6 +244,7 @@ h3 { font-size: 1.35rem; }
   object-fit: cover;
   width: 100%;
   background: var(--cream-dark);
+  filter: sepia(0.12) contrast(1.04);
 }
 
 .card-body {
@@ -253,15 +316,6 @@ h3 { font-size: 1.35rem; }
 .alert-error { background: #fee2e2; color: #991b1b; }
 .alert-info { background: #dbeafe; color: #1e40af; }
 
-.site-footer {
-  margin-top: 4rem;
-  padding: 2rem 0;
-  border-top: 1px solid var(--cream-dark);
-  text-align: center;
-  color: var(--sepia);
-  font-size: 0.9rem;
-}
-
 .hero-section {
   padding: 3.5rem 0 2.5rem;
   text-align: center;
@@ -282,6 +336,162 @@ h3 { font-size: 1.35rem; }
   text-align: center;
 }
 
+/* Hero layanan — turunan visual hero landing page */
+.service-hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 500px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, var(--deep) 0%, #5c3f2c 48%, var(--sepia) 100%);
+  color: var(--cream);
+}
+
+.service-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 25%, rgba(201, 166, 107, 0.18), transparent 50%);
+  pointer-events: none;
+}
+
+.service-hero-pattern {
+  position: absolute;
+  inset: 0;
+  background-image: url("../images/hero-floral-pattern.svg");
+  background-size: 420px;
+  opacity: 0.12;
+}
+
+.service-hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 780px;
+  padding-block: 5rem;
+  text-align: center;
+}
+
+.service-hero h1 {
+  color: var(--cream);
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  margin-bottom: 0.35em;
+}
+
+.service-hero p {
+  max-width: 620px;
+  margin: 0 auto 1.75rem;
+  color: rgba(244, 233, 216, 0.9);
+  font-size: clamp(1rem, 2vw, 1.18rem);
+}
+
+.stamp {
+  display: inline-block;
+  padding: 0.25rem 0.8rem;
+  border: 2px solid var(--gold);
+  color: var(--gold);
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  transform: rotate(-2deg);
+}
+
+.hero-actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Footer identik dengan landing page */
+.site-footer {
+  margin-top: 4rem;
+  background: var(--deep);
+  color: var(--cream);
+  font-size: 0.9rem;
+}
+
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 2rem;
+  padding: 3rem 0 2rem;
+}
+
+.footer-title,
+.site-footer h4 {
+  color: var(--gold);
+  font-family: var(--font-heading);
+  margin-bottom: 0.75rem;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 0.35rem;
+}
+
+.site-footer a {
+  color: var(--cream);
+  opacity: 0.9;
+}
+
+.site-footer a:hover {
+  color: var(--gold);
+  opacity: 1;
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(201, 166, 107, 0.3);
+  padding: 1rem 0;
+  text-align: center;
+  opacity: 0.8;
+}
+
+.footer-bottom p {
+  margin: 0;
+}
+
+.social-links {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.social-links a {
+  font-size: 0.85rem;
+  border-bottom: 1px solid rgba(201, 166, 107, 0.45);
+}
+
+.wa-float {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 40;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #25d366;
+  color: #fff !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
+  box-shadow: 0 8px 20px rgba(37, 211, 102, 0.35);
+}
+
+.wa-float:hover {
+  color: #fff !important;
+  transform: translateY(-2px);
+}
+
 /* Admin */
 .admin-body {
   background: #f5f0e8;
@@ -300,12 +510,39 @@ h3 { font-size: 1.35rem; }
   flex-shrink: 0;
 }
 
-.admin-sidebar .brand {
+.admin-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
   color: #f4e9d8;
   padding: 0 1.25rem 1.5rem;
   border-bottom: 1px solid rgba(244, 233, 216, 0.15);
   margin-bottom: 1rem;
-  font-size: 1.25rem;
+}
+
+.admin-brand-logo {
+  width: 42px;
+  height: 42px;
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.admin-brand span {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.admin-brand strong {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+}
+
+.admin-brand small {
+  margin-top: 0.15rem;
+  color: var(--gold);
+  font-size: 0.72rem;
 }
 
 .admin-sidebar a {
@@ -382,7 +619,112 @@ h3 { font-size: 1.35rem; }
   font-size: 0.85rem;
 }
 
+/* Login admin mengikuti identitas login website profil */
+.login-body {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  background:
+    linear-gradient(135deg, rgba(74, 50, 34, 0.94), rgba(139, 94, 60, 0.9)),
+    url("../images/hero-floral-pattern.svg");
+  background-size: auto, 420px;
+}
+
+.login-card {
+  width: min(420px, 100%);
+  padding: clamp(1.75rem, 4vw, 2.25rem);
+  background: var(--white);
+  border: 1px solid rgba(201, 166, 107, 0.55);
+  border-radius: 14px;
+  box-shadow: 0 18px 45px rgba(38, 24, 16, 0.32);
+}
+
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.login-brand-logo {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 0.85rem;
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.login-brand h1 {
+  margin: 0;
+  font-size: 1.55rem;
+}
+
+.login-sub {
+  margin: 0.35rem 0 0;
+  color: var(--sepia);
+  font-size: 0.9rem;
+}
+
+.btn-block {
+  width: 100%;
+}
+
+.login-back {
+  display: block;
+  margin-top: 1.25rem;
+  text-align: center;
+  font-size: 0.85rem;
+}
+
 @media (max-width: 768px) {
+  .header-inner {
+    position: relative;
+    flex-wrap: wrap;
+  }
+
+  .nav-toggle {
+    display: block;
+  }
+
+  .site-nav {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0.5rem 0 0.25rem;
+  }
+
+  .site-nav.is-open {
+    display: flex;
+  }
+
+  .site-nav a {
+    padding: 0.7rem 0;
+    border-top: 1px solid rgba(201, 166, 107, 0.3);
+  }
+
+  .site-nav a.active::after {
+    display: none;
+  }
+
+  .brand-tagline {
+    display: none;
+  }
+
+  .service-hero {
+    min-height: 440px;
+  }
+
+  .footer-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
   .admin-layout {
     flex-direction: column;
   }
