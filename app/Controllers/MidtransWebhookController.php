@@ -17,7 +17,7 @@ class MidtransWebhookController extends BaseController
     public function notify()
     {
         $payload = $this->request->getJSON(true);
-        if (! is_array($payload)) {
+        if (!is_array($payload)) {
             $raw = $this->request->getBody();
             $payload = json_decode($raw, true) ?? [];
         }
@@ -26,50 +26,50 @@ class MidtransWebhookController extends BaseController
             return $this->response->setStatusCode(400)->setJSON(['message' => 'empty payload']);
         }
 
-        $orderId     = (string) ($payload['order_id'] ?? '');
-        $statusCode  = (string) ($payload['status_code'] ?? '');
+        $orderId = (string) ($payload['order_id'] ?? '');
+        $statusCode = (string) ($payload['status_code'] ?? '');
         $grossAmount = (string) ($payload['gross_amount'] ?? '');
-        $signature   = (string) ($payload['signature_key'] ?? '');
-        $trxStatus   = (string) ($payload['transaction_status'] ?? '');
+        $signature = (string) ($payload['signature_key'] ?? '');
+        $trxStatus = (string) ($payload['transaction_status'] ?? '');
         $fraudStatus = (string) ($payload['fraud_status'] ?? '');
-        $trxId       = (string) ($payload['transaction_id'] ?? '');
+        $trxId = (string) ($payload['transaction_id'] ?? '');
 
         $midtrans = new MidtransService();
-        $valid    = $midtrans->verifySignature($orderId, $statusCode, $grossAmount, $signature);
+        $valid = $midtrans->verifySignature($orderId, $statusCode, $grossAmount, $signature);
 
-        $tipe         = str_starts_with($orderId, 'ORD-') ? 'order' : 'reservasi';
-        $reservasi    = null;
-        $order        = null;
-        $reservasiId  = null;
-        $orderDbId    = null;
+        $tipe = str_starts_with($orderId, 'ORD-') ? 'order' : 'reservasi';
+        $reservasi = null;
+        $order = null;
+        $reservasiId = null;
+        $orderDbId = null;
 
         if ($tipe === 'reservasi') {
-            $reservasi   = model(ReservasiModel::class)->findByMidtransOrderId($orderId);
+            $reservasi = model(ReservasiModel::class)->findByMidtransOrderId($orderId);
             $reservasiId = $reservasi['id'] ?? null;
         } else {
-            $order     = model(OrderModel::class)->findByMidtransOrderId($orderId);
+            $order = model(OrderModel::class)->findByMidtransOrderId($orderId);
             $orderDbId = $order['id'] ?? null;
         }
 
         model(MidtransLogModel::class)->insert([
-            'tipe'                => $tipe,
-            'reservasi_id'        => $reservasiId,
-            'order_id'            => $orderDbId,
-            'midtrans_order_id'   => $orderId,
-            'transaction_status'  => $trxStatus,
-            'payload'             => json_encode($payload),
-            'signature_valid'     => $valid ? 1 : 0,
+            'tipe' => $tipe,
+            'reservasi_id' => $reservasiId,
+            'order_id' => $orderDbId,
+            'midtrans_order_id' => $orderId,
+            'transaction_status' => $trxStatus,
+            'payload' => json_encode($payload),
+            'signature_valid' => $valid ? 1 : 0,
         ]);
 
-        if (! $valid) {
+        if (!$valid) {
             return $this->response->setStatusCode(403)->setJSON(['message' => 'invalid signature']);
         }
 
-        $paidStatuses   = ['capture', 'settlement'];
-        $failStatuses   = ['deny', 'cancel'];
+        $paidStatuses = ['capture', 'settlement'];
+        $failStatuses = ['deny', 'cancel'];
         $expireStatuses = ['expire'];
 
-        $isPaid   = in_array($trxStatus, $paidStatuses, true)
+        $isPaid = in_array($trxStatus, $paidStatuses, true)
             && ($trxStatus !== 'capture' || $fraudStatus === '' || $fraudStatus === 'accept');
         $isFailed = in_array($trxStatus, $failStatuses, true);
         $isExpire = in_array($trxStatus, $expireStatuses, true);
@@ -93,16 +93,16 @@ class MidtransWebhookController extends BaseController
             return;
         }
 
-        $model     = model(ReservasiModel::class);
+        $model = model(ReservasiModel::class);
         $pelanggan = model(PelangganModel::class)->find($reservasi['pelanggan_id']);
-        $wa        = new WhatsappService();
+        $wa = new WhatsappService();
 
         if ($isPaid) {
             $model->update($reservasi['id'], [
-                'status_pembayaran'        => 'paid',
-                'status_reservasi'         => 'dikonfirmasi',
-                'midtrans_transaction_id'  => $trxId,
-                'paid_at'                  => date('Y-m-d H:i:s'),
+                'status_pembayaran' => 'paid',
+                'status_reservasi' => 'dikonfirmasi',
+                'midtrans_transaction_id' => $trxId,
+                'paid_at' => date('Y-m-d H:i:s'),
             ]);
 
             if ($pelanggan) {
@@ -119,14 +119,11 @@ class MidtransWebhookController extends BaseController
         if ($isFailed || $isExpire) {
             $model->update($reservasi['id'], [
                 'status_pembayaran' => $isExpire ? 'expired' : 'failed',
-                'status_reservasi'  => 'dibatalkan',
+                'status_reservasi' => 'dibatalkan',
             ]);
 
-            if ((int) $reservasi['kuota_locked'] === 1 && ! empty($reservasi['jadwal_id'])) {
-                model(JadwalPaketWisataModel::class)->releaseKuota(
-                    (int) $reservasi['jadwal_id'],
-                    (int) $reservasi['jumlah_tamu']
-                );
+            if ((int) $reservasi['kuota_locked'] === 1) {
+                $this->releaseReservasiKuota($reservasi);
                 $model->update($reservasi['id'], ['kuota_locked' => 0]);
             }
 
@@ -149,16 +146,16 @@ class MidtransWebhookController extends BaseController
             return;
         }
 
-        $model     = model(OrderModel::class);
+        $model = model(OrderModel::class);
         $pelanggan = model(PelangganModel::class)->find($order['pelanggan_id']);
-        $wa        = new WhatsappService();
+        $wa = new WhatsappService();
 
         if ($isPaid) {
             $model->update($order['id'], [
-                'status_pembayaran'       => 'paid',
-                'status_order'            => 'diproses',
+                'status_pembayaran' => 'paid',
+                'status_order' => 'diproses',
                 'midtrans_transaction_id' => $trxId,
-                'paid_at'                 => date('Y-m-d H:i:s'),
+                'paid_at' => date('Y-m-d H:i:s'),
             ]);
 
             if ($pelanggan) {
@@ -175,7 +172,7 @@ class MidtransWebhookController extends BaseController
         if ($isFailed || $isExpire) {
             $model->update($order['id'], [
                 'status_pembayaran' => $isExpire ? 'expired' : 'failed',
-                'status_order'      => 'dibatalkan',
+                'status_order' => 'dibatalkan',
             ]);
 
             if ((int) $order['stok_locked'] === 1) {
@@ -194,6 +191,31 @@ class MidtransWebhookController extends BaseController
                     (int) $order['id']
                 );
             }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $reservasi
+     */
+    protected function releaseReservasiKuota(array $reservasi): void
+    {
+        $jadwalModel = model(JadwalPaketWisataModel::class);
+
+        if (!empty($reservasi['check_in']) && !empty($reservasi['check_out'])) {
+            $jadwalModel->releaseRange(
+                (int) $reservasi['paket_wisata_id'],
+                (string) $reservasi['check_in'],
+                (string) $reservasi['check_out']
+            );
+
+            return;
+        }
+
+        if (!empty($reservasi['jadwal_id'])) {
+            $jadwalModel->releaseKuota(
+                (int) $reservasi['jadwal_id'],
+                (int) $reservasi['jumlah_tamu']
+            );
         }
     }
 }

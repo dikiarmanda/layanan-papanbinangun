@@ -1,16 +1,17 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <?php
-    $site = pengaturan();
-    $brandName = $site['nama_desa'] ?: 'Wisata Binangun';
-    $pageTitle = ($title ?? 'Layanan Reservasi & Toko UMKM') . ' — ' . $brandName;
-    $description = $meta_description
-        ?? (strip_tags((string) ($site['deskripsi_singkat'] ?: $site['tagline'])) ?: 'Pesan paket wisata, homestay, dan produk UMKM secara mudah dan aman.');
-    $ogImage = base_url('assets/images/og-image.png');
-    $uri = uri_string();
+  $site = pengaturan();
+  $brandName = $site['nama_desa'] ?: 'Wisata Binangun';
+  $pageTitle = ($title ?? 'Layanan Reservasi & Toko UMKM') . ' — ' . $brandName;
+  $description = $meta_description
+    ?? (strip_tags((string) ($site['deskripsi_singkat'] ?: $site['tagline'])) ?: 'Pesan paket wisata, homestay, dan produk UMKM secara mudah dan aman.');
+  $ogImage = base_url('assets/images/og-image.png');
+  $uri = uri_string();
   ?>
   <title><?= esc($pageTitle) ?></title>
   <meta name="description" content="<?= esc($description) ?>">
@@ -25,7 +26,9 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="<?= base_url('assets/vendor/fonts/fonts.css') ?>">
   <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/vendor/flatpickr/flatpickr.min.css') ?>">
 </head>
+
 <body>
   <header class="site-header">
     <div class="container header-inner">
@@ -36,12 +39,16 @@
           <small class="brand-tagline">Layanan Reservasi &amp; Toko UMKM</small>
         </span>
       </a>
-      <button class="nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="siteNav" id="navToggle">☰</button>
+      <button class="nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="siteNav"
+        id="navToggle">☰</button>
       <nav class="site-nav" id="siteNav">
         <a href="<?= site_url('/') ?>" class="<?= $uri === '' ? 'active' : '' ?>">Beranda</a>
-        <a href="<?= site_url('paket-wisata') ?>" class="<?= str_starts_with($uri, 'paket-wisata') ? 'active' : '' ?>">Paket Wisata</a>
-        <a href="<?= site_url('toko') ?>" class="<?= str_starts_with($uri, 'toko') ? 'active' : '' ?>">Toko UMKM</a>
-        <a href="<?= site_url('keranjang') ?>" class="<?= str_starts_with($uri, 'keranjang') || str_starts_with($uri, 'checkout-produk') ? 'active' : '' ?>">Keranjang</a>
+        <a href="<?= site_url('paket-wisata') ?>"
+          class="<?= str_starts_with($uri, 'paket-wisata') ? 'active' : '' ?>">Wisata &amp; Homestay</a>
+        <a href="<?= site_url('toko') ?>" class="<?= str_starts_with($uri, 'toko') ? 'active' : '' ?>">Toko &amp;
+          Catering</a>
+        <a href="<?= site_url('keranjang') ?>"
+          class="<?= str_starts_with($uri, 'keranjang') || str_starts_with($uri, 'checkout-produk') ? 'active' : '' ?>">Keranjang</a>
         <a href="<?= site_url('/') ?>#cek-status">Cek Status</a>
       </nav>
     </div>
@@ -49,10 +56,14 @@
 
   <main>
     <?php if (session()->getFlashdata('success')): ?>
-      <div class="container" style="padding-top:1rem"><div class="alert alert-success"><?= esc(session()->getFlashdata('success')) ?></div></div>
+      <div class="container" style="padding-top:1rem">
+        <div class="alert alert-success"><?= esc(session()->getFlashdata('success')) ?></div>
+      </div>
     <?php endif; ?>
     <?php if (session()->getFlashdata('error')): ?>
-      <div class="container" style="padding-top:1rem"><div class="alert alert-error"><?= esc(session()->getFlashdata('error')) ?></div></div>
+      <div class="container" style="padding-top:1rem">
+        <div class="alert alert-error"><?= esc(session()->getFlashdata('error')) ?></div>
+      </div>
     <?php endif; ?>
 
     <?= $this->renderSection('content') ?>
@@ -67,35 +78,36 @@
       <div>
         <h4>Navigasi</h4>
         <ul class="footer-links">
-          <li><a href="<?= site_url('paket-wisata') ?>">Paket Wisata &amp; Homestay</a></li>
-          <li><a href="<?= site_url('toko') ?>">Produk UMKM</a></li>
+          <li><a href="<?= site_url('paket-wisata') ?>">Wisata &amp; Homestay</a></li>
+          <li><a href="<?= site_url('toko') ?>">Toko UMKM &amp; Catering</a></li>
           <li><a href="<?= site_url('keranjang') ?>">Keranjang Belanja</a></li>
           <li><a href="<?= site_url('/') ?>#cek-status">Cek Status Transaksi</a></li>
         </ul>
       </div>
       <div>
         <h4>Kontak</h4>
-        <?php if (! empty($site['alamat'])): ?>
+        <?php if (!empty($site['alamat'])): ?>
           <p><?= esc($site['alamat']) ?></p>
         <?php endif; ?>
-        <?php if (! empty($site['email_kontak'])): ?>
+        <?php if (!empty($site['email_kontak'])): ?>
           <p><a href="mailto:<?= esc($site['email_kontak']) ?>"><?= esc($site['email_kontak']) ?></a></p>
         <?php endif; ?>
-        <?php if (! empty($site['no_whatsapp'])): ?>
+        <?php if (!empty($site['no_whatsapp'])): ?>
           <p>
-            <a href="<?= wa_link($site['no_whatsapp'], 'Halo, saya ingin bertanya tentang layanan ' . $brandName) ?>" target="_blank" rel="noopener">
+            <a href="<?= wa_link($site['no_whatsapp'], 'Halo, saya ingin bertanya tentang layanan ' . $brandName) ?>"
+              target="_blank" rel="noopener">
               WhatsApp <?= esc($site['no_whatsapp']) ?>
             </a>
           </p>
         <?php endif; ?>
         <div class="social-links">
-          <?php if (! empty($site['instagram_url'])): ?>
+          <?php if (!empty($site['instagram_url'])): ?>
             <a href="<?= esc($site['instagram_url']) ?>" target="_blank" rel="noopener">Instagram</a>
           <?php endif; ?>
-          <?php if (! empty($site['facebook_url'])): ?>
+          <?php if (!empty($site['facebook_url'])): ?>
             <a href="<?= esc($site['facebook_url']) ?>" target="_blank" rel="noopener">Facebook</a>
           <?php endif; ?>
-          <?php if (! empty($site['tiktok_url'])): ?>
+          <?php if (!empty($site['tiktok_url'])): ?>
             <a href="<?= esc($site['tiktok_url']) ?>" target="_blank" rel="noopener">TikTok</a>
           <?php endif; ?>
         </div>
@@ -108,9 +120,9 @@
     </div>
   </footer>
 
-  <?php if (! empty($site['no_whatsapp'])): ?>
+  <?php if (!empty($site['no_whatsapp'])): ?>
     <a href="<?= wa_link($site['no_whatsapp'], 'Halo, saya ingin bertanya tentang layanan ' . $brandName) ?>"
-       class="wa-float" target="_blank" rel="noopener" aria-label="Chat WhatsApp">WA</a>
+      class="wa-float" target="_blank" rel="noopener" aria-label="Chat WhatsApp">WA</a>
   <?php endif; ?>
 
   <script>
@@ -125,6 +137,10 @@
       });
     })();
   </script>
+  <script src="<?= base_url('assets/vendor/flatpickr/flatpickr.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/flatpickr/l10n/id.js') ?>"></script>
   <?= $this->renderSection('scripts') ?>
+  <script src="<?= base_url('assets/js/datepicker.js') ?>"></script>
 </body>
+
 </html>

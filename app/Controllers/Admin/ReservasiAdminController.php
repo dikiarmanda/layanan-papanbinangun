@@ -15,7 +15,7 @@ class ReservasiAdminController extends BaseController
         helper('layanan');
 
         return view('admin/reservasi/index', [
-            'title'     => 'Kelola Reservasi',
+            'title' => 'Kelola Reservasi',
             'reservasi' => model(ReservasiModel::class)->withDetails(100),
         ]);
     }
@@ -24,17 +24,17 @@ class ReservasiAdminController extends BaseController
     {
         helper('layanan');
         $row = model(ReservasiModel::class)
-            ->select('reservasi.*, pelanggan.nama as pelanggan_nama, pelanggan.no_hp, paket_wisata.nama as paket_nama')
+            ->select('reservasi.*, pelanggan.nama as pelanggan_nama, pelanggan.no_hp, paket_wisata.nama as paket_nama, paket_wisata.jenis as paket_jenis')
             ->join('pelanggan', 'pelanggan.id = reservasi.pelanggan_id')
             ->join('paket_wisata', 'paket_wisata.id = reservasi.paket_wisata_id')
             ->find($id);
 
-        if (! $row) {
+        if (!$row) {
             return redirect()->to('/admin/reservasi');
         }
 
         return view('admin/reservasi/show', [
-            'title'     => 'Detail Reservasi',
+            'title' => 'Detail Reservasi',
             'reservasi' => $row,
         ]);
     }
@@ -42,24 +42,33 @@ class ReservasiAdminController extends BaseController
     public function updateStatus(int $id)
     {
         $reservasi = model(ReservasiModel::class)->find($id);
-        if (! $reservasi) {
+        if (!$reservasi) {
             return redirect()->to('/admin/reservasi');
         }
 
         $status = (string) $this->request->getPost('status_reservasi');
         $allowed = ['dikonfirmasi', 'selesai', 'dibatalkan'];
 
-        if (! in_array($status, $allowed, true)) {
+        if (!in_array($status, $allowed, true)) {
             return redirect()->back()->with('error', 'Status tidak valid.');
         }
 
         model(ReservasiModel::class)->update($id, ['status_reservasi' => $status]);
 
-        if ($status === 'dibatalkan' && (int) $reservasi['kuota_locked'] === 1 && $reservasi['jadwal_id']) {
-            model(JadwalPaketWisataModel::class)->releaseKuota(
-                (int) $reservasi['jadwal_id'],
-                (int) $reservasi['jumlah_tamu']
-            );
+        if ($status === 'dibatalkan' && (int) $reservasi['kuota_locked'] === 1) {
+            $jadwalModel = model(JadwalPaketWisataModel::class);
+            if (!empty($reservasi['check_in']) && !empty($reservasi['check_out'])) {
+                $jadwalModel->releaseRange(
+                    (int) $reservasi['paket_wisata_id'],
+                    (string) $reservasi['check_in'],
+                    (string) $reservasi['check_out']
+                );
+            } elseif (!empty($reservasi['jadwal_id'])) {
+                $jadwalModel->releaseKuota(
+                    (int) $reservasi['jadwal_id'],
+                    (int) $reservasi['jumlah_tamu']
+                );
+            }
             model(ReservasiModel::class)->update($id, ['kuota_locked' => 0]);
         }
 

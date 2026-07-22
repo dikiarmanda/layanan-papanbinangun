@@ -18,7 +18,7 @@ class ProdukAdminController extends BaseController
             ->findAll();
 
         return view('admin/produk/index', [
-            'title'  => 'Kelola Produk',
+            'title' => 'Kelola Produk',
             'produk' => $produk,
         ]);
     }
@@ -26,8 +26,8 @@ class ProdukAdminController extends BaseController
     public function create()
     {
         return view('admin/produk/form', [
-            'title'    => 'Tambah Produk',
-            'produk'   => null,
+            'title' => 'Tambah Produk',
+            'produk' => null,
             'kategori' => model(KategoriProdukModel::class)->findAll(),
         ]);
     }
@@ -36,19 +36,22 @@ class ProdukAdminController extends BaseController
     {
         helper('layanan');
         $nama = (string) $this->request->getPost('nama');
-        $img  = upload_image('gambar', 'produk');
+        $img = upload_image('gambar', 'produk');
+
+        $jenis = $this->request->getPost('jenis') === 'catering' ? 'catering' : 'umkm';
 
         model(ProdukModel::class)->insert([
-            'nama'        => $nama,
-            'slug'        => slugify($nama) . '-' . substr(uniqid(), -4),
-            'deskripsi'   => $this->request->getPost('deskripsi'),
-            'harga'       => $this->request->getPost('harga'),
-            'stok'        => (int) $this->request->getPost('stok'),
-            'berat'       => (int) ($this->request->getPost('berat') ?: 1000),
-            'gambar'      => $img,
+            'nama' => $nama,
+            'slug' => slugify($nama) . '-' . substr(uniqid(), -4),
+            'jenis' => $jenis,
+            'deskripsi' => $this->request->getPost('deskripsi'),
+            'harga' => $this->request->getPost('harga'),
+            'stok' => (int) $this->request->getPost('stok'),
+            'berat' => (int) ($this->request->getPost('berat') ?: 1000),
+            'gambar' => $img,
             'kategori_id' => $this->request->getPost('kategori_id') ?: null,
-            'status'      => $this->request->getPost('status') ?: 'draft',
-            'admin_id'    => session()->get('admin_id'),
+            'status' => $this->request->getPost('status') ?: 'draft',
+            'admin_id' => session()->get('admin_id'),
         ]);
 
         return redirect()->to('/admin/produk')->with('success', 'Produk ditambahkan.');
@@ -57,13 +60,13 @@ class ProdukAdminController extends BaseController
     public function edit(int $id)
     {
         $produk = model(ProdukModel::class)->find($id);
-        if (! $produk) {
+        if (!$produk) {
             return redirect()->to('/admin/produk');
         }
 
         return view('admin/produk/form', [
-            'title'    => 'Edit Produk',
-            'produk'   => $produk,
+            'title' => 'Edit Produk',
+            'produk' => $produk,
             'kategori' => model(KategoriProdukModel::class)->findAll(),
         ]);
     }
@@ -72,18 +75,21 @@ class ProdukAdminController extends BaseController
     {
         helper('layanan');
         $produk = model(ProdukModel::class)->find($id);
-        if (! $produk) {
+        if (!$produk) {
             return redirect()->to('/admin/produk');
         }
 
+        $jenis = $this->request->getPost('jenis') === 'catering' ? 'catering' : 'umkm';
+
         $data = [
-            'nama'        => $this->request->getPost('nama'),
-            'deskripsi'   => $this->request->getPost('deskripsi'),
-            'harga'       => $this->request->getPost('harga'),
-            'stok'        => (int) $this->request->getPost('stok'),
-            'berat'       => (int) ($this->request->getPost('berat') ?: 1000),
+            'nama' => $this->request->getPost('nama'),
+            'jenis' => $jenis,
+            'deskripsi' => $this->request->getPost('deskripsi'),
+            'harga' => $this->request->getPost('harga'),
+            'stok' => (int) $this->request->getPost('stok'),
+            'berat' => (int) ($this->request->getPost('berat') ?: 1000),
             'kategori_id' => $this->request->getPost('kategori_id') ?: null,
-            'status'      => $this->request->getPost('status'),
+            'status' => $this->request->getPost('status'),
         ];
 
         $img = upload_image('gambar', 'produk');

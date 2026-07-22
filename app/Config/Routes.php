@@ -21,6 +21,8 @@ $routes->get('api/provinces', 'ProdukController::provinces');
 $routes->get('api/cities', 'ProdukController::cities');
 $routes->get('api/destinations', 'ProdukController::destinations');
 $routes->get('api/ongkir', 'ProdukController::ongkir');
+$routes->get('api/zona-antar', 'ProdukController::zonaAntar');
+$routes->get('api/homestay-availability', 'ProdukController::homestayAvailability');
 
 $routes->get('checkout-produk', 'CheckoutProdukController::index');
 $routes->post('checkout-produk', 'CheckoutProdukController::process');
@@ -53,6 +55,13 @@ $routes->group('admin', ['filter' => 'adminauth'], static function ($routes) {
     $routes->get('produk/(:num)/edit', 'Admin\ProdukAdminController::edit/$1');
     $routes->post('produk/(:num)', 'Admin\ProdukAdminController::update/$1');
     $routes->post('produk/(:num)/delete', 'Admin\ProdukAdminController::delete/$1');
+
+    $routes->get('zona-antar', 'Admin\ZonaAntarAdminController::index');
+    $routes->get('zona-antar/create', 'Admin\ZonaAntarAdminController::create');
+    $routes->post('zona-antar', 'Admin\ZonaAntarAdminController::store');
+    $routes->get('zona-antar/(:num)/edit', 'Admin\ZonaAntarAdminController::edit/$1');
+    $routes->post('zona-antar/(:num)', 'Admin\ZonaAntarAdminController::update/$1');
+    $routes->post('zona-antar/(:num)/delete', 'Admin\ZonaAntarAdminController::delete/$1');
 
     $routes->get('reservasi', 'Admin\ReservasiAdminController::index');
     $routes->get('reservasi/(:num)', 'Admin\ReservasiAdminController::show/$1');

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,17 +9,21 @@
   <link rel="apple-touch-icon" href="<?= base_url('assets/images/apple-touch-icon.png') ?>">
   <link rel="stylesheet" href="<?= base_url('assets/vendor/fonts/fonts.css') ?>">
   <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/vendor/flatpickr/flatpickr.min.css') ?>">
 </head>
+
 <body class="admin-body">
   <div class="admin-layout">
     <aside class="admin-sidebar">
       <div class="admin-brand">
         <img src="<?= brand_logo_url() ?>" alt="" class="admin-brand-logo">
-        <span><strong>Panel Admin</strong><small><?= esc(pengaturan()['nama_desa'] ?? 'Wisata Binangun') ?></small></span>
+        <span><strong>Panel
+            Admin</strong><small><?= esc(pengaturan()['nama_desa'] ?? 'Wisata Binangun') ?></small></span>
       </div>
       <a href="<?= site_url('admin/dashboard') ?>">Dashboard</a>
-      <a href="<?= site_url('admin/paket-wisata') ?>">Paket Wisata</a>
-      <a href="<?= site_url('admin/produk') ?>">Produk</a>
+      <a href="<?= site_url('admin/paket-wisata') ?>">Wisata &amp; Homestay</a>
+      <a href="<?= site_url('admin/produk') ?>">Produk &amp; Catering</a>
+      <a href="<?= site_url('admin/zona-antar') ?>">Zona Antar Lokal</a>
       <a href="<?= site_url('admin/reservasi') ?>">Reservasi</a>
       <a href="<?= site_url('admin/order') ?>">Order</a>
       <a href="<?= site_url('admin/pembayaran') ?>">Log Midtrans</a>
@@ -31,7 +36,8 @@
     <div class="admin-main">
       <div class="admin-topbar">
         <h1 style="margin:0;font-size:1.6rem"><?= esc($title ?? '') ?></h1>
-        <span style="color:var(--sepia);font-size:0.9rem"><?= esc(session()->get('admin_nama')) ?> (<?= esc(session()->get('admin_role')) ?>)</span>
+        <span style="color:var(--sepia);font-size:0.9rem"><?= esc(session()->get('admin_nama')) ?>
+          (<?= esc(session()->get('admin_role')) ?>)</span>
       </div>
       <?php if (session()->getFlashdata('success')): ?>
         <div class="alert alert-success"><?= esc(session()->getFlashdata('success')) ?></div>
@@ -42,5 +48,10 @@
       <?= $this->renderSection('content') ?>
     </div>
   </div>
+  <script src="<?= base_url('assets/vendor/flatpickr/flatpickr.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/flatpickr/l10n/id.js') ?>"></script>
+  <?= $this->renderSection('scripts') ?>
+  <script src="<?= base_url('assets/js/datepicker.js') ?>"></script>
 </body>
+
 </html>

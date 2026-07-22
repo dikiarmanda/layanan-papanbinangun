@@ -6,15 +6,27 @@ use CodeIgniter\Model;
 
 class ReservasiModel extends Model
 {
-    protected $table            = 'reservasi';
-    protected $primaryKey       = 'id';
+    protected $table = 'reservasi';
+    protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
-    protected $allowedFields    = [
-        'kode_reservasi', 'paket_wisata_id', 'jadwal_id', 'pelanggan_id',
-        'jumlah_tamu', 'catatan', 'total_harga', 'status_pembayaran',
-        'status_reservasi', 'midtrans_order_id', 'midtrans_transaction_id',
-        'paid_at', 'kuota_locked',
+    protected $returnType = 'array';
+    protected $allowedFields = [
+        'kode_reservasi',
+        'paket_wisata_id',
+        'jadwal_id',
+        'pelanggan_id',
+        'jumlah_tamu',
+        'check_in',
+        'check_out',
+        'jumlah_malam',
+        'catatan',
+        'total_harga',
+        'status_pembayaran',
+        'status_reservasi',
+        'midtrans_order_id',
+        'midtrans_transaction_id',
+        'paid_at',
+        'kuota_locked',
     ];
     protected $useTimestamps = true;
 

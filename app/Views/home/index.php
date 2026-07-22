@@ -7,10 +7,30 @@
     <?php $site = pengaturan(); ?>
     <span class="stamp">Layanan <?= esc($site['nama_desa']) ?></span>
     <h1><?= esc($site['tagline'] ?: 'Jelajahi Desa, Bawa Pulang Ceritanya') ?></h1>
-    <p><?= esc(strip_tags((string) ($site['deskripsi_singkat'] ?: 'Pesan pengalaman wisata dan homestay, lalu temukan karya terbaik UMKM desa dalam satu layanan.'))) ?></p>
+    <p>
+      <?= esc(strip_tags((string) ($site['deskripsi_singkat'] ?: 'Pesan pengalaman wisata dan homestay, lalu temukan karya terbaik UMKM desa dalam satu layanan.'))) ?>
+    </p>
     <div class="hero-actions">
-      <a class="btn btn-primary" href="<?= site_url('paket-wisata') ?>">Lihat Paket Wisata</a>
-      <a class="btn btn-cream" href="<?= site_url('toko') ?>">Belanja Produk UMKM</a>
+      <a class="btn btn-primary" href="<?= site_url('paket-wisata?jenis=wisata') ?>">Paket Wisata</a>
+      <a class="btn btn-cream" href="<?= site_url('toko?jenis=umkm') ?>">Toko UMKM</a>
+    </div>
+    <div class="service-pills">
+      <a class="service-pill" href="<?= site_url('paket-wisata?jenis=wisata') ?>">
+        <strong>Wisata</strong>
+        <span>Per orang · pilih jadwal</span>
+      </a>
+      <a class="service-pill" href="<?= site_url('paket-wisata?jenis=homestay') ?>">
+        <strong>Homestay</strong>
+        <span>Per malam · check-in/out</span>
+      </a>
+      <a class="service-pill" href="<?= site_url('toko?jenis=umkm') ?>">
+        <strong>UMKM</strong>
+        <span>Kirim via ekspedisi</span>
+      </a>
+      <a class="service-pill" href="<?= site_url('toko?jenis=catering') ?>">
+        <strong>Catering</strong>
+        <span>Ambil / antar lokal</span>
+      </a>
     </div>
   </div>
 </section>
@@ -23,14 +43,19 @@
     <div class="card-grid">
       <?php foreach ($paket as $p): ?>
         <a class="card" href="<?= site_url('paket-wisata/' . $p['slug']) ?>">
-          <?php if (! empty($p['gambar_cover'])): ?>
+          <?php if (!empty($p['gambar_cover'])): ?>
             <img class="card-img" src="<?= media_url($p['gambar_cover']) ?>" alt="<?= esc($p['nama']) ?>">
           <?php else: ?>
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;color:var(--sepia)">Paket</div>
+            <div class="card-img" style="display:flex;align-items:center;justify-content:center;color:var(--sepia)">Paket
+            </div>
           <?php endif; ?>
           <div class="card-body">
             <h3><?= esc($p['nama']) ?></h3>
-            <div class="price"><?= format_rupiah($p['harga']) ?> <small style="font-weight:400;color:var(--sepia)">/ <?= esc(str_replace('_', ' ', $p['satuan_harga'])) ?></small></div>
+            <span class="badge-jenis <?= ($p['jenis'] ?? '') === 'homestay' ? 'badge-homestay' : 'badge-wisata' ?>">
+              <?= ($p['jenis'] ?? '') === 'homestay' ? 'Homestay' : 'Wisata' ?>
+            </span>
+            <div class="price"><?= format_rupiah($p['harga']) ?> <small style="font-weight:400;color:var(--sepia)">/
+                <?= ($p['jenis'] ?? '') === 'homestay' ? 'malam' : 'orang' ?></small></div>
           </div>
         </a>
       <?php endforeach; ?>
@@ -46,13 +71,17 @@
     <div class="card-grid">
       <?php foreach ($produk as $pr): ?>
         <a class="card" href="<?= site_url('toko/' . $pr['slug']) ?>">
-          <?php if (! empty($pr['gambar'])): ?>
+          <?php if (!empty($pr['gambar'])): ?>
             <img class="card-img" src="<?= media_url($pr['gambar']) ?>" alt="<?= esc($pr['nama']) ?>">
           <?php else: ?>
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;color:var(--sepia)">Produk</div>
+            <div class="card-img" style="display:flex;align-items:center;justify-content:center;color:var(--sepia)">Produk
+            </div>
           <?php endif; ?>
           <div class="card-body">
             <h3><?= esc($pr['nama']) ?></h3>
+            <span class="badge-jenis <?= ($pr['jenis'] ?? '') === 'catering' ? 'badge-catering' : 'badge-umkm' ?>">
+              <?= ($pr['jenis'] ?? '') === 'catering' ? 'Catering' : 'UMKM' ?>
+            </span>
             <div class="price"><?= format_rupiah($pr['harga']) ?></div>
           </div>
         </a>
@@ -63,7 +92,9 @@
 
 <section class="section container" id="cek-status">
   <h2 class="section-title">Cek Status Transaksi</h2>
-  <form method="get" onsubmit="event.preventDefault(); const k=this.kode.value.trim(); if(k) location.href='<?= site_url('status') ?>/'+encodeURIComponent(k);" style="max-width:480px;margin:0 auto">
+  <form method="get"
+    onsubmit="event.preventDefault(); const k=this.kode.value.trim(); if(k) location.href='<?= site_url('status') ?>/'+encodeURIComponent(k);"
+    style="max-width:480px;margin:0 auto">
     <div class="form-group">
       <label for="kode">Kode transaksi (RSV-… atau ORD-…)</label>
       <input class="form-control" type="text" name="kode" id="kode" placeholder="RSV-xxxx atau ORD-xxxx" required>

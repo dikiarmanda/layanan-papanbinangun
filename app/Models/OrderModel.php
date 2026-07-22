@@ -6,16 +6,32 @@ use CodeIgniter\Model;
 
 class OrderModel extends Model
 {
-    protected $table            = 'order';
-    protected $primaryKey       = 'id';
+    protected $table = 'order';
+    protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
-    protected $allowedFields    = [
-        'kode_order', 'pelanggan_id', 'alamat_kirim', 'kota_tujuan_id',
-        'kota_tujuan_nama', 'kurir', 'layanan_kurir', 'estimasi_ongkir',
-        'ongkos_kirim', 'total_harga', 'no_resi', 'status_pembayaran',
-        'status_order', 'midtrans_order_id', 'midtrans_transaction_id',
-        'paid_at', 'stok_locked',
+    protected $returnType = 'array';
+    protected $allowedFields = [
+        'kode_order',
+        'pelanggan_id',
+        'alamat_kirim',
+        'tanggal_acara',
+        'waktu_acara',
+        'metode_pengiriman',
+        'zona_antar_id',
+        'kota_tujuan_id',
+        'kota_tujuan_nama',
+        'kurir',
+        'layanan_kurir',
+        'estimasi_ongkir',
+        'ongkos_kirim',
+        'total_harga',
+        'no_resi',
+        'status_pembayaran',
+        'status_order',
+        'midtrans_order_id',
+        'midtrans_transaction_id',
+        'paid_at',
+        'stok_locked',
     ];
     protected $useTimestamps = true;
 

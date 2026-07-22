@@ -2,23 +2,41 @@
 <?= $this->section('content') ?>
 <section class="section container">
   <h1>Keranjang Belanja</h1>
+  <?php if (!empty($cartJenis)): ?>
+    <p style="color:var(--sepia)">Jenis keranjang:
+      <strong><?= $cartJenis === 'catering' ? 'Catering' : 'Produk UMKM' ?></strong>
+      — tidak bisa dicampur dengan jenis lain.</p>
+  <?php endif; ?>
+
   <?php if (empty($items)): ?>
-    <p style="color:var(--sepia)">Keranjang masih kosong. <a href="<?= site_url('toko') ?>">Belanja sekarang</a></p>
+    <p style="color:var(--sepia)">Keranjang masih kosong.
+      <a href="<?= site_url('toko?jenis=umkm') ?>">Belanja UMKM</a> ·
+      <a href="<?= site_url('toko?jenis=catering') ?>">Pesan Catering</a>
+    </p>
   <?php else: ?>
     <table class="table">
       <thead>
-        <tr><th>Produk</th><th>Harga</th><th>Jumlah</th><th>Subtotal</th><th></th></tr>
+        <tr>
+          <th>Produk</th>
+          <th>Jenis</th>
+          <th>Harga</th>
+          <th>Jumlah</th>
+          <th>Subtotal</th>
+          <th></th>
+        </tr>
       </thead>
       <tbody>
         <?php foreach ($items as $item): ?>
           <tr>
             <td><?= esc($item['produk']['nama']) ?></td>
+            <td><?= esc($item['produk']['jenis'] ?? 'umkm') ?></td>
             <td><?= format_rupiah($item['produk']['harga']) ?></td>
             <td>
               <form method="post" action="<?= site_url('keranjang/update') ?>" style="display:flex;gap:0.4rem">
                 <?= csrf_field() ?>
                 <input type="hidden" name="produk_id" value="<?= (int) $item['produk']['id'] ?>">
-                <input type="number" name="jumlah" value="<?= (int) $item['jumlah'] ?>" min="0" class="form-control" style="width:80px">
+                <input type="number" name="jumlah" value="<?= (int) $item['jumlah'] ?>" min="0" class="form-control"
+                  style="width:80px">
                 <button class="btn btn-sm btn-outline" type="submit">Update</button>
               </form>
             </td>

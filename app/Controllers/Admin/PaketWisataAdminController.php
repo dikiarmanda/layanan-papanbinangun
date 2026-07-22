@@ -31,18 +31,26 @@ class PaketWisataAdminController extends BaseController
         helper('layanan');
         $nama = (string) $this->request->getPost('nama');
         $slug = slugify($nama);
-        $img  = upload_image('gambar_cover', 'paket');
+        $img = upload_image('gambar_cover', 'paket');
+
+        $jenis = $this->request->getPost('jenis') === 'homestay' ? 'homestay' : 'wisata';
+        $satuan = $jenis === 'homestay' ? 'per_rumah' : 'per_orang';
+        $kuota = $this->request->getPost('kuota_default');
+        if ($kuota === null || $kuota === '') {
+            $kuota = $jenis === 'homestay' ? 1 : 10;
+        }
 
         model(PaketWisataModel::class)->insert([
-            'nama'          => $nama,
-            'slug'          => $slug . '-' . substr(uniqid(), -4),
-            'deskripsi'     => $this->request->getPost('deskripsi'),
-            'harga'         => $this->request->getPost('harga'),
-            'satuan_harga'  => $this->request->getPost('satuan_harga') ?: 'per_orang',
-            'kuota_default' => $this->request->getPost('kuota_default') ?: null,
-            'gambar_cover'  => $img,
-            'status'        => $this->request->getPost('status') ?: 'draft',
-            'admin_id'      => session()->get('admin_id'),
+            'nama' => $nama,
+            'slug' => $slug . '-' . substr(uniqid(), -4),
+            'jenis' => $jenis,
+            'deskripsi' => $this->request->getPost('deskripsi'),
+            'harga' => $this->request->getPost('harga'),
+            'satuan_harga' => $satuan,
+            'kuota_default' => $kuota,
+            'gambar_cover' => $img,
+            'status' => $this->request->getPost('status') ?: 'draft',
+            'admin_id' => session()->get('admin_id'),
         ]);
 
         return redirect()->to('/admin/paket-wisata')->with('success', 'Paket ditambahkan.');
@@ -51,7 +59,7 @@ class PaketWisataAdminController extends BaseController
     public function edit(int $id)
     {
         $paket = model(PaketWisataModel::class)->find($id);
-        if (! $paket) {
+        if (!$paket) {
             return redirect()->to('/admin/paket-wisata')->with('error', 'Tidak ditemukan.');
         }
 
@@ -65,17 +73,21 @@ class PaketWisataAdminController extends BaseController
     {
         helper('layanan');
         $paket = model(PaketWisataModel::class)->find($id);
-        if (! $paket) {
+        if (!$paket) {
             return redirect()->to('/admin/paket-wisata');
         }
 
+        $jenis = $this->request->getPost('jenis') === 'homestay' ? 'homestay' : 'wisata';
+        $satuan = $jenis === 'homestay' ? 'per_rumah' : 'per_orang';
+
         $data = [
-            'nama'          => $this->request->getPost('nama'),
-            'deskripsi'     => $this->request->getPost('deskripsi'),
-            'harga'         => $this->request->getPost('harga'),
-            'satuan_harga'  => $this->request->getPost('satuan_harga'),
+            'nama' => $this->request->getPost('nama'),
+            'jenis' => $jenis,
+            'deskripsi' => $this->request->getPost('deskripsi'),
+            'harga' => $this->request->getPost('harga'),
+            'satuan_harga' => $satuan,
             'kuota_default' => $this->request->getPost('kuota_default') ?: null,
-            'status'        => $this->request->getPost('status'),
+            'status' => $this->request->getPost('status'),
         ];
 
         $img = upload_image('gambar_cover', 'paket');
@@ -99,13 +111,13 @@ class PaketWisataAdminController extends BaseController
     {
         helper('layanan');
         $paket = model(PaketWisataModel::class)->find($id);
-        if (! $paket) {
+        if (!$paket) {
             return redirect()->to('/admin/paket-wisata');
         }
 
         return view('admin/paket-wisata/jadwal', [
-            'title'  => 'Jadwal: ' . $paket['nama'],
-            'paket'  => $paket,
+            'title' => 'Jadwal: ' . $paket['nama'],
+            'paket' => $paket,
             'jadwal' => model(JadwalPaketWisataModel::class)
                 ->where('paket_wisata_id', $id)
                 ->orderBy('tanggal', 'ASC')
@@ -116,7 +128,7 @@ class PaketWisataAdminController extends BaseController
     public function storeJadwal(int $id)
     {
         $paket = model(PaketWisataModel::class)->find($id);
-        if (! $paket) {
+        if (!$paket) {
             return redirect()->to('/admin/paket-wisata');
         }
 
@@ -125,9 +137,9 @@ class PaketWisataAdminController extends BaseController
         try {
             model(JadwalPaketWisataModel::class)->insert([
                 'paket_wisata_id' => $id,
-                'tanggal'         => $this->request->getPost('tanggal'),
-                'kuota'           => $kuota,
-                'kuota_terpakai'  => 0,
+                'tanggal' => $this->request->getPost('tanggal'),
+                'kuota' => $kuota,
+                'kuota_terpakai' => 0,
             ]);
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', 'Jadwal untuk tanggal itu sudah ada.');

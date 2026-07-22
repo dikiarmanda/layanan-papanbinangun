@@ -6,21 +6,33 @@ use CodeIgniter\Model;
 
 class ProdukModel extends Model
 {
-    protected $table            = 'produk';
-    protected $primaryKey       = 'id';
+    protected $table = 'produk';
+    protected $primaryKey = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = 'array';
-    protected $allowedFields    = [
-        'nama', 'slug', 'deskripsi', 'harga', 'stok', 'berat',
-        'gambar', 'kategori_id', 'status', 'admin_id',
+    protected $returnType = 'array';
+    protected $allowedFields = [
+        'nama',
+        'slug',
+        'jenis',
+        'deskripsi',
+        'harga',
+        'stok',
+        'berat',
+        'gambar',
+        'kategori_id',
+        'status',
+        'admin_id',
     ];
     protected $useTimestamps = true;
 
-    public function findPublished(?int $limit = null, ?int $kategoriId = null): array
+    public function findPublished(?int $limit = null, ?int $kategoriId = null, ?string $jenis = null): array
     {
         $builder = $this->where('status', 'publish')->orderBy('created_at', 'DESC');
         if ($kategoriId) {
             $builder->where('kategori_id', $kategoriId);
+        }
+        if ($jenis !== null && $jenis !== '') {
+            $builder->where('jenis', $jenis);
         }
         if ($limit) {
             $builder->limit($limit);
@@ -44,7 +56,7 @@ class ProdukModel extends Model
             [$produkId]
         )->getRowArray();
 
-        if (! $produk || (int) $produk['stok'] < $jumlah) {
+        if (!$produk || (int) $produk['stok'] < $jumlah) {
             $db->transRollback();
 
             return false;

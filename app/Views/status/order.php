@@ -5,13 +5,18 @@
   <p>Kode: <strong><?= esc($order['kode_order']) ?></strong></p>
   <p>Pembayaran: <?= badge_status($order['status_pembayaran']) ?></p>
   <p>Order: <?= badge_status($order['status_order']) ?></p>
-  <?php if (! empty($order['no_resi'])): ?>
+  <?php if (!empty($order['no_resi'])): ?>
     <p><strong>No. Resi:</strong> <?= esc($order['no_resi']) ?></p>
   <?php endif; ?>
   <hr style="border-color:var(--cream-dark);margin:1.5rem 0">
   <p><strong>Penerima:</strong> <?= esc($pelanggan['nama'] ?? '-') ?></p>
   <p><strong>Alamat:</strong> <?= esc($order['alamat_kirim']) ?></p>
-  <p><strong>Kurir:</strong> <?= esc(strtoupper((string) $order['kurir'])) ?> <?= esc($order['layanan_kurir']) ?></p>
+  <?php if (!empty($order['tanggal_acara'])): ?>
+    <p><strong>Tanggal acara:</strong> <?= esc($order['tanggal_acara']) ?>   <?= esc($order['waktu_acara'] ?? '') ?></p>
+    <p><strong>Metode:</strong> <?= esc(str_replace('_', ' ', (string) ($order['metode_pengiriman'] ?? ''))) ?></p>
+  <?php endif; ?>
+  <p><strong>Pengiriman:</strong> <?= esc(strtoupper((string) $order['kurir'])) ?> <?= esc($order['layanan_kurir']) ?>
+  </p>
   <ul>
     <?php foreach ($items as $item): ?>
       <li><?= esc($item['nama_produk']) ?> × <?= (int) $item['jumlah'] ?> — <?= format_rupiah($item['subtotal']) ?></li>
