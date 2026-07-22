@@ -30,6 +30,9 @@ $routes->post('checkout-produk', 'CheckoutProdukController::process');
 $routes->get('status/(:segment)', 'StatusTransaksiController::show/$1');
 $routes->post('midtrans/notification', 'MidtransWebhookController::notify');
 
+$routes->get('kebijakan-privasi', 'LegalController::privasi');
+$routes->get('persyaratan', 'LegalController::persyaratan');
+
 // Admin auth
 $routes->get('admin/login', 'Admin\AuthController::login');
 $routes->post('admin/login', 'Admin\AuthController::attempt');

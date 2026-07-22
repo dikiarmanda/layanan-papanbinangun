@@ -221,7 +221,12 @@ $labelSatuan = $isHomestay ? 'malam' : 'orang';
 
           <label class="policy-agree">
             <input type="checkbox" name="setuju_kebijakan" id="setuju_kebijakan" value="1" required>
-            <span>Saya telah membaca dan menyetujui <a href="#kebijakan">kebijakan dan persyaratan</a> di atas.</span>
+            <span>Saya telah membaca dan menyetujui
+              <a href="<?= site_url('kebijakan-privasi') ?>" target="_blank" rel="noopener">kebijakan privasi</a>
+              serta
+              <a href="<?= site_url('persyaratan') ?>" target="_blank" rel="noopener">syarat &amp; ketentuan</a>,
+              termasuk <a href="#kebijakan">kebijakan layanan</a> di atas.
+            </span>
           </label>
 
           <button type="submit" class="btn btn-primary" style="width:100%;margin-top:1rem" id="btn-submit" disabled>

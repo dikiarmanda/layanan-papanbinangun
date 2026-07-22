@@ -82,6 +82,8 @@
           <li><a href="<?= site_url('toko') ?>">Toko UMKM &amp; Catering</a></li>
           <li><a href="<?= site_url('keranjang') ?>">Keranjang Belanja</a></li>
           <li><a href="<?= site_url('/') ?>#cek-status">Cek Status Transaksi</a></li>
+          <li><a href="<?= site_url('kebijakan-privasi') ?>">Kebijakan Privasi</a></li>
+          <li><a href="<?= site_url('persyaratan') ?>">Syarat &amp; Ketentuan</a></li>
         </ul>
       </div>
       <div>
@@ -114,8 +116,13 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <div class="container">
+      <div class="container footer-bottom-inner">
         <p>&copy; <?= date('Y') ?> <?= esc($brandName) ?>. Semua hak dilindungi.</p>
+        <p class="footer-legal-links">
+          <a href="<?= site_url('kebijakan-privasi') ?>">Privasi</a>
+          <span aria-hidden="true">·</span>
+          <a href="<?= site_url('persyaratan') ?>">Persyaratan</a>
+        </p>
       </div>
     </div>
   </footer>
