@@ -41,46 +41,52 @@ class ReservasiAdminController extends BaseController
 
     public function updateStatus(int $id)
     {
-        $reservasi = model(ReservasiModel::class)->find($id);
-        if (!$reservasi) {
-            return redirect()->to('/admin/reservasi');
-        }
+        try {
+            $reservasi = model(ReservasiModel::class)->find($id);
+            if (!$reservasi) {
+                return redirect()->to('/admin/reservasi')->with('error', 'Reservasi tidak ditemukan.');
+            }
 
-        $status = (string) $this->request->getPost('status_reservasi');
-        $allowed = ['dikonfirmasi', 'selesai', 'dibatalkan'];
+            $status = (string) $this->request->getPost('status_reservasi');
+            $allowed = ['dikonfirmasi', 'selesai', 'dibatalkan'];
 
-        if (!in_array($status, $allowed, true)) {
-            return redirect()->back()->with('error', 'Status tidak valid.');
-        }
+            if (!in_array($status, $allowed, true)) {
+                return redirect()->back()->with('error', 'Status tidak valid.');
+            }
 
-        model(ReservasiModel::class)->update($id, ['status_reservasi' => $status]);
+            model(ReservasiModel::class)->update($id, ['status_reservasi' => $status]);
 
-        if ($status === 'dibatalkan' && (int) $reservasi['kuota_locked'] === 1) {
-            $jadwalModel = model(JadwalPaketWisataModel::class);
-            if (!empty($reservasi['check_in']) && !empty($reservasi['check_out'])) {
-                $jadwalModel->releaseRange(
-                    (int) $reservasi['paket_wisata_id'],
-                    (string) $reservasi['check_in'],
-                    (string) $reservasi['check_out']
-                );
-            } elseif (!empty($reservasi['jadwal_id'])) {
-                $jadwalModel->releaseKuota(
-                    (int) $reservasi['jadwal_id'],
-                    (int) $reservasi['jumlah_tamu']
+            if ($status === 'dibatalkan' && (int) $reservasi['kuota_locked'] === 1) {
+                $jadwalModel = model(JadwalPaketWisataModel::class);
+                if (!empty($reservasi['check_in']) && !empty($reservasi['check_out'])) {
+                    $jadwalModel->releaseRange(
+                        (int) $reservasi['paket_wisata_id'],
+                        (string) $reservasi['check_in'],
+                        (string) $reservasi['check_out']
+                    );
+                } elseif (!empty($reservasi['jadwal_id'])) {
+                    $jadwalModel->releaseKuota(
+                        (int) $reservasi['jadwal_id'],
+                        (int) $reservasi['jumlah_tamu']
+                    );
+                }
+                model(ReservasiModel::class)->update($id, ['kuota_locked' => 0]);
+            }
+
+            $pelanggan = model(PelangganModel::class)->find($reservasi['pelanggan_id']);
+            if ($pelanggan) {
+                (new WhatsappService())->notifyReservasi(
+                    $pelanggan['no_hp'],
+                    "Update reservasi {$reservasi['kode_reservasi']}: status {$status}.",
+                    $id
                 );
             }
-            model(ReservasiModel::class)->update($id, ['kuota_locked' => 0]);
-        }
 
-        $pelanggan = model(PelangganModel::class)->find($reservasi['pelanggan_id']);
-        if ($pelanggan) {
-            (new WhatsappService())->notifyReservasi(
-                $pelanggan['no_hp'],
-                "Update reservasi {$reservasi['kode_reservasi']}: status {$status}.",
-                $id
-            );
-        }
+            return redirect()->to('/admin/reservasi/' . $id)->with('success', 'Status diperbarui.');
+        } catch (\Throwable $e) {
+            log_message('error', 'ReservasiAdminController::updateStatus — ' . $e->getMessage() . "\n" . $e->getTraceAsString());
 
-        return redirect()->to('/admin/reservasi/' . $id)->with('success', 'Status diperbarui.');
+            return redirect()->back()->with('error', 'Gagal memperbarui status reservasi. Silakan coba lagi.');
+        }
     }
 }

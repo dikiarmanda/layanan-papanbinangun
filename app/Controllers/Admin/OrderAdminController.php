@@ -17,7 +17,7 @@ class OrderAdminController extends BaseController
 
         return view('admin/order/index', [
             'title' => 'Kelola Order',
-            'orders'=> model(OrderModel::class)->withDetails(100),
+            'orders' => model(OrderModel::class)->withDetails(100),
         ]);
     }
 
@@ -29,7 +29,7 @@ class OrderAdminController extends BaseController
             ->join('pelanggan', 'pelanggan.id = `order`.pelanggan_id')
             ->find($id);
 
-        if (! $order) {
+        if (!$order) {
             return redirect()->to('/admin/order');
         }
 
@@ -42,42 +42,48 @@ class OrderAdminController extends BaseController
 
     public function updateStatus(int $id)
     {
-        $order = model(OrderModel::class)->find($id);
-        if (! $order) {
-            return redirect()->to('/admin/order');
-        }
-
-        $status = (string) $this->request->getPost('status_order');
-        $allowed = ['diproses', 'dikirim', 'selesai', 'dibatalkan'];
-
-        if (! in_array($status, $allowed, true)) {
-            return redirect()->back()->with('error', 'Status tidak valid.');
-        }
-
-        $data = ['status_order' => $status];
-        if ($status === 'dikirim') {
-            $data['no_resi'] = $this->request->getPost('no_resi');
-        }
-
-        model(OrderModel::class)->update($id, $data);
-
-        if ($status === 'dibatalkan' && (int) $order['stok_locked'] === 1) {
-            $items = model(OrderItemModel::class)->forOrder($id);
-            foreach ($items as $item) {
-                model(ProdukModel::class)->releaseStok((int) $item['produk_id'], (int) $item['jumlah']);
+        try {
+            $order = model(OrderModel::class)->find($id);
+            if (!$order) {
+                return redirect()->to('/admin/order')->with('error', 'Order tidak ditemukan.');
             }
-            model(OrderModel::class)->update($id, ['stok_locked' => 0]);
-        }
 
-        $pelanggan = model(PelangganModel::class)->find($order['pelanggan_id']);
-        if ($pelanggan) {
-            $msg = "Update pesanan {$order['kode_order']}: status {$status}.";
-            if (! empty($data['no_resi'])) {
-                $msg .= ' Resi: ' . $data['no_resi'];
+            $status = (string) $this->request->getPost('status_order');
+            $allowed = ['diproses', 'dikirim', 'selesai', 'dibatalkan'];
+
+            if (!in_array($status, $allowed, true)) {
+                return redirect()->back()->with('error', 'Status tidak valid.');
             }
-            (new WhatsappService())->notifyOrder($pelanggan['no_hp'], $msg, $id);
-        }
 
-        return redirect()->to('/admin/order/' . $id)->with('success', 'Status diperbarui.');
+            $data = ['status_order' => $status];
+            if ($status === 'dikirim') {
+                $data['no_resi'] = $this->request->getPost('no_resi');
+            }
+
+            model(OrderModel::class)->update($id, $data);
+
+            if ($status === 'dibatalkan' && (int) $order['stok_locked'] === 1) {
+                $items = model(OrderItemModel::class)->forOrder($id);
+                foreach ($items as $item) {
+                    model(ProdukModel::class)->releaseStok((int) $item['produk_id'], (int) $item['jumlah']);
+                }
+                model(OrderModel::class)->update($id, ['stok_locked' => 0]);
+            }
+
+            $pelanggan = model(PelangganModel::class)->find($order['pelanggan_id']);
+            if ($pelanggan) {
+                $msg = "Update pesanan {$order['kode_order']}: status {$status}.";
+                if (!empty($data['no_resi'])) {
+                    $msg .= ' Resi: ' . $data['no_resi'];
+                }
+                (new WhatsappService())->notifyOrder($pelanggan['no_hp'], $msg, $id);
+            }
+
+            return redirect()->to('/admin/order/' . $id)->with('success', 'Status diperbarui.');
+        } catch (\Throwable $e) {
+            log_message('error', 'OrderAdminController::updateStatus — ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+
+            return redirect()->back()->with('error', 'Gagal memperbarui status order. Silakan coba lagi.');
+        }
     }
 }

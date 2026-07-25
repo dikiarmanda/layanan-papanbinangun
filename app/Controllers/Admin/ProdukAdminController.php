@@ -35,26 +35,32 @@ class ProdukAdminController extends BaseController
     public function store()
     {
         helper('layanan');
-        $nama = (string) $this->request->getPost('nama');
-        $img = upload_image('gambar', 'produk');
 
-        $jenis = $this->request->getPost('jenis') === 'catering' ? 'catering' : 'umkm';
+        try {
+            $nama = (string) $this->request->getPost('nama');
+            $img = upload_image('gambar', 'produk');
+            $jenis = $this->request->getPost('jenis') === 'catering' ? 'catering' : 'umkm';
 
-        model(ProdukModel::class)->insert([
-            'nama' => $nama,
-            'slug' => slugify($nama) . '-' . substr(uniqid(), -4),
-            'jenis' => $jenis,
-            'deskripsi' => $this->request->getPost('deskripsi'),
-            'harga' => $this->request->getPost('harga'),
-            'stok' => (int) $this->request->getPost('stok'),
-            'berat' => (int) ($this->request->getPost('berat') ?: 1000),
-            'gambar' => $img,
-            'kategori_id' => $this->request->getPost('kategori_id') ?: null,
-            'status' => $this->request->getPost('status') ?: 'draft',
-            'admin_id' => session()->get('admin_id'),
-        ]);
+            model(ProdukModel::class)->insert([
+                'nama' => $nama,
+                'slug' => slugify($nama) . '-' . substr(uniqid(), -4),
+                'jenis' => $jenis,
+                'deskripsi' => $this->request->getPost('deskripsi'),
+                'harga' => $this->request->getPost('harga'),
+                'stok' => (int) $this->request->getPost('stok'),
+                'berat' => (int) ($this->request->getPost('berat') ?: 1000),
+                'gambar' => $img,
+                'kategori_id' => $this->request->getPost('kategori_id') ?: null,
+                'status' => $this->request->getPost('status') ?: 'draft',
+                'admin_id' => session()->get('admin_id'),
+            ]);
 
-        return redirect()->to('/admin/produk')->with('success', 'Produk ditambahkan.');
+            return redirect()->to('/admin/produk')->with('success', 'Produk ditambahkan.');
+        } catch (\Throwable $e) {
+            log_message('error', 'ProdukAdminController::store — ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+
+            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan produk. Silakan coba lagi.');
+        }
     }
 
     public function edit(int $id)
@@ -74,38 +80,51 @@ class ProdukAdminController extends BaseController
     public function update(int $id)
     {
         helper('layanan');
-        $produk = model(ProdukModel::class)->find($id);
-        if (!$produk) {
-            return redirect()->to('/admin/produk');
+
+        try {
+            $produk = model(ProdukModel::class)->find($id);
+            if (!$produk) {
+                return redirect()->to('/admin/produk')->with('error', 'Produk tidak ditemukan.');
+            }
+
+            $jenis = $this->request->getPost('jenis') === 'catering' ? 'catering' : 'umkm';
+
+            $data = [
+                'nama' => $this->request->getPost('nama'),
+                'jenis' => $jenis,
+                'deskripsi' => $this->request->getPost('deskripsi'),
+                'harga' => $this->request->getPost('harga'),
+                'stok' => (int) $this->request->getPost('stok'),
+                'berat' => (int) ($this->request->getPost('berat') ?: 1000),
+                'kategori_id' => $this->request->getPost('kategori_id') ?: null,
+                'status' => $this->request->getPost('status'),
+            ];
+
+            $img = upload_image('gambar', 'produk');
+            if ($img) {
+                $data['gambar'] = $img;
+            }
+
+            model(ProdukModel::class)->update($id, $data);
+
+            return redirect()->to('/admin/produk')->with('success', 'Produk diperbarui.');
+        } catch (\Throwable $e) {
+            log_message('error', 'ProdukAdminController::update — ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+
+            return redirect()->back()->withInput()->with('error', 'Gagal memperbarui produk. Silakan coba lagi.');
         }
-
-        $jenis = $this->request->getPost('jenis') === 'catering' ? 'catering' : 'umkm';
-
-        $data = [
-            'nama' => $this->request->getPost('nama'),
-            'jenis' => $jenis,
-            'deskripsi' => $this->request->getPost('deskripsi'),
-            'harga' => $this->request->getPost('harga'),
-            'stok' => (int) $this->request->getPost('stok'),
-            'berat' => (int) ($this->request->getPost('berat') ?: 1000),
-            'kategori_id' => $this->request->getPost('kategori_id') ?: null,
-            'status' => $this->request->getPost('status'),
-        ];
-
-        $img = upload_image('gambar', 'produk');
-        if ($img) {
-            $data['gambar'] = $img;
-        }
-
-        model(ProdukModel::class)->update($id, $data);
-
-        return redirect()->to('/admin/produk')->with('success', 'Produk diperbarui.');
     }
 
     public function delete(int $id)
     {
-        model(ProdukModel::class)->delete($id);
+        try {
+            model(ProdukModel::class)->delete($id);
 
-        return redirect()->to('/admin/produk')->with('success', 'Produk dihapus.');
+            return redirect()->to('/admin/produk')->with('success', 'Produk dihapus.');
+        } catch (\Throwable $e) {
+            log_message('error', 'ProdukAdminController::delete — ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+
+            return redirect()->to('/admin/produk')->with('error', 'Gagal menghapus produk. Silakan coba lagi.');
+        }
     }
 }

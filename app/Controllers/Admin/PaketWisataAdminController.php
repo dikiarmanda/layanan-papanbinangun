@@ -29,31 +29,37 @@ class PaketWisataAdminController extends BaseController
     public function store()
     {
         helper('layanan');
-        $nama = (string) $this->request->getPost('nama');
-        $slug = slugify($nama);
-        $img = upload_image('gambar_cover', 'paket');
 
-        $jenis = $this->request->getPost('jenis') === 'homestay' ? 'homestay' : 'wisata';
-        $satuan = $jenis === 'homestay' ? 'per_rumah' : 'per_orang';
-        $kuota = $this->request->getPost('kuota_default');
-        if ($kuota === null || $kuota === '') {
-            $kuota = $jenis === 'homestay' ? 1 : 10;
+        try {
+            $nama = (string) $this->request->getPost('nama');
+            $slug = slugify($nama);
+            $img = upload_image('gambar_cover', 'paket');
+            $jenis = $this->request->getPost('jenis') === 'homestay' ? 'homestay' : 'wisata';
+            $satuan = $jenis === 'homestay' ? 'per_rumah' : 'per_orang';
+            $kuota = $this->request->getPost('kuota_default');
+            if ($kuota === null || $kuota === '') {
+                $kuota = $jenis === 'homestay' ? 1 : 10;
+            }
+
+            model(PaketWisataModel::class)->insert([
+                'nama' => $nama,
+                'slug' => $slug . '-' . substr(uniqid(), -4),
+                'jenis' => $jenis,
+                'deskripsi' => $this->request->getPost('deskripsi'),
+                'harga' => $this->request->getPost('harga'),
+                'satuan_harga' => $satuan,
+                'kuota_default' => $kuota,
+                'gambar_cover' => $img,
+                'status' => $this->request->getPost('status') ?: 'draft',
+                'admin_id' => session()->get('admin_id'),
+            ]);
+
+            return redirect()->to('/admin/paket-wisata')->with('success', 'Paket ditambahkan.');
+        } catch (\Throwable $e) {
+            log_message('error', 'PaketWisataAdminController::store — ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+
+            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan paket. Silakan coba lagi.');
         }
-
-        model(PaketWisataModel::class)->insert([
-            'nama' => $nama,
-            'slug' => $slug . '-' . substr(uniqid(), -4),
-            'jenis' => $jenis,
-            'deskripsi' => $this->request->getPost('deskripsi'),
-            'harga' => $this->request->getPost('harga'),
-            'satuan_harga' => $satuan,
-            'kuota_default' => $kuota,
-            'gambar_cover' => $img,
-            'status' => $this->request->getPost('status') ?: 'draft',
-            'admin_id' => session()->get('admin_id'),
-        ]);
-
-        return redirect()->to('/admin/paket-wisata')->with('success', 'Paket ditambahkan.');
     }
 
     public function edit(int $id)
@@ -72,39 +78,52 @@ class PaketWisataAdminController extends BaseController
     public function update(int $id)
     {
         helper('layanan');
-        $paket = model(PaketWisataModel::class)->find($id);
-        if (!$paket) {
-            return redirect()->to('/admin/paket-wisata');
+
+        try {
+            $paket = model(PaketWisataModel::class)->find($id);
+            if (!$paket) {
+                return redirect()->to('/admin/paket-wisata')->with('error', 'Paket tidak ditemukan.');
+            }
+
+            $jenis = $this->request->getPost('jenis') === 'homestay' ? 'homestay' : 'wisata';
+            $satuan = $jenis === 'homestay' ? 'per_rumah' : 'per_orang';
+
+            $data = [
+                'nama' => $this->request->getPost('nama'),
+                'jenis' => $jenis,
+                'deskripsi' => $this->request->getPost('deskripsi'),
+                'harga' => $this->request->getPost('harga'),
+                'satuan_harga' => $satuan,
+                'kuota_default' => $this->request->getPost('kuota_default') ?: null,
+                'status' => $this->request->getPost('status'),
+            ];
+
+            $img = upload_image('gambar_cover', 'paket');
+            if ($img) {
+                $data['gambar_cover'] = $img;
+            }
+
+            model(PaketWisataModel::class)->update($id, $data);
+
+            return redirect()->to('/admin/paket-wisata')->with('success', 'Paket diperbarui.');
+        } catch (\Throwable $e) {
+            log_message('error', 'PaketWisataAdminController::update — ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+
+            return redirect()->back()->withInput()->with('error', 'Gagal memperbarui paket. Silakan coba lagi.');
         }
-
-        $jenis = $this->request->getPost('jenis') === 'homestay' ? 'homestay' : 'wisata';
-        $satuan = $jenis === 'homestay' ? 'per_rumah' : 'per_orang';
-
-        $data = [
-            'nama' => $this->request->getPost('nama'),
-            'jenis' => $jenis,
-            'deskripsi' => $this->request->getPost('deskripsi'),
-            'harga' => $this->request->getPost('harga'),
-            'satuan_harga' => $satuan,
-            'kuota_default' => $this->request->getPost('kuota_default') ?: null,
-            'status' => $this->request->getPost('status'),
-        ];
-
-        $img = upload_image('gambar_cover', 'paket');
-        if ($img) {
-            $data['gambar_cover'] = $img;
-        }
-
-        model(PaketWisataModel::class)->update($id, $data);
-
-        return redirect()->to('/admin/paket-wisata')->with('success', 'Paket diperbarui.');
     }
 
     public function delete(int $id)
     {
-        model(PaketWisataModel::class)->delete($id);
+        try {
+            model(PaketWisataModel::class)->delete($id);
 
-        return redirect()->to('/admin/paket-wisata')->with('success', 'Paket dihapus.');
+            return redirect()->to('/admin/paket-wisata')->with('success', 'Paket dihapus.');
+        } catch (\Throwable $e) {
+            log_message('error', 'PaketWisataAdminController::delete — ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+
+            return redirect()->to('/admin/paket-wisata')->with('error', 'Gagal menghapus paket. Silakan coba lagi.');
+        }
     }
 
     public function jadwal(int $id)
@@ -127,37 +146,45 @@ class PaketWisataAdminController extends BaseController
 
     public function storeJadwal(int $id)
     {
-        $paket = model(PaketWisataModel::class)->find($id);
-        if (!$paket) {
-            return redirect()->to('/admin/paket-wisata');
-        }
-
-        $kuota = (int) ($this->request->getPost('kuota') ?: $paket['kuota_default'] ?: 10);
-
         try {
+            $paket = model(PaketWisataModel::class)->find($id);
+            if (!$paket) {
+                return redirect()->to('/admin/paket-wisata')->with('error', 'Paket tidak ditemukan.');
+            }
+
+            $kuota = (int) ($this->request->getPost('kuota') ?: $paket['kuota_default'] ?: 10);
+
             model(JadwalPaketWisataModel::class)->insert([
                 'paket_wisata_id' => $id,
                 'tanggal' => $this->request->getPost('tanggal'),
                 'kuota' => $kuota,
                 'kuota_terpakai' => 0,
             ]);
-        } catch (\Throwable $e) {
-            return redirect()->back()->with('error', 'Jadwal untuk tanggal itu sudah ada.');
-        }
 
-        return redirect()->to('/admin/paket-wisata/' . $id . '/jadwal')->with('success', 'Jadwal ditambahkan.');
+            return redirect()->to('/admin/paket-wisata/' . $id . '/jadwal')->with('success', 'Jadwal ditambahkan.');
+        } catch (\Throwable $e) {
+            log_message('error', 'PaketWisataAdminController::storeJadwal — ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+
+            return redirect()->back()->with('error', 'Gagal menambah jadwal. Pastikan tanggal belum terdaftar.');
+        }
     }
 
     public function deleteJadwal(int $jadwalId)
     {
-        $jadwal = model(JadwalPaketWisataModel::class)->find($jadwalId);
-        if ($jadwal) {
+        try {
+            $jadwal = model(JadwalPaketWisataModel::class)->find($jadwalId);
+            if (!$jadwal) {
+                return redirect()->to('/admin/paket-wisata')->with('error', 'Jadwal tidak ditemukan.');
+            }
+
             model(JadwalPaketWisataModel::class)->delete($jadwalId);
 
             return redirect()->to('/admin/paket-wisata/' . $jadwal['paket_wisata_id'] . '/jadwal')
                 ->with('success', 'Jadwal dihapus.');
-        }
+        } catch (\Throwable $e) {
+            log_message('error', 'PaketWisataAdminController::deleteJadwal — ' . $e->getMessage() . "\n" . $e->getTraceAsString());
 
-        return redirect()->to('/admin/paket-wisata');
+            return redirect()->to('/admin/paket-wisata')->with('error', 'Gagal menghapus jadwal. Silakan coba lagi.');
+        }
     }
 }

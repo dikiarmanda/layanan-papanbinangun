@@ -19,62 +19,74 @@ class UserAdminController extends BaseController
     {
         return view('admin/users/form', [
             'title' => 'Tambah Admin',
-            'user'  => null,
+            'user' => null,
         ]);
     }
 
     public function store()
     {
-        $email = (string) $this->request->getPost('email');
-        if (model(AdminUserModel::class)->where('email', $email)->first()) {
-            return redirect()->back()->withInput()->with('error', 'Email sudah dipakai.');
+        try {
+            $email = (string) $this->request->getPost('email');
+            if (model(AdminUserModel::class)->where('email', $email)->first()) {
+                return redirect()->back()->withInput()->with('error', 'Email sudah dipakai.');
+            }
+
+            model(AdminUserModel::class)->insert([
+                'nama' => $this->request->getPost('nama'),
+                'email' => $email,
+                'password' => password_hash((string) $this->request->getPost('password'), PASSWORD_DEFAULT),
+                'role' => $this->request->getPost('role') ?: 'admin',
+                'status' => 'aktif',
+            ]);
+
+            return redirect()->to('/admin/users')->with('success', 'Admin ditambahkan.');
+        } catch (\Throwable $e) {
+            log_message('error', 'UserAdminController::store — ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+
+            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan admin. Silakan coba lagi.');
         }
-
-        model(AdminUserModel::class)->insert([
-            'nama'     => $this->request->getPost('nama'),
-            'email'    => $email,
-            'password' => password_hash((string) $this->request->getPost('password'), PASSWORD_DEFAULT),
-            'role'     => $this->request->getPost('role') ?: 'admin',
-            'status'   => 'aktif',
-        ]);
-
-        return redirect()->to('/admin/users')->with('success', 'Admin ditambahkan.');
     }
 
     public function edit(int $id)
     {
         $user = model(AdminUserModel::class)->find($id);
-        if (! $user) {
+        if (!$user) {
             return redirect()->to('/admin/users');
         }
 
         return view('admin/users/form', [
             'title' => 'Edit Admin',
-            'user'  => $user,
+            'user' => $user,
         ]);
     }
 
     public function update(int $id)
     {
-        $user = model(AdminUserModel::class)->find($id);
-        if (! $user) {
-            return redirect()->to('/admin/users');
+        try {
+            $user = model(AdminUserModel::class)->find($id);
+            if (!$user) {
+                return redirect()->to('/admin/users')->with('error', 'Admin tidak ditemukan.');
+            }
+
+            $data = [
+                'nama' => $this->request->getPost('nama'),
+                'email' => $this->request->getPost('email'),
+                'role' => $this->request->getPost('role'),
+                'status' => $this->request->getPost('status'),
+            ];
+
+            $password = (string) $this->request->getPost('password');
+            if ($password !== '') {
+                $data['password'] = password_hash($password, PASSWORD_DEFAULT);
+            }
+
+            model(AdminUserModel::class)->update($id, $data);
+
+            return redirect()->to('/admin/users')->with('success', 'Admin diperbarui.');
+        } catch (\Throwable $e) {
+            log_message('error', 'UserAdminController::update — ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+
+            return redirect()->back()->withInput()->with('error', 'Gagal memperbarui admin. Silakan coba lagi.');
         }
-
-        $data = [
-            'nama'   => $this->request->getPost('nama'),
-            'email'  => $this->request->getPost('email'),
-            'role'   => $this->request->getPost('role'),
-            'status' => $this->request->getPost('status'),
-        ];
-
-        $password = (string) $this->request->getPost('password');
-        if ($password !== '') {
-            $data['password'] = password_hash($password, PASSWORD_DEFAULT);
-        }
-
-        model(AdminUserModel::class)->update($id, $data);
-
-        return redirect()->to('/admin/users')->with('success', 'Admin diperbarui.');
     }
 }
