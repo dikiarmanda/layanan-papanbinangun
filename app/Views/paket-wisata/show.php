@@ -2,18 +2,22 @@
 <?= $this->section('content') ?>
 <?php
 $hargaSatuan = (float) $paket['harga'];
-$isHomestay = ($paket['jenis'] ?? '') === 'homestay';
-$labelSatuan = $isHomestay ? 'malam' : 'orang';
+$jenisPaket = $paket['jenis'] ?? 'wisata';
+$isHomestay = is_paket_menginap($jenisPaket);
+$labelSatuan = satuan_label($jenisPaket, $paket['satuan_harga'] ?? null);
+$badgeClass = match ($jenisPaket) {
+    'homestay' => 'badge-homestay',
+    'camping' => 'badge-camping',
+    default => 'badge-wisata',
+};
 ?>
 <section class="section container">
   <div class="booking-layout">
     <div>
-      <?php if (!empty($paket['gambar_cover'])): ?>
-        <img src="<?= media_url($paket['gambar_cover']) ?>" alt="<?= esc($paket['nama']) ?>"
-          style="width:100%;max-height:420px;object-fit:cover;border-radius:8px">
-      <?php endif; ?>
-      <span class="badge-jenis <?= $isHomestay ? 'badge-homestay' : 'badge-wisata' ?>" style="margin-top:1.25rem">
-        <?= $isHomestay ? 'Homestay' : 'Paket Wisata' ?>
+      <img src="<?= esc(cover_url($paket['gambar_cover'] ?? null, $jenisPaket)) ?>" alt="<?= esc($paket['nama']) ?>"
+        style="width:100%;max-height:420px;object-fit:cover;border-radius:8px">
+      <span class="badge-jenis <?= $badgeClass ?>" style="margin-top:1.25rem">
+        <?= esc(label_jenis_paket($jenisPaket)) ?>
       </span>
       <h1 style="margin-top:0.5rem"><?= esc($paket['nama']) ?></h1>
       <div class="price" style="margin-bottom:1rem">

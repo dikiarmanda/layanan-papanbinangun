@@ -393,11 +393,234 @@ h3 {
   pointer-events: none;
 }
 
+.home-hero-photo {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  opacity: 0;
+  transform: scale(1.06);
+  transition:
+    opacity 0.7s ease,
+    transform 8s ease;
+}
+
+.home-hero-photo.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.home-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg, rgba(30, 20, 14, 0.88) 0%, rgba(47, 33, 24, 0.72) 42%, rgba(74, 50, 34, 0.55) 100%),
+    linear-gradient(to top, rgba(30, 20, 14, 0.55), transparent 45%);
+}
+
 .home-hero-glow {
   position: absolute;
   inset: -20% -10% auto;
   height: 70%;
   background: radial-gradient(ellipse at 30% 40%, rgba(201, 166, 107, 0.28), transparent 55%), radial-gradient(ellipse at 80% 20%, rgba(122, 132, 80, 0.18), transparent 50%);
+  transition: background 0.5s ease;
+}
+
+.home-estimate {
+  margin: 0 0 1.35rem;
+  padding: 1.15rem 1.2rem 1.05rem;
+  border: 1px solid rgba(201, 166, 107, 0.28);
+  border-radius: 18px;
+  background: linear-gradient(160deg, rgba(30, 20, 14, 0.38), rgba(47, 33, 24, 0.28));
+  backdrop-filter: blur(10px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+  animation: heroFadeUp 0.7s ease 0.22s both;
+}
+
+.home-estimate.is-swap {
+  animation: heroPanelSwap 0.35s ease;
+}
+
+.home-estimate-head {
+  margin-bottom: 0.95rem;
+}
+
+.home-estimate-title {
+  margin: 0 0 0.2rem;
+  font-family: var(--font-heading);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.01em;
+}
+
+.home-estimate-note {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(244, 233, 216, 0.72);
+}
+
+.home-estimate-fields {
+  display: grid;
+  gap: 0.85rem;
+  margin-bottom: 0.95rem;
+}
+
+.home-estimate-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.home-estimate-field label,
+.home-estimate-stepper-label {
+  font-size: 0.82rem;
+  color: rgba(244, 233, 216, 0.78);
+}
+
+.home-estimate-select {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(201, 166, 107, 0.32);
+  border-radius: 12px;
+  background-color: rgba(255, 251, 245, 0.96);
+  color: var(--deep);
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%234a3222' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.9rem center;
+  padding-right: 2.2rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.home-estimate-select:focus,
+.home-estimate-input:focus {
+  outline: none;
+  border-color: rgba(201, 166, 107, 0.75);
+  box-shadow: 0 0 0 3px rgba(201, 166, 107, 0.2);
+}
+
+.home-estimate-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.home-estimate-stepper {
+  flex: 1 1 9rem;
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+/* [hidden] harus menang atas display:grid */
+.home-estimate-field--dates[hidden],
+#estimateNightsWrap[hidden] {
+  display: none !important;
+}
+
+.home-estimate-fields.is-menginap .home-estimate-field--dates:not([hidden]) {
+  display: grid;
+  flex: 1 1 14rem;
+  min-width: 0;
+}
+
+.home-estimate-daterange,
+input.home-estimate-daterange.flatpickr-input,
+input.home-estimate-daterange.form-control {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid rgba(201, 166, 107, 0.32);
+  border-radius: 12px;
+  background: rgba(255, 251, 245, 0.96);
+  color: var(--deep);
+  font: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.home-estimate-daterange:focus,
+input.home-estimate-daterange:focus {
+  outline: none;
+  border-color: rgba(201, 166, 107, 0.75);
+  box-shadow: 0 0 0 3px rgba(201, 166, 107, 0.2);
+}
+
+.home-estimate-stepper-ctrl {
+  display: inline-flex;
+  align-items: stretch;
+  width: 100%;
+  max-width: 11.5rem;
+  border: 1px solid rgba(201, 166, 107, 0.32);
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 251, 245, 0.96);
+}
+
+.home-estimate-step {
+  flex: 0 0 2.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--deep);
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.home-estimate-step:hover {
+  background: rgba(201, 166, 107, 0.22);
+}
+
+.home-estimate-stepper-ctrl .home-estimate-input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  text-align: center;
+  padding: 0.55rem 0.2rem;
+  color: var(--deep);
+  font: inherit;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  -moz-appearance: textfield;
+}
+
+.home-estimate-stepper-ctrl .home-estimate-input::-webkit-outer-spin-button,
+.home-estimate-stepper-ctrl .home-estimate-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.home-estimate-result {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(201, 166, 107, 0.22);
+}
+
+.home-estimate-breakdown {
+  color: rgba(244, 233, 216, 0.78);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  max-width: 16rem;
+}
+
+.home-estimate-result strong {
+  font-family: var(--font-heading);
+  font-size: clamp(1.55rem, 3vw, 1.9rem);
+  font-weight: 600;
+  color: var(--cream);
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .home-hero-pattern {
@@ -750,8 +973,8 @@ h3 {
   }
 }
 
-.home-hero[data-active="homestay"] .home-hero-glow {
-  background: radial-gradient(ellipse at 35% 35%, rgba(201, 166, 107, 0.32), transparent 55%), radial-gradient(ellipse at 75% 30%, rgba(193, 80, 46, 0.12), transparent 48%);
+.home-hero[data-active="menginap"] .home-hero-glow {
+  background: radial-gradient(ellipse at 35% 35%, rgba(201, 166, 107, 0.32), transparent 55%), radial-gradient(ellipse at 75% 30%, rgba(122, 132, 80, 0.16), transparent 48%);
 }
 
 .home-hero[data-active="umkm"] .home-hero-glow {
@@ -779,6 +1002,20 @@ h3 {
 
   .home-hero-aside {
     order: -1;
+  }
+
+  .home-estimate-row {
+    gap: 0.65rem;
+  }
+
+  .home-estimate-stepper-ctrl {
+    max-width: none;
+  }
+
+  .home-estimate-result {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.35rem;
   }
 
   .hero-carousel {
@@ -1285,6 +1522,10 @@ h3 {
   background: #f5ebe0;
   color: var(--sepia);
 }
+.badge-camping {
+  background: #e7efe4;
+  color: #3f5a2e;
+}
 .badge-umkm {
   background: #eef2ff;
   color: #3730a3;
@@ -1577,4 +1818,86 @@ input.form-control.flatpickr-input {
   margin-top: 2.25rem;
   padding-top: 1.25rem;
   border-top: 1px solid var(--cream-dark);
+}
+
+/* Vendor: Select2, Dropify, Lexical — selaras tema */
+.select2-container .select2-selection--single {
+  height: 42px;
+  border: 1px solid var(--cream-dark);
+  border-radius: 6px;
+  background: var(--white);
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 40px;
+  color: var(--deep);
+  padding-left: 0.75rem;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 40px;
+}
+
+.select2-dropdown {
+  border-color: var(--cream-dark);
+  border-radius: 6px;
+}
+
+.dropify-wrapper {
+  border: 1px solid var(--cream-dark);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--sepia);
+}
+
+.dropify-wrapper .dropify-message span.file-icon {
+  color: var(--gold);
+}
+
+.lexical-shell {
+  border: 1px solid var(--cream-dark);
+  border-radius: 8px;
+  background: var(--white);
+  overflow: hidden;
+}
+
+.lexical-shell .lexical-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.45rem 0.55rem;
+  border-bottom: 1px solid var(--cream-dark);
+  background: rgba(244, 233, 216, 0.45);
+}
+
+.lexical-shell .lexical-toolbar button {
+  border: 0;
+  background: transparent;
+  color: var(--deep);
+  border-radius: 4px;
+  padding: 0.25rem 0.45rem;
+  cursor: pointer;
+}
+
+.lexical-shell .lexical-toolbar button:hover,
+.lexical-shell .lexical-toolbar button.is-active {
+  background: rgba(201, 166, 107, 0.28);
+}
+
+.lexical-shell .lexical-editor {
+  min-height: 160px;
+  padding: 0.75rem 0.9rem;
+  outline: none;
+}
+
+textarea.lexical-field {
+  /* textarea asli disembunyikan setelah Lexical siap; tetap tersedia untuk submit */
+}
+
+.swal2-popup {
+  font-family: var(--font-body);
+}
+
+.swal2-title {
+  font-family: var(--font-heading);
 }

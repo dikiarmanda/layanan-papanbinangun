@@ -11,14 +11,19 @@ class PaketWisataController extends BaseController
     {
         helper('layanan');
         $jenis = $this->request->getGet('jenis');
-        if (!in_array($jenis, ['wisata', 'homestay'], true)) {
+        if (! in_array($jenis, ['wisata', 'homestay', 'camping', 'menginap'], true)) {
             $jenis = null;
         }
 
+        // homestay/camping lama → gabungan menginap
+        if (in_array($jenis, ['homestay', 'camping'], true)) {
+            $jenis = 'menginap';
+        }
+
         $title = match ($jenis) {
-            'homestay' => 'Homestay',
+            'menginap' => 'Homestay & Camping',
             'wisata' => 'Paket Wisata',
-            default => 'Wisata & Homestay',
+            default => 'Wisata, Homestay & Camping',
         };
 
         return view('paket-wisata/index', [

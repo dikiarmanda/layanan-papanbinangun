@@ -25,8 +25,12 @@
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="<?= base_url('assets/vendor/fonts/fonts.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/vendor/fontawesome/css/all.min.css') ?>">
   <link rel="stylesheet" href="<?= base_url('assets/css/app.css') ?>">
   <link rel="stylesheet" href="<?= base_url('assets/vendor/flatpickr/flatpickr.min.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/vendor/select2/css/select2.min.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/vendor/dropify/css/dropify.min.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/vendor/sweetalert2/css/sweetalert2.min.css') ?>">
 </head>
 
 <body>
@@ -56,14 +60,10 @@
 
   <main>
     <?php if (session()->getFlashdata('success')): ?>
-      <div class="container" style="padding-top:1rem">
-        <div class="alert alert-success"><?= esc(session()->getFlashdata('success')) ?></div>
-      </div>
+      <div class="swal-flash" data-type="success" data-message="<?= esc(session()->getFlashdata('success'), 'attr') ?>" hidden></div>
     <?php endif; ?>
     <?php if (session()->getFlashdata('error')): ?>
-      <div class="container" style="padding-top:1rem">
-        <div class="alert alert-error"><?= esc(session()->getFlashdata('error')) ?></div>
-      </div>
+      <div class="swal-flash" data-type="error" data-message="<?= esc(session()->getFlashdata('error'), 'attr') ?>" hidden></div>
     <?php endif; ?>
 
     <?= $this->renderSection('content') ?>
@@ -144,10 +144,18 @@
       });
     })();
   </script>
+  <script src="<?= base_url('assets/vendor/jquery/jquery.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/select2/js/select2.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/select2/js/i18n/id.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/dropify/js/dropify.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/sweetalert2/js/sweetalert2.all.min.js') ?>"></script>
   <script src="<?= base_url('assets/vendor/flatpickr/flatpickr.min.js') ?>"></script>
   <script src="<?= base_url('assets/vendor/flatpickr/l10n/id.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/lexical/lexical-editor.min.js') ?>"></script>
+  <script src="<?= base_url('assets/js/swal-helper.js') ?>"></script>
   <?= $this->renderSection('scripts') ?>
   <script src="<?= base_url('assets/js/datepicker.js') ?>"></script>
+  <script src="<?= base_url('assets/js/vendor-init.js') ?>"></script>
 </body>
 
 </html>

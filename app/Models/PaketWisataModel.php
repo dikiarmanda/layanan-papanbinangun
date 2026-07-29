@@ -28,7 +28,11 @@ class PaketWisataModel extends Model
     {
         $builder = $this->where('status', 'publish')->orderBy('created_at', 'DESC');
         if ($jenis !== null && $jenis !== '') {
-            $builder->where('jenis', $jenis);
+            if ($jenis === 'menginap') {
+                $builder->whereIn('jenis', ['homestay', 'camping']);
+            } else {
+                $builder->where('jenis', $jenis);
+            }
         }
         if ($limit) {
             $builder->limit($limit);

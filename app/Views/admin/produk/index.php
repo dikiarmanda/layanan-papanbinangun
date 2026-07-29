@@ -25,7 +25,8 @@
         <td>
           <a href="<?= site_url('admin/produk/' . $p['id'] . '/edit') ?>">Edit</a> |
           <form method="post" action="<?= site_url('admin/produk/' . $p['id'] . '/delete') ?>" style="display:inline"
-            onsubmit="return confirm('Hapus?')">
+            class="js-swal-confirm" data-swal-title="Hapus produk?" data-swal-text="Produk akan dihapus."
+            data-swal-confirm="Hapus" data-swal-icon="warning">
             <?= csrf_field() ?><button type="submit" class="btn btn-sm btn-danger">Hapus</button>
           </form>
         </td>

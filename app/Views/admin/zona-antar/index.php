@@ -28,7 +28,8 @@
         <td>
           <a href="<?= site_url('admin/zona-antar/' . $z['id'] . '/edit') ?>">Edit</a> |
           <form method="post" action="<?= site_url('admin/zona-antar/' . $z['id'] . '/delete') ?>" style="display:inline"
-            onsubmit="return confirm('Hapus?')">
+            class="js-swal-confirm" data-swal-title="Hapus zona?" data-swal-text="Zona antar akan dihapus."
+            data-swal-confirm="Hapus" data-swal-icon="warning">
             <?= csrf_field() ?><button type="submit" class="btn btn-sm btn-danger">Hapus</button>
           </form>
         </td>

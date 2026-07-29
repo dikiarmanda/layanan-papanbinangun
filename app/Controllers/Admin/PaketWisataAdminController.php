@@ -34,11 +34,12 @@ class PaketWisataAdminController extends BaseController
             $nama = (string) $this->request->getPost('nama');
             $slug = slugify($nama);
             $img = upload_image('gambar_cover', 'paket');
-            $jenis = $this->request->getPost('jenis') === 'homestay' ? 'homestay' : 'wisata';
-            $satuan = $jenis === 'homestay' ? 'per_rumah' : 'per_orang';
+            $jenisPost = (string) $this->request->getPost('jenis');
+            $jenis = in_array($jenisPost, ['wisata', 'homestay', 'camping'], true) ? $jenisPost : 'wisata';
+            $satuan = is_paket_menginap($jenis) ? 'per_rumah' : 'per_orang';
             $kuota = $this->request->getPost('kuota_default');
             if ($kuota === null || $kuota === '') {
-                $kuota = $jenis === 'homestay' ? 1 : 10;
+                $kuota = is_paket_menginap($jenis) ? 1 : 10;
             }
 
             model(PaketWisataModel::class)->insert([
@@ -85,8 +86,9 @@ class PaketWisataAdminController extends BaseController
                 return redirect()->to('/admin/paket-wisata')->with('error', 'Paket tidak ditemukan.');
             }
 
-            $jenis = $this->request->getPost('jenis') === 'homestay' ? 'homestay' : 'wisata';
-            $satuan = $jenis === 'homestay' ? 'per_rumah' : 'per_orang';
+            $jenisPost = (string) $this->request->getPost('jenis');
+            $jenis = in_array($jenisPost, ['wisata', 'homestay', 'camping'], true) ? $jenisPost : 'wisata';
+            $satuan = is_paket_menginap($jenis) ? 'per_rumah' : 'per_orang';
 
             $data = [
                 'nama' => $this->request->getPost('nama'),

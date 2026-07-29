@@ -21,7 +21,7 @@ class CheckoutReservasiController extends BaseController
             return redirect()->back()->withInput()->with('error', 'Paket tidak valid.');
         }
 
-        $jenis = ($paket['jenis'] ?? 'wisata') === 'homestay' ? 'homestay' : 'wisata';
+        $jenis = is_paket_menginap((string) ($paket['jenis'] ?? 'wisata')) ? 'homestay' : 'wisata';
 
         if ($jenis === 'homestay') {
             return $this->createHomestay($paket);

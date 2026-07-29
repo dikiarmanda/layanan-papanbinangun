@@ -6,8 +6,8 @@
     <a href="<?= site_url('paket-wisata') ?>" class="<?= empty($activeJenis) ? 'is-active' : '' ?>">Semua</a>
     <a href="<?= site_url('paket-wisata?jenis=wisata') ?>"
       class="<?= ($activeJenis ?? '') === 'wisata' ? 'is-active' : '' ?>">Paket Wisata</a>
-    <a href="<?= site_url('paket-wisata?jenis=homestay') ?>"
-      class="<?= ($activeJenis ?? '') === 'homestay' ? 'is-active' : '' ?>">Homestay</a>
+    <a href="<?= site_url('paket-wisata?jenis=menginap') ?>"
+      class="<?= ($activeJenis ?? '') === 'menginap' ? 'is-active' : '' ?>">Homestay &amp; Camping</a>
   </div>
 
   <?php if (empty($paket)): ?>
@@ -15,22 +15,23 @@
   <?php else: ?>
     <div class="card-grid">
       <?php foreach ($paket as $p): ?>
-        <?php $isHomestay = ($p['jenis'] ?? '') === 'homestay'; ?>
+        <?php
+          $jenisPaket = $p['jenis'] ?? 'wisata';
+          $badgeClass = match ($jenisPaket) {
+              'homestay' => 'badge-homestay',
+              'camping' => 'badge-camping',
+              default => 'badge-wisata',
+          };
+        ?>
         <a class="card" href="<?= site_url('paket-wisata/' . $p['slug']) ?>">
-          <?php if (!empty($p['gambar_cover'])): ?>
-            <img class="card-img" src="<?= media_url($p['gambar_cover']) ?>" alt="<?= esc($p['nama']) ?>">
-          <?php else: ?>
-            <div class="card-img" style="display:flex;align-items:center;justify-content:center;color:var(--sepia)">
-              <?= $isHomestay ? 'Homestay' : 'Wisata' ?></div>
-          <?php endif; ?>
+          <img class="card-img" src="<?= esc(cover_url($p['gambar_cover'] ?? null, $jenisPaket)) ?>" alt="<?= esc($p['nama']) ?>">
           <div class="card-body">
-            <span
-              class="badge-jenis <?= $isHomestay ? 'badge-homestay' : 'badge-wisata' ?>"><?= $isHomestay ? 'Homestay' : 'Wisata' ?></span>
+            <span class="badge-jenis <?= $badgeClass ?>"><?= esc(label_jenis_paket($jenisPaket)) ?></span>
             <h3><?= esc($p['nama']) ?></h3>
             <p style="color:var(--sepia);font-size:0.9rem"><?= esc(mb_substr(strip_tags($p['deskripsi']), 0, 90)) ?>…</p>
             <div class="price">
               <?= format_rupiah($p['harga']) ?>
-              <small style="font-weight:400;color:var(--sepia)">/ <?= $isHomestay ? 'malam' : 'orang' ?></small>
+              <small style="font-weight:400;color:var(--sepia)">/ <?= esc(satuan_label($jenisPaket, $p['satuan_harga'] ?? null)) ?></small>
             </div>
           </div>
         </a>

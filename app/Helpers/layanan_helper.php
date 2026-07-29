@@ -125,6 +125,99 @@ if (! function_exists('media_url')) {
     }
 }
 
+if (! function_exists('unsplash_by_jenis')) {
+    /**
+     * Gambar Unsplash fallback per jenis layanan (hero / kartu).
+     */
+    function unsplash_by_jenis(string $jenis, int $index = 0): string
+    {
+        $pool = [
+            'wisata' => [
+                'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1400&q=80',
+                'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1400&q=80',
+                'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=1400&q=80',
+            ],
+            'homestay' => [
+                'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=1400&q=80',
+                'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1400&q=80',
+                'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1400&q=80',
+            ],
+            'camping' => [
+                'https://images.unsplash.com/photo-1504851149312-7a075b496cc7?w=1400&q=80',
+                'https://images.unsplash.com/photo-1478131143081-80f7f84ca84d?w=1400&q=80',
+                'https://images.unsplash.com/photo-1537905569824-f89d28b5e0e2?w=1400&q=80',
+            ],
+            'umkm' => [
+                'https://images.unsplash.com/photo-1610701596007-11502861dcfa?w=1400&q=80',
+                'https://images.unsplash.com/photo-1558171813-4c088753af8f?w=1400&q=80',
+                'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=1400&q=80',
+            ],
+            'catering' => [
+                'https://images.unsplash.com/photo-1555244162-803834f70033?w=1400&q=80',
+                'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=1400&q=80',
+                'https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=1400&q=80',
+            ],
+        ];
+
+        $images = $pool[$jenis] ?? $pool['wisata'];
+
+        return $images[$index % count($images)];
+    }
+}
+
+if (! function_exists('cover_url')) {
+    /**
+     * Gambar cover lokal/URL, fallback Unsplash jika kosong atau file lokal tidak ada.
+     */
+    function cover_url(?string $path, string $jenis = 'wisata', int $index = 0): string
+    {
+        if ($path !== null && $path !== '') {
+            if (preg_match('#^https?://#i', $path) === 1) {
+                return $path;
+            }
+
+            $absolute = FCPATH . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, ltrim($path, '/\\'));
+            if (is_file($absolute)) {
+                return base_url($path);
+            }
+        }
+
+        return unsplash_by_jenis($jenis, $index);
+    }
+}
+
+if (! function_exists('label_jenis_paket')) {
+    function label_jenis_paket(string $jenis): string
+    {
+        return match ($jenis) {
+            'homestay' => 'Homestay',
+            'camping' => 'Camping Ground',
+            'umkm' => 'UMKM',
+            'catering' => 'Catering',
+            default => 'Paket Wisata',
+        };
+    }
+}
+
+if (! function_exists('satuan_label')) {
+    function satuan_label(string $jenis, ?string $satuan = null): string
+    {
+        if ($jenis === 'homestay' || $jenis === 'camping' || $satuan === 'per_rumah') {
+            return 'rumah / malam';
+        }
+
+        return 'orang';
+    }
+}
+
+if (! function_exists('is_paket_menginap')) {
+    /** Homestay & camping ground memakai alur check-in/out per rumah × malam. */
+    function is_paket_menginap(string $jenis): bool
+    {
+        return in_array($jenis, ['homestay', 'camping'], true);
+    }
+}
+
 if (! function_exists('upload_image')) {
     /**
      * @return string|null relative path under public/uploads

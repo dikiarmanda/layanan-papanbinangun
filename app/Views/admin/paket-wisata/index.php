@@ -15,15 +15,16 @@
     <?php foreach ($paket as $p): ?>
       <tr>
         <td><?= esc($p['nama']) ?></td>
-        <td><?= esc($p['jenis'] ?? 'wisata') ?></td>
+        <td><?= esc(label_jenis_paket($p['jenis'] ?? 'wisata')) ?></td>
         <td><?= format_rupiah($p['harga']) ?> <small>/
-            <?= ($p['jenis'] ?? '') === 'homestay' ? 'malam' : 'orang' ?></small></td>
+            <?= esc(satuan_label($p['jenis'] ?? 'wisata', $p['satuan_harga'] ?? null)) ?></small></td>
         <td><?= badge_status($p['status']) ?></td>
         <td style="white-space:nowrap">
           <a href="<?= site_url('admin/paket-wisata/' . $p['id'] . '/jadwal') ?>">Jadwal</a> |
           <a href="<?= site_url('admin/paket-wisata/' . $p['id'] . '/edit') ?>">Edit</a> |
           <form method="post" action="<?= site_url('admin/paket-wisata/' . $p['id'] . '/delete') ?>"
-            style="display:inline" onsubmit="return confirm('Hapus?')">
+            style="display:inline" class="js-swal-confirm" data-swal-title="Hapus paket?"
+            data-swal-text="Data paket akan dihapus." data-swal-confirm="Hapus" data-swal-icon="warning">
             <?= csrf_field() ?><button type="submit" class="btn btn-sm btn-danger">Hapus</button>
           </form>
         </td>
