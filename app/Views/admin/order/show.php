@@ -1,13 +1,19 @@
 <?= $this->extend('layouts/admin') ?>
 <?= $this->section('content') ?>
-<p><a href="<?= site_url('admin/order') ?>">&larr; Kembali</a></p>
-<div
-  style="background:var(--white);padding:1.25rem;border-radius:6px;border:1px solid var(--cream-dark);max-width:720px">
+
+<div class="page-toolbar">
+  <p>Detail order <strong><?= esc($order['kode_order']) ?></strong></p>
+  <a href="<?= site_url('admin/order') ?>" class="btn btn-outline btn-sm">
+    <i class="fa-solid fa-arrow-left"></i> Kembali
+  </a>
+</div>
+
+<div class="card card-form">
   <p><strong>Kode:</strong> <?= esc($order['kode_order']) ?></p>
   <p><strong>Pelanggan:</strong> <?= esc($order['pelanggan_nama']) ?> (<?= esc($order['no_hp']) ?>)</p>
   <p><strong>Alamat:</strong> <?= esc($order['alamat_kirim']) ?></p>
-  <?php if (!empty($order['tanggal_acara'])): ?>
-    <p><strong>Tanggal acara:</strong> <?= esc($order['tanggal_acara']) ?>   <?= esc($order['waktu_acara'] ?? '') ?></p>
+  <?php if (! empty($order['tanggal_acara'])): ?>
+    <p><strong>Tanggal acara:</strong> <?= esc($order['tanggal_acara']) ?> <?= esc($order['waktu_acara'] ?? '') ?></p>
     <p><strong>Metode:</strong> <?= esc(str_replace('_', ' ', (string) ($order['metode_pengiriman'] ?? ''))) ?></p>
   <?php endif; ?>
   <p><strong>Kurir:</strong> <?= esc($order['kurir']) ?> <?= esc($order['layanan_kurir']) ?> —
@@ -20,9 +26,10 @@
       <li><?= esc($item['nama_produk']) ?> × <?= (int) $item['jumlah'] ?> = <?= format_rupiah($item['subtotal']) ?></li>
     <?php endforeach; ?>
   </ul>
-  <p class="price">Total: <?= format_rupiah($order['total_harga']) ?></p>
+  <p><strong>Total:</strong> <?= format_rupiah($order['total_harga']) ?></p>
 
-  <form method="post" action="<?= site_url('admin/order/' . $order['id'] . '/status') ?>" style="margin-top:1.25rem">
+  <form method="post" action="<?= site_url('admin/order/' . $order['id'] . '/status') ?>"
+    style="margin-top:1.25rem;padding-top:1rem;border-top:1px solid var(--admin-border)">
     <?= csrf_field() ?>
     <div class="form-group">
       <label>Ubah status order</label>
@@ -37,7 +44,8 @@
       <label>No. Resi (wajib jika dikirim)</label>
       <input type="text" name="no_resi" class="form-control" value="<?= esc($order['no_resi'] ?? '') ?>">
     </div>
-    <button class="btn btn-primary" type="submit">Simpan</button>
+    <button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan</button>
   </form>
 </div>
+
 <?= $this->endSection() ?>
