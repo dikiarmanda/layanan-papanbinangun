@@ -13,6 +13,8 @@ class ProdukController extends BaseController
     public function index()
     {
         helper('layanan');
+        assert_fitur_produk();
+
         $kategoriId = $this->request->getGet('kategori');
         $jenis = $this->request->getGet('jenis');
         if (!in_array($jenis, ['umkm', 'catering'], true)) {
@@ -35,6 +37,8 @@ class ProdukController extends BaseController
     public function show(string $slug)
     {
         helper('layanan');
+        assert_fitur_produk();
+
         $produk = model(ProdukModel::class)->findBySlug($slug);
 
         if (!$produk || $produk['status'] !== 'publish') {
@@ -50,6 +54,8 @@ class ProdukController extends BaseController
     public function keranjang()
     {
         helper('layanan');
+        assert_fitur_produk();
+
         $cart = session()->get('cart') ?? [];
         $items = [];
         $subtotal = 0;
@@ -83,6 +89,9 @@ class ProdukController extends BaseController
 
     public function addCart()
     {
+        helper('layanan');
+        assert_fitur_produk();
+
         $produkId = (int) $this->request->getPost('produk_id');
         $jumlah = max(1, (int) $this->request->getPost('jumlah'));
         $produk = model(ProdukModel::class)->find($produkId);
@@ -122,6 +131,9 @@ class ProdukController extends BaseController
 
     public function updateCart()
     {
+        helper('layanan');
+        assert_fitur_produk();
+
         $produkId = (int) $this->request->getPost('produk_id');
         $jumlah = (int) $this->request->getPost('jumlah');
         $cart = session()->get('cart') ?? [];
@@ -139,6 +151,9 @@ class ProdukController extends BaseController
 
     public function removeCart(int $produkId)
     {
+        helper('layanan');
+        assert_fitur_produk();
+
         $cart = session()->get('cart') ?? [];
         unset($cart[$produkId]);
         session()->set('cart', $cart);
@@ -148,11 +163,17 @@ class ProdukController extends BaseController
 
     public function provinces()
     {
+        helper('layanan');
+        assert_fitur_produk();
+
         return $this->response->setJSON([]);
     }
 
     public function cities()
     {
+        helper('layanan');
+        assert_fitur_produk();
+
         return $this->response->setJSON([]);
     }
 
@@ -161,6 +182,9 @@ class ProdukController extends BaseController
      */
     public function destinations()
     {
+        helper('layanan');
+        assert_fitur_produk();
+
         $q = (string) $this->request->getGet('q');
         $svc = new RajaOngkirService();
 
@@ -172,6 +196,9 @@ class ProdukController extends BaseController
      */
     public function ongkir()
     {
+        helper('layanan');
+        assert_fitur_produk();
+
         $destination = (int) $this->request->getGet('destination');
         $weight = max(1, (int) $this->request->getGet('weight'));
         $svc = new RajaOngkirService();
@@ -184,6 +211,9 @@ class ProdukController extends BaseController
      */
     public function zonaAntar()
     {
+        helper('layanan');
+        assert_fitur_produk();
+
         $list = model(ZonaAntarLokalModel::class)->findAktif();
         $out = array_map(static function (array $z): array {
             return [

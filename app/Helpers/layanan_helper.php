@@ -218,6 +218,32 @@ if (! function_exists('is_paket_menginap')) {
     }
 }
 
+if (! function_exists('fitur_produk_aktif')) {
+    /**
+     * Flag publik untuk toko UMKM & catering.
+     * Matikan sementara agar fokus develop wisata/homestay.
+     * Aktifkan lewat .env: app.fiturProduk = true
+     */
+    function fitur_produk_aktif(): bool
+    {
+        return filter_var(env('app.fiturProduk', false), FILTER_VALIDATE_BOOLEAN);
+    }
+}
+
+if (! function_exists('assert_fitur_produk')) {
+    /**
+     * Blokir akses route publik UMKM/catering jika fitur nonaktif.
+     *
+     * @throws \CodeIgniter\Exceptions\PageNotFoundException
+     */
+    function assert_fitur_produk(): void
+    {
+        if (! fitur_produk_aktif()) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+    }
+}
+
 if (! function_exists('upload_image')) {
     /**
      * @return string|null relative path under public/uploads

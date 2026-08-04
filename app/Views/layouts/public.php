@@ -7,9 +7,13 @@
   <?php
   $site = pengaturan();
   $brandName = $site['nama_desa'] ?: 'Wisata Binangun';
-  $pageTitle = ($title ?? 'Layanan Reservasi & Toko UMKM') . ' — ' . $brandName;
+  $pageTitle = ($title ?? (fitur_produk_aktif() ? 'Layanan Reservasi & Toko UMKM' : 'Layanan Reservasi Wisata & Homestay')) . ' — ' . $brandName;
   $description = $meta_description
-    ?? (strip_tags((string) ($site['deskripsi_singkat'] ?: $site['tagline'])) ?: 'Pesan paket wisata, homestay, dan produk UMKM secara mudah dan aman.');
+    ?? (strip_tags((string) ($site['deskripsi_singkat'] ?: $site['tagline'])) ?: (
+      fitur_produk_aktif()
+        ? 'Pesan paket wisata, homestay, dan produk UMKM secara mudah dan aman.'
+        : 'Pesan paket wisata dan homestay desa secara mudah dan aman.'
+    ));
   $ogImage = base_url('assets/images/og-image.png');
   $uri = uri_string();
   ?>
@@ -40,7 +44,7 @@
         <img src="<?= brand_logo_url() ?>" alt="" class="brand-logo">
         <span class="brand-text">
           <strong><?= esc($brandName) ?></strong>
-          <small class="brand-tagline">Layanan Reservasi &amp; Toko UMKM</small>
+          <small class="brand-tagline"><?= fitur_produk_aktif() ? 'Layanan Reservasi &amp; Toko UMKM' : 'Layanan Wisata &amp; Homestay' ?></small>
         </span>
       </a>
       <button class="nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="siteNav"
@@ -49,10 +53,12 @@
         <a href="<?= site_url('/') ?>" class="<?= $uri === '' ? 'active' : '' ?>">Beranda</a>
         <a href="<?= site_url('paket-wisata') ?>"
           class="<?= str_starts_with($uri, 'paket-wisata') ? 'active' : '' ?>">Wisata &amp; Homestay</a>
-        <a href="<?= site_url('toko') ?>" class="<?= str_starts_with($uri, 'toko') ? 'active' : '' ?>">Toko &amp;
-          Catering</a>
-        <a href="<?= site_url('keranjang') ?>"
-          class="<?= str_starts_with($uri, 'keranjang') || str_starts_with($uri, 'checkout-produk') ? 'active' : '' ?>">Keranjang</a>
+        <?php if (fitur_produk_aktif()): ?>
+          <a href="<?= site_url('toko') ?>" class="<?= str_starts_with($uri, 'toko') ? 'active' : '' ?>">Toko &amp;
+            Catering</a>
+          <a href="<?= site_url('keranjang') ?>"
+            class="<?= str_starts_with($uri, 'keranjang') || str_starts_with($uri, 'checkout-produk') ? 'active' : '' ?>">Keranjang</a>
+        <?php endif; ?>
         <a href="<?= site_url('/') ?>#cek-status">Cek Status</a>
       </nav>
     </div>
@@ -79,8 +85,10 @@
         <h4>Navigasi</h4>
         <ul class="footer-links">
           <li><a href="<?= site_url('paket-wisata') ?>">Wisata &amp; Homestay</a></li>
-          <li><a href="<?= site_url('toko') ?>">Toko UMKM &amp; Catering</a></li>
-          <li><a href="<?= site_url('keranjang') ?>">Keranjang Belanja</a></li>
+          <?php if (fitur_produk_aktif()): ?>
+            <li><a href="<?= site_url('toko') ?>">Toko UMKM &amp; Catering</a></li>
+            <li><a href="<?= site_url('keranjang') ?>">Keranjang Belanja</a></li>
+          <?php endif; ?>
           <li><a href="<?= site_url('/') ?>#cek-status">Cek Status Transaksi</a></li>
           <li><a href="<?= site_url('kebijakan-privasi') ?>">Kebijakan Privasi</a></li>
           <li><a href="<?= site_url('persyaratan') ?>">Syarat &amp; Ketentuan</a></li>

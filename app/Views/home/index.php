@@ -12,14 +12,17 @@ $bgWisata = $heroBackgrounds['wisata'] ?? unsplash_by_jenis('wisata');
 $bgMenginap = $heroBackgrounds['menginap'] ?? unsplash_by_jenis('homestay');
 $bgUmkm = $heroBackgrounds['umkm'] ?? unsplash_by_jenis('umkm');
 $bgCatering = $heroBackgrounds['catering'] ?? unsplash_by_jenis('catering');
+$fiturProduk = fitur_produk_aktif();
 ?>
 
 <section class="home-hero" id="homeHero" data-active="wisata" aria-label="Beranda layanan">
   <div class="home-hero-bg" aria-hidden="true">
     <div class="home-hero-photo is-active" data-bg="wisata" style="background-image:url('<?= esc($bgWisata, 'attr') ?>')"></div>
     <div class="home-hero-photo" data-bg="menginap" style="background-image:url('<?= esc($bgMenginap, 'attr') ?>')"></div>
-    <div class="home-hero-photo" data-bg="umkm" style="background-image:url('<?= esc($bgUmkm, 'attr') ?>')"></div>
-    <div class="home-hero-photo" data-bg="catering" style="background-image:url('<?= esc($bgCatering, 'attr') ?>')"></div>
+    <?php if ($fiturProduk): ?>
+      <div class="home-hero-photo" data-bg="umkm" style="background-image:url('<?= esc($bgUmkm, 'attr') ?>')"></div>
+      <div class="home-hero-photo" data-bg="catering" style="background-image:url('<?= esc($bgCatering, 'attr') ?>')"></div>
+    <?php endif; ?>
     <div class="home-hero-scrim"></div>
     <div class="home-hero-glow"></div>
     <div class="home-hero-pattern"></div>
@@ -40,12 +43,14 @@ $bgCatering = $heroBackgrounds['catering'] ?? unsplash_by_jenis('catering');
         <button type="button" class="home-service-tab" role="tab" aria-selected="false" data-service="menginap">
           <span class="home-service-tab-label">Homestay &amp; Camping</span>
         </button>
-        <button type="button" class="home-service-tab" role="tab" aria-selected="false" data-service="umkm">
-          <span class="home-service-tab-label">UMKM</span>
-        </button>
-        <button type="button" class="home-service-tab" role="tab" aria-selected="false" data-service="catering">
-          <span class="home-service-tab-label">Catering</span>
-        </button>
+        <?php if ($fiturProduk): ?>
+          <button type="button" class="home-service-tab" role="tab" aria-selected="false" data-service="umkm">
+            <span class="home-service-tab-label">UMKM</span>
+          </button>
+          <button type="button" class="home-service-tab" role="tab" aria-selected="false" data-service="catering">
+            <span class="home-service-tab-label">Catering</span>
+          </button>
+        <?php endif; ?>
       </div>
 
       <div class="home-estimate" id="heroEstimate" data-mode="wisata" hidden>
@@ -163,6 +168,7 @@ $bgCatering = $heroBackgrounds['catering'] ?? unsplash_by_jenis('catering');
   <?php endif; ?>
 </section>
 
+<?php if ($fiturProduk): ?>
 <section class="section container">
   <h2 class="section-title">Produk UMKM Unggulan</h2>
   <?php if (empty($produk)): ?>
@@ -188,6 +194,7 @@ $bgCatering = $heroBackgrounds['catering'] ?? unsplash_by_jenis('catering');
     </div>
   <?php endif; ?>
 </section>
+<?php endif; ?>
 
 <section class="section container" id="cek-status">
   <h2 class="section-title">Cek Status Transaksi</h2>
@@ -195,8 +202,8 @@ $bgCatering = $heroBackgrounds['catering'] ?? unsplash_by_jenis('catering');
     onsubmit="event.preventDefault(); const k=this.kode.value.trim(); if(k) location.href='<?= site_url('status') ?>/'+encodeURIComponent(k);"
     style="max-width:480px;margin:0 auto">
     <div class="form-group">
-      <label for="kode">Kode transaksi (RSV-… atau ORD-…)</label>
-      <input class="form-control" type="text" name="kode" id="kode" placeholder="RSV-xxxx atau ORD-xxxx" required>
+      <label for="kode">Kode transaksi (RSV-…<?= $fiturProduk ? ' atau ORD-…' : '' ?>)</label>
+      <input class="form-control" type="text" name="kode" id="kode" placeholder="RSV-xxxx<?= $fiturProduk ? ' atau ORD-xxxx' : '' ?>" required>
     </div>
     <button class="btn btn-primary" type="submit" style="width:100%">Cek Status</button>
   </form>
@@ -225,6 +232,7 @@ $bgCatering = $heroBackgrounds['catering'] ?? unsplash_by_jenis('catering');
       href: '<?= site_url('paket-wisata?jenis=menginap') ?>',
       estimate: true,
     },
+    <?php if ($fiturProduk): ?>
     umkm: {
       lead: 'Karya UMKM desa — belanja online dengan pengiriman ekspedisi.',
       cta: 'Belanja UMKM',
@@ -237,6 +245,7 @@ $bgCatering = $heroBackgrounds['catering'] ?? unsplash_by_jenis('catering');
       href: '<?= site_url('toko?jenis=catering') ?>',
       estimate: false,
     },
+    <?php endif; ?>
   };
 
   const hero = document.getElementById('homeHero');

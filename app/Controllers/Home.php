@@ -14,8 +14,8 @@ class Home extends BaseController
         $paketModel = model(PaketWisataModel::class);
         $produkModel = model(ProdukModel::class);
 
-        $paketAll = $paketModel->findPublished(20);
-        $produkAll = $produkModel->findPublished(20);
+        $paketAll  = $paketModel->findPublished(20);
+        $produkAll = fitur_produk_aktif() ? $produkModel->findPublished(20) : [];
 
         $wisata = array_values(array_filter($paketAll, static fn ($p) => ($p['jenis'] ?? '') === 'wisata'));
         $menginap = array_values(array_filter(
@@ -41,25 +41,29 @@ class Home extends BaseController
                 'img'    => cover_url($p['gambar_cover'] ?? null, $jenis, $i++),
             ];
         }
-        foreach ($produkAll as $pr) {
-            $jenis = ($pr['jenis'] ?? 'umkm') === 'catering' ? 'catering' : 'umkm';
-            $heroSlides[] = [
-                'jenis'  => $jenis,
-                'group'  => $jenis,
-                'nama'   => $pr['nama'],
-                'harga'  => (float) $pr['harga'],
-                'satuan' => $jenis === 'catering' ? 'paket' : null,
-                'url'    => site_url('toko/' . $pr['slug']),
-                'img'    => cover_url($pr['gambar'] ?? null, $jenis, $i++),
-            ];
+        if (fitur_produk_aktif()) {
+            foreach ($produkAll as $pr) {
+                $jenis = ($pr['jenis'] ?? 'umkm') === 'catering' ? 'catering' : 'umkm';
+                $heroSlides[] = [
+                    'jenis'  => $jenis,
+                    'group'  => $jenis,
+                    'nama'   => $pr['nama'],
+                    'harga'  => (float) $pr['harga'],
+                    'satuan' => $jenis === 'catering' ? 'paket' : null,
+                    'url'    => site_url('toko/' . $pr['slug']),
+                    'img'    => cover_url($pr['gambar'] ?? null, $jenis, $i++),
+                ];
+            }
         }
 
         $heroBackgrounds = [
             'wisata'   => unsplash_by_jenis('wisata', 0),
             'menginap' => unsplash_by_jenis('homestay', 0),
-            'umkm'     => unsplash_by_jenis('umkm', 0),
-            'catering' => unsplash_by_jenis('catering', 0),
         ];
+        if (fitur_produk_aktif()) {
+            $heroBackgrounds['umkm']     = unsplash_by_jenis('umkm', 0);
+            $heroBackgrounds['catering'] = unsplash_by_jenis('catering', 0);
+        }
 
         $estimateWisata = array_map(static fn ($p) => [
             'id'     => (int) $p['id'],

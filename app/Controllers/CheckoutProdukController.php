@@ -15,6 +15,8 @@ class CheckoutProdukController extends BaseController
     public function index()
     {
         helper('layanan');
+        assert_fitur_produk();
+
         $cart = session()->get('cart') ?? [];
 
         if ($cart === []) {
@@ -43,6 +45,7 @@ class CheckoutProdukController extends BaseController
     public function process()
     {
         helper('layanan');
+        assert_fitur_produk();
 
         $cart = session()->get('cart') ?? [];
         if ($cart === []) {
