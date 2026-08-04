@@ -12,6 +12,25 @@ $routes->get('kebijakan-privasi', 'LegalController::privasi');
 $routes->get('persyaratan', 'LegalController::persyaratan');
 
 // -------------------------------------------------------------------------
+// Publik — auth pelanggan
+// -------------------------------------------------------------------------
+$routes->get('masuk', 'AuthPelangganController::login');
+$routes->post('masuk', 'AuthPelangganController::attempt');
+$routes->get('daftar', 'AuthPelangganController::register');
+$routes->post('daftar', 'AuthPelangganController::store');
+$routes->get('keluar', 'AuthPelangganController::logout');
+
+$routes->group('akun', ['filter' => 'pelangganauth'], static function ($routes) {
+    $routes->get('/', 'AkunController::index');
+    $routes->get('reservasi', 'AkunController::reservasi');
+    $routes->get('reservasi/(:num)', 'AkunController::showReservasi/$1');
+    $routes->get('order', 'AkunController::order');
+    $routes->get('order/(:num)', 'AkunController::showOrder/$1');
+    $routes->get('profil', 'AkunController::profil');
+    $routes->post('profil', 'AkunController::updateProfil');
+});
+
+// -------------------------------------------------------------------------
 // Publik — wisata & homestay
 // -------------------------------------------------------------------------
 $routes->group('paket-wisata', static function ($routes) {

@@ -146,7 +146,7 @@ class CheckoutReservasiController extends BaseController
      */
     protected function finishReservasi(array $paket, array $booking): string
     {
-        $pelangganId = model(PelangganModel::class)->createGuest([
+        $pelangganId = model(PelangganModel::class)->resolveCheckout([
             'nama' => (string) $this->request->getPost('nama'),
             'email' => (string) $this->request->getPost('email'),
             'no_hp' => (string) $this->request->getPost('no_hp'),

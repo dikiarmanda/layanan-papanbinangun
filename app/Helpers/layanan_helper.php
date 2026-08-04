@@ -2,7 +2,7 @@
 
 use App\Models\PengaturanMasterModel;
 
-if (! function_exists('pengaturan')) {
+if (!function_exists('pengaturan')) {
     /**
      * Data situs dari database master (desa_wisata.pengaturan_situs).
      *
@@ -20,7 +20,7 @@ if (! function_exists('pengaturan')) {
     }
 }
 
-if (! function_exists('landing_url')) {
+if (!function_exists('landing_url')) {
     /**
      * Base URL website profil (untuk logo upload di master, dll).
      */
@@ -36,7 +36,7 @@ if (! function_exists('landing_url')) {
     }
 }
 
-if (! function_exists('brand_logo_url')) {
+if (!function_exists('brand_logo_url')) {
     /**
      * Logo dari master (jika ada), fallback ke aset lokal layanan.
      */
@@ -56,7 +56,7 @@ if (! function_exists('brand_logo_url')) {
     }
 }
 
-if (! function_exists('wa_link')) {
+if (!function_exists('wa_link')) {
     function wa_link(?string $number, string $message = ''): string
     {
         $number = preg_replace('/[^0-9]/', '', $number ?? '') ?? '';
@@ -73,21 +73,21 @@ if (! function_exists('wa_link')) {
     }
 }
 
-if (! function_exists('format_rupiah')) {
+if (!function_exists('format_rupiah')) {
     function format_rupiah(float|int|string $amount): string
     {
         return 'Rp ' . number_format((float) $amount, 0, ',', '.');
     }
 }
 
-if (! function_exists('generate_kode')) {
+if (!function_exists('generate_kode')) {
     function generate_kode(string $prefix): string
     {
         return strtoupper($prefix) . '-' . bin2hex(random_bytes(12));
     }
 }
 
-if (! function_exists('slugify')) {
+if (!function_exists('slugify')) {
     function slugify(string $text): string
     {
         $text = strtolower(trim($text));
@@ -98,7 +98,7 @@ if (! function_exists('slugify')) {
     }
 }
 
-if (! function_exists('badge_status')) {
+if (!function_exists('badge_status')) {
     function badge_status(string $status): string
     {
         $class = 'badge badge-' . esc($status, 'attr');
@@ -107,7 +107,7 @@ if (! function_exists('badge_status')) {
     }
 }
 
-if (! function_exists('media_url')) {
+if (!function_exists('media_url')) {
     /**
      * URL lokal (uploads/...) atau absolut (https://images.unsplash.com/...).
      */
@@ -125,7 +125,7 @@ if (! function_exists('media_url')) {
     }
 }
 
-if (! function_exists('unsplash_by_jenis')) {
+if (!function_exists('unsplash_by_jenis')) {
     /**
      * Gambar Unsplash fallback per jenis layanan (hero / kartu).
      */
@@ -165,7 +165,7 @@ if (! function_exists('unsplash_by_jenis')) {
     }
 }
 
-if (! function_exists('cover_url')) {
+if (!function_exists('cover_url')) {
     /**
      * Gambar cover lokal/URL, fallback Unsplash jika kosong atau file lokal tidak ada.
      */
@@ -186,7 +186,7 @@ if (! function_exists('cover_url')) {
     }
 }
 
-if (! function_exists('label_jenis_paket')) {
+if (!function_exists('label_jenis_paket')) {
     function label_jenis_paket(string $jenis): string
     {
         return match ($jenis) {
@@ -199,7 +199,7 @@ if (! function_exists('label_jenis_paket')) {
     }
 }
 
-if (! function_exists('satuan_label')) {
+if (!function_exists('satuan_label')) {
     function satuan_label(string $jenis, ?string $satuan = null): string
     {
         if ($jenis === 'homestay' || $jenis === 'camping' || $satuan === 'per_rumah') {
@@ -210,7 +210,7 @@ if (! function_exists('satuan_label')) {
     }
 }
 
-if (! function_exists('is_paket_menginap')) {
+if (!function_exists('is_paket_menginap')) {
     /** Homestay & camping ground memakai alur check-in/out per rumah × malam. */
     function is_paket_menginap(string $jenis): bool
     {
@@ -218,7 +218,7 @@ if (! function_exists('is_paket_menginap')) {
     }
 }
 
-if (! function_exists('fitur_produk_aktif')) {
+if (!function_exists('fitur_produk_aktif')) {
     /**
      * Flag publik untuk toko UMKM & catering.
      * Matikan sementara agar fokus develop wisata/homestay.
@@ -230,7 +230,7 @@ if (! function_exists('fitur_produk_aktif')) {
     }
 }
 
-if (! function_exists('assert_fitur_produk')) {
+if (!function_exists('assert_fitur_produk')) {
     /**
      * Blokir akses route publik UMKM/catering jika fitur nonaktif.
      *
@@ -238,13 +238,13 @@ if (! function_exists('assert_fitur_produk')) {
      */
     function assert_fitur_produk(): void
     {
-        if (! fitur_produk_aktif()) {
+        if (!fitur_produk_aktif()) {
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
     }
 }
 
-if (! function_exists('upload_image')) {
+if (!function_exists('upload_image')) {
     /**
      * @return string|null relative path under public/uploads
      */
@@ -252,12 +252,12 @@ if (! function_exists('upload_image')) {
     {
         $file = service('request')->getFile($field);
 
-        if (! $file || ! $file->isValid() || $file->hasMoved()) {
+        if (!$file || !$file->isValid() || $file->hasMoved()) {
             return null;
         }
 
         $dir = FCPATH . 'uploads/' . $folder;
-        if (! is_dir($dir)) {
+        if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
 
@@ -265,5 +265,33 @@ if (! function_exists('upload_image')) {
         $file->move($dir, $newName);
 
         return 'uploads/' . $folder . '/' . $newName;
+    }
+}
+
+if (!function_exists('pelanggan_logged_in')) {
+    function pelanggan_logged_in(): bool
+    {
+        return (int) (session()->get('pelanggan_id') ?? 0) > 0;
+    }
+}
+
+if (!function_exists('pelanggan_aktif')) {
+    /**
+     * Data sesi pelanggan yang sedang login (tanpa password).
+     *
+     * @return array{id:int,nama:string,email:string}|null
+     */
+    function pelanggan_aktif(): ?array
+    {
+        $id = (int) (session()->get('pelanggan_id') ?? 0);
+        if ($id < 1) {
+            return null;
+        }
+
+        return [
+            'id' => $id,
+            'nama' => (string) (session()->get('pelanggan_nama') ?? ''),
+            'email' => (string) (session()->get('pelanggan_email') ?? ''),
+        ];
     }
 }

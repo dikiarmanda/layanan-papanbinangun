@@ -6,9 +6,9 @@ $jenisPaket = $paket['jenis'] ?? 'wisata';
 $isHomestay = is_paket_menginap($jenisPaket);
 $labelSatuan = satuan_label($jenisPaket, $paket['satuan_harga'] ?? null);
 $badgeClass = match ($jenisPaket) {
-    'homestay' => 'badge-homestay',
-    'camping' => 'badge-camping',
-    default => 'badge-wisata',
+  'homestay' => 'badge-homestay',
+  'camping' => 'badge-camping',
+  default => 'badge-wisata',
 };
 ?>
 <section class="section container">
@@ -191,17 +191,24 @@ $badgeClass = match ($jenisPaket) {
             </div>
           <?php endif; ?>
 
+          <?php
+          $pLogin = pelanggan_aktif();
+          $pDb = $pLogin ? model(\App\Models\PelangganModel::class)->find($pLogin['id']) : null;
+          ?>
           <div class="form-group">
             <label>Nama Lengkap</label>
-            <input type="text" name="nama" class="form-control" value="<?= esc(old('nama')) ?>" required>
+            <input type="text" name="nama" class="form-control"
+              value="<?= esc(old('nama', $pDb['nama'] ?? $pLogin['nama'] ?? '')) ?>" required>
           </div>
           <div class="form-group">
             <label>Email</label>
-            <input type="email" name="email" class="form-control" value="<?= esc(old('email')) ?>" required>
+            <input type="email" name="email" class="form-control"
+              value="<?= esc(old('email', $pDb['email'] ?? $pLogin['email'] ?? '')) ?>" required>
           </div>
           <div class="form-group">
             <label>No. HP / WhatsApp</label>
-            <input type="text" name="no_hp" class="form-control" value="<?= esc(old('no_hp')) ?>" required>
+            <input type="text" name="no_hp" class="form-control" value="<?= esc(old('no_hp', $pDb['no_hp'] ?? '')) ?>"
+              required>
           </div>
           <div class="form-group">
             <label>Catatan (opsional)</label>

@@ -8,17 +8,24 @@
     <div>
       <form method="post" action="<?= site_url('checkout-produk') ?>" id="checkout-form">
         <?= csrf_field() ?>
+        <?php
+        $pLogin = pelanggan_aktif();
+        $pDb = $pLogin ? model(\App\Models\PelangganModel::class)->find($pLogin['id']) : null;
+        ?>
         <div class="form-group">
           <label>Nama</label>
-          <input type="text" name="nama" class="form-control" required value="<?= esc(old('nama')) ?>">
+          <input type="text" name="nama" class="form-control" required
+            value="<?= esc(old('nama', $pDb['nama'] ?? $pLogin['nama'] ?? '')) ?>">
         </div>
         <div class="form-group">
           <label>Email</label>
-          <input type="email" name="email" class="form-control" required value="<?= esc(old('email')) ?>">
+          <input type="email" name="email" class="form-control" required
+            value="<?= esc(old('email', $pDb['email'] ?? $pLogin['email'] ?? '')) ?>">
         </div>
         <div class="form-group">
           <label>No. HP</label>
-          <input type="text" name="no_hp" class="form-control" required value="<?= esc(old('no_hp')) ?>">
+          <input type="text" name="no_hp" class="form-control" required
+            value="<?= esc(old('no_hp', $pDb['no_hp'] ?? '')) ?>">
         </div>
 
         <?php if ($isCatering): ?>

@@ -11,8 +11,8 @@
   $description = $meta_description
     ?? (strip_tags((string) ($site['deskripsi_singkat'] ?: $site['tagline'])) ?: (
       fitur_produk_aktif()
-        ? 'Pesan paket wisata, homestay, dan produk UMKM secara mudah dan aman.'
-        : 'Pesan paket wisata dan homestay desa secara mudah dan aman.'
+      ? 'Pesan paket wisata, homestay, dan produk UMKM secara mudah dan aman.'
+      : 'Pesan paket wisata dan homestay desa secara mudah dan aman.'
     ));
   $ogImage = base_url('assets/images/og-image.png');
   $uri = uri_string();
@@ -44,7 +44,8 @@
         <img src="<?= brand_logo_url() ?>" alt="" class="brand-logo">
         <span class="brand-text">
           <strong><?= esc($brandName) ?></strong>
-          <small class="brand-tagline"><?= fitur_produk_aktif() ? 'Layanan Reservasi &amp; Toko UMKM' : 'Layanan Wisata &amp; Homestay' ?></small>
+          <small
+            class="brand-tagline"><?= fitur_produk_aktif() ? 'Layanan Reservasi &amp; Toko UMKM' : 'Layanan Wisata &amp; Homestay' ?></small>
         </span>
       </a>
       <button class="nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="siteNav"
@@ -60,16 +61,25 @@
             class="<?= str_starts_with($uri, 'keranjang') || str_starts_with($uri, 'checkout-produk') ? 'active' : '' ?>">Keranjang</a>
         <?php endif; ?>
         <a href="<?= site_url('/') ?>#cek-status">Cek Status</a>
+        <?php if (pelanggan_logged_in()): ?>
+          <a href="<?= site_url('akun') ?>" class="nav-auth <?= str_starts_with($uri, 'akun') ? 'active' : '' ?>">Akun
+            Saya</a>
+        <?php else: ?>
+          <a href="<?= site_url('masuk') ?>"
+            class="nav-auth <?= in_array($uri, ['masuk', 'daftar'], true) ? 'active' : '' ?>">Masuk</a>
+        <?php endif; ?>
       </nav>
     </div>
   </header>
 
   <main>
     <?php if (session()->getFlashdata('success')): ?>
-      <div class="swal-flash" data-type="success" data-message="<?= esc(session()->getFlashdata('success'), 'attr') ?>" hidden></div>
+      <div class="swal-flash" data-type="success" data-message="<?= esc(session()->getFlashdata('success'), 'attr') ?>"
+        hidden></div>
     <?php endif; ?>
     <?php if (session()->getFlashdata('error')): ?>
-      <div class="swal-flash" data-type="error" data-message="<?= esc(session()->getFlashdata('error'), 'attr') ?>" hidden></div>
+      <div class="swal-flash" data-type="error" data-message="<?= esc(session()->getFlashdata('error'), 'attr') ?>"
+        hidden></div>
     <?php endif; ?>
 
     <?= $this->renderSection('content') ?>
@@ -137,7 +147,7 @@
 
   <?php if (!empty($site['no_whatsapp'])): ?>
     <a href="<?= wa_link($site['no_whatsapp'], 'Halo, saya ingin bertanya tentang layanan ' . $brandName) ?>"
-      class="wa-float" target="_blank" rel="noopener" aria-label="Chat WhatsApp">WA</a>
+      class="wa-float" target="_blank" rel="noopener" aria-label="Chat WhatsApp"><i class="fa-brands fa-whatsapp text-white"></i></a>
   <?php endif; ?>
 
   <script>
