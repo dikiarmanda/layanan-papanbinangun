@@ -10,6 +10,16 @@ $badgeClass = match ($jenisPaket) {
   'camping' => 'badge-camping',
   default => 'badge-wisata',
 };
+$availabilityMap = $availabilityMap ?? [];
+$jadwalByDate = $jadwalByDate ?? [];
+$calendarMonths = [];
+$calCursor = new DateTimeImmutable('first day of this month');
+$calEnd = new DateTimeImmutable('first day of +2 months');
+while ($calCursor < $calEnd) {
+  $calendarMonths[] = $calCursor->format('Y-m');
+  $calCursor = $calCursor->modify('first day of next month');
+}
+$hariNama = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
 ?>
 <section class="section container">
   <div class="booking-layout">
@@ -25,6 +35,50 @@ $badgeClass = match ($jenisPaket) {
         <small style="font-weight:400;color:var(--sepia)">/ <?= esc($labelSatuan) ?></small>
       </div>
       <div style="white-space:pre-wrap"><?= esc($paket['deskripsi']) ?></div>
+
+      <div class="avail-calendar" id="kalender-ketersediaan">
+        <div class="avail-calendar-head">
+          <h2 class="policy-title" style="margin:0">Kalender Ketersediaan</h2>
+          <div class="avail-legend">
+            <span class="avail-legend-item"><i class="dot is-available"></i>Tersedia</span>
+            <span class="avail-legend-item"><i class="dot is-full"></i>Penuh</span>
+            <span class="avail-legend-item"><i class="dot is-none"></i>Belum ada jadwal</span>
+          </div>
+        </div>
+
+        <div class="avail-months">
+          <?php foreach ($calendarMonths as $calKey): ?>
+            <?php
+            $firstDay = new DateTimeImmutable($calKey . '-01');
+            $daysInMonth = (int) $firstDay->format('t');
+            $monthLabel = format_tanggal($firstDay->format('Y-m-d'), false);
+            $leading = (int) $firstDay->format('N') - 1;
+            ?>
+            <div class="avail-month">
+              <div class="avail-month-title"><?= esc(format_tanggal($firstDay->format('Y-m') . '-01')) ?></div>
+              <div class="avail-weekdays">
+                <?php foreach ($hariNama as $nama): ?><span><?= $nama ?></span><?php endforeach; ?>
+              </div>
+              <div class="avail-grid">
+                <?php for ($i = 0; $i < $leading; $i++): ?><span class="avail-day is-empty"></span><?php endfor; ?>
+                <?php for ($d = 1; $d <= $daysInMonth; $d++): ?>
+                  <?php
+                    $tgl = $calKey . '-' . str_pad((string) $d, 2, '0', STR_PAD_LEFT);
+                    $state = $availabilityMap[$tgl] ?? 'none';
+                    $isClickable = $state === 'available';
+                    ?>
+                  <button type="button" class="avail-day is-<?= $state ?>" data-tanggal="<?= $tgl ?>"
+                    data-state="<?= $state ?>" <?= $isClickable ? '' : 'disabled' ?>>
+                    <span class="avail-day-num"><?= $d ?></span>
+                    <?php if ($state === 'full'): ?><span class="avail-day-tag">Penuh</span><?php endif; ?>
+                  </button>
+                <?php endfor; ?>
+              </div>
+            </div>
+          <?php endforeach; ?>
+        </div>
+        <p class="avail-hint">Klik tanggal yang <strong>tersedia</strong> untuk mengisi formulir di samping.</p>
+      </div>
 
       <div class="policy-section" id="kebijakan">
         <h2 class="policy-title">Kebijakan</h2>
@@ -89,7 +143,7 @@ $badgeClass = match ($jenisPaket) {
               <li>Peserta dari segala usia diperbolehkan mengikuti kegiatan, kecuali ada ketentuan khusus di deskripsi
                 paket.</li>
               <li>Anak usia 12 tahun ke atas dihitung sebagai peserta dewasa.</li>
-              <li>Pastikan jumlah dan usia peserta sesuai data reservasi. Jika tidak sesuai, mungkin dikenakan biaya
+              <li>Pastikan jumlah dan usia peserta sesuai data reservasi. Jika belum sesuai, mungkin dikenakan biaya
                 tambahan.</li>
             </ul>
           </div>
@@ -123,7 +177,7 @@ $badgeClass = match ($jenisPaket) {
             <h3>Merokok &amp; alkohol</h3>
             <ul>
               <li>Merokok hanya di area yang diizinkan pengelola.</li>
-              <li>Minuman beralkohol diperbolehkan dengan tetap menjaga ketertiban.</li>
+              <li>Minuman beralkohol diperbolehkan dengan menjaga ketertiban.</li>
             </ul>
           </div>
           <div class="policy-item">
@@ -140,14 +194,16 @@ $badgeClass = match ($jenisPaket) {
       <h2>Pesan sekarang</h2>
       <p class="hint">
         <?php if ($isHomestay): ?>
-          Pilih check-in &amp; check-out. Harga dihitung per malam × harga rumah.
+          Pilih check-in &amp; check-out. Harga dihitung per malam × satuan.
         <?php else: ?>
           Pilih tanggal jadwal dan jumlah tamu. Harga dihitung per orang.
         <?php endif; ?>
       </p>
 
-      <?php if (empty($jadwal)): ?>
+      <?php if (empty($jadwal) && $isHomestay): ?>
         <div class="alert alert-info">Belum ada jadwal tersedia. Hubungi pengelola desa.</div>
+      <?php elseif (empty($jadwal)): ?>
+        <div class="alert alert-info">Belum ada jadwal wisata. Hubungi pengelola desa.</div>
       <?php else: ?>
         <form method="post" action="<?= site_url('checkout-reservasi') ?>" id="form-reservasi">
           <?= csrf_field() ?>
@@ -175,18 +231,19 @@ $badgeClass = match ($jenisPaket) {
           <?php else: ?>
             <div class="form-group">
               <label>Pilih Tanggal</label>
-              <select name="jadwal_id" class="form-control" required>
+              <select name="jadwal_id" id="jadwal_id" class="form-control" required>
                 <?php foreach ($jadwal as $j): ?>
                   <?php $sisa = (int) $j['kuota'] - (int) $j['kuota_terpakai']; ?>
-                  <option value="<?= (int) $j['id'] ?>" <?= $sisa <= 0 ? 'disabled' : '' ?>>
-                    <?= esc($j['tanggal']) ?> — sisa <?= $sisa ?>/<?= (int) $j['kuota'] ?>
+                  <option value="<?= (int) $j['id'] ?>" data-tanggal="<?= $j['tanggal'] ?>"
+                    data-sisa="<?= $sisa ?>" <?= $sisa <= 0 ? 'disabled' : '' ?>>
+                    <?= esc(format_tanggal($j['tanggal'])) ?> — sisa <?= $sisa ?>/<?= (int) $j['kuota'] ?>
                   </option>
                 <?php endforeach; ?>
               </select>
             </div>
             <div class="form-group">
               <label>Jumlah Tamu</label>
-              <input type="number" name="jumlah_tamu" id="jumlah_tamu" class="form-control" min="1"
+              <input type="number" name="jumlah_tamu" id="jumlah_tamu" class="form-control" min="1" max="999"
                 value="<?= esc(old('jumlah_tamu') ?: '1') ?>" required>
             </div>
           <?php endif; ?>
@@ -256,6 +313,7 @@ $badgeClass = match ($jenisPaket) {
     const hargaSatuan = <?= json_encode($hargaSatuan) ?>;
     const isHomestay = <?= $isHomestay ? 'true' : 'false' ?>;
     const paketId = <?= (int) $paket['id'] ?>;
+    const jadwalByDate = <?= json_encode($jadwalByDate) ?>;
     const elTotal = document.getElementById('estimasi-total');
     const elQty = document.getElementById('estimasi-qty');
     const elLabel = document.getElementById('estimasi-label');
@@ -273,6 +331,12 @@ $badgeClass = match ($jenisPaket) {
       const end = new Date(b + 'T00:00:00');
       const diff = (end - start) / 86400000;
       return diff > 0 ? Math.floor(diff) : 0;
+    }
+
+    function addDays(dateStr, n) {
+      const d = new Date(dateStr + 'T00:00:00');
+      d.setDate(d.getDate() + n);
+      return d.toISOString().slice(0, 10);
     }
 
     function syncSubmit() {
@@ -330,6 +394,44 @@ $badgeClass = match ($jenisPaket) {
       syncSubmit();
     }
 
+    // Klik tanggal tersedia di kalender → isi formulir
+    document.querySelectorAll('.avail-day[data-state="available"]').forEach(function (cell) {
+      cell.addEventListener('click', function () {
+        const tgl = cell.getAttribute('data-tanggal');
+        if (!tgl) return;
+
+        if (isHomestay) {
+          const cin = document.getElementById('check_in');
+          if (cin && cin._flatpickr) cin._flatpickr.setDate(tgl, true);
+          else if (cin) cin.value = tgl;
+
+          const cout = document.getElementById('check_out');
+          const currentOut = cout ? cout.value : '';
+          const firstNight = addDays(tgl, 1);
+          if (!currentOut || currentOut <= tgl) {
+            const target = currentOut && currentOut > tgl ? currentOut : firstNight;
+            if (cout && cout._flatpickr) cout._flatpickr.setDate(target, true);
+            else if (cout) cout.value = target;
+          }
+
+          Array.prototype.forEach.call(document.querySelectorAll('.avail-day'), function (c) {
+            c.classList.toggle('is-selected', c.getAttribute('data-tanggal') === tgl);
+          });
+          updateHomestay();
+        } else {
+          const jadwalId = jadwalByDate[tgl];
+          const sel = document.getElementById('jadwal_id');
+          if (!jadwalId || !sel) return;
+          const option = sel.querySelector('option[value="' + jadwalId + '"]');
+          if (option && !option.disabled) {
+            sel.value = String(jadwalId);
+          }
+          // tampilkan judul di atas select sebagai feedback
+          updateWisata();
+        }
+      });
+    });
+
     agreeEl?.addEventListener('change', syncSubmit);
 
     if (isHomestay) {
@@ -338,7 +440,9 @@ $badgeClass = match ($jenisPaket) {
       document.getElementById('check_out')?.addEventListener('change', updateHomestay);
       updateHomestay();
     } else {
-      document.getElementById('jumlah_tamu')?.addEventListener('input', updateWisata);
+      const jumEl = document.getElementById('jumlah_tamu');
+      jumEl?.addEventListener('input', updateWisata);
+      document.getElementById('jadwal_id')?.addEventListener('change', updateWisata);
       updateWisata();
     }
 

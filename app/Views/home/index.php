@@ -96,6 +96,7 @@ $fiturProduk = fitur_produk_aktif();
           <div class="home-estimate-breakdown" id="estimateBreakdown">2 orang</div>
           <strong id="estimateTotal">Rp 0</strong>
         </div>
+        <p id="estimateAvailMsg" class="availability-msg" aria-live="polite" hidden></p>
       </div>
 
       <div class="home-hero-actions">
@@ -157,13 +158,21 @@ $fiturProduk = fitur_produk_aktif();
           'camping' => 'badge-camping',
           default => 'badge-wisata',
         };
+        $avail = $ketersediaan[(int) $p['id']] ?? ['total' => 0, 'available' => 0, 'remaining' => null];
         ?>
         <a class="card" href="<?= site_url('paket-wisata/' . $p['slug']) ?>">
           <img class="card-img" src="<?= esc(cover_url($p['gambar_cover'] ?? null, $jenisPaket)) ?>"
             alt="<?= esc($p['nama']) ?>">
           <div class="card-body">
+            <div class="card-badges">
+              <span class="badge-jenis <?= $badgeClass ?>"><?= esc(label_jenis_paket($jenisPaket)) ?></span>
+              <?php if ((int) $avail['available'] > 0): ?>
+                <span class="badge badge-available">Tersedia</span>
+              <?php else: ?>
+                <span class="badge badge-soldout">Penuh</span>
+              <?php endif; ?>
+            </div>
             <h3><?= esc($p['nama']) ?></h3>
-            <span class="badge-jenis <?= $badgeClass ?>"><?= esc(label_jenis_paket($jenisPaket)) ?></span>
             <div class="price"><?= format_rupiah($p['harga']) ?>
               <small style="font-weight:400;color:var(--sepia)">/
                 <?= esc(satuan_label($jenisPaket, $p['satuan_harga'] ?? null)) ?></small>
@@ -273,6 +282,8 @@ $fiturProduk = fitur_produk_aktif();
     const estimateTotal = document.getElementById('estimateTotal');
     const estimateNote = document.getElementById('estimateNote');
     const estimateBreakdown = document.getElementById('estimateBreakdown');
+    const estimateAvailMsg = document.getElementById('estimateAvailMsg');
+    let availTimer = null;
     const carousel = document.getElementById('heroCarousel');
     const slides = carousel ? Array.from(carousel.querySelectorAll('.hero-carousel-slide')) : [];
     const dotsWrap = document.getElementById('heroCarouselDots');
@@ -416,6 +427,46 @@ $fiturProduk = fitur_produk_aktif();
       calcEstimate();
     }
 
+    function setAvail(msg, ok, busy) {
+      if (!estimateAvailMsg) return;
+      if (busy) {
+        estimateAvailMsg.hidden = false;
+        estimateAvailMsg.className = 'availability-msg';
+        estimateAvailMsg.textContent = msg;
+        return;
+      }
+      estimateAvailMsg.hidden = !msg;
+      estimateAvailMsg.textContent = msg || '';
+      estimateAvailMsg.className = 'availability-msg' + (ok ? ' ok' : ' err');
+    }
+
+    function checkMenginapAvailability() {
+      if (activeJenis !== 'menginap' || !rangeFp) {
+        setAvail('', false);
+        return;
+      }
+      const dates = rangeFp.selectedDates || [];
+      const opt = estimateSelect?.selectedOptions?.[0];
+      if (!opt || !opt.value || dates.length !== 2) {
+        setAvail('', false);
+        return;
+      }
+      const fmt = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+      const checkIn = fmt(dates[0]);
+      const checkOut = fmt(dates[1]);
+      setAvail('Memeriksa ketersediaan…', false, true);
+      clearTimeout(availTimer);
+      availTimer = setTimeout(() => {
+        fetch('<?= site_url('api/homestay-availability') ?>'
+          + '?paket_id=' + encodeURIComponent(opt.value)
+          + '&check_in=' + encodeURIComponent(checkIn)
+          + '&check_out=' + encodeURIComponent(checkOut))
+          .then((res) => res.json())
+          .then((data) => setAvail(data.message || '', !!data.ok))
+          .catch(() => setAvail('Gagal cek ketersediaan', false));
+      }, 400);
+    }
+
     function calcEstimate() {
       if (!estimateSelect || !estimateQty || !estimateTotal) return;
       const opt = estimateSelect.selectedOptions[0];
@@ -441,6 +492,8 @@ $fiturProduk = fitur_produk_aktif();
 
       estimateTotal.textContent = total > 0 ? rupiah(total) : (isMenginap ? '—' : rupiah(0));
       if (estimateBreakdown) estimateBreakdown.textContent = breakdown;
+      if (isMenginap) checkMenginapAvailability();
+      else if (estimateAvailMsg) setAvail('', false);
     }
 
     function nudge(inputId, delta) {

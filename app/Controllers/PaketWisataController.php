@@ -20,6 +20,9 @@ class PaketWisataController extends BaseController
             $jenis = 'menginap';
         }
 
+        $q = trim((string) $this->request->getGet('q'));
+        $paket = model(PaketWisataModel::class)->findPublished(null, $jenis, $q !== '' ? $q : null);
+
         $title = match ($jenis) {
             'menginap' => 'Homestay & Camping',
             'wisata' => 'Paket Wisata',
@@ -28,8 +31,10 @@ class PaketWisataController extends BaseController
 
         return view('paket-wisata/index', [
             'title' => $title,
-            'paket' => model(PaketWisataModel::class)->findPublished(null, $jenis),
+            'paket' => $paket,
             'activeJenis' => $jenis,
+            'q' => $q,
+            'ketersediaan' => $this->collectAvailability($paket),
         ]);
     }
 
@@ -42,12 +47,52 @@ class PaketWisataController extends BaseController
             throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
         }
 
-        $jadwal = model(JadwalPaketWisataModel::class)->availableForPaket((int) $paket['id']);
+        $paketId = (int) $paket['id'];
+        $jadwalModel = model(JadwalPaketWisataModel::class);
+        $jadwal = $jadwalModel->availableForPaket($paketId);
+
+        $today = date('Y-m-d');
+        $to = date('Y-m-d', strtotime('+62 days'));
 
         return view('paket-wisata/show', [
             'title' => $paket['nama'],
             'paket' => $paket,
             'jadwal' => $jadwal,
+            'availabilityMap' => $jadwalModel->availabilityMap($paketId, $today, $to),
+            'jadwalByDate' => $this->jadwalByDate($jadwal),
         ]);
+    }
+
+    /**
+     * Peta tanggal => jadwal_id untuk interaksi kalender dengan form wisata.
+     *
+     * @param list<array> $jadwal
+     *
+     * @return array<string, int>
+     */
+    protected function jadwalByDate(array $jadwal): array
+    {
+        $map = [];
+        foreach ($jadwal as $j) {
+            $map[$j['tanggal']] = (int) $j['id'];
+        }
+
+        return $map;
+    }
+
+    /**
+     * @param list<array> $paket
+     *
+     * @return array<int, array{total:int,available:int,remaining:?string}>
+     */
+    protected function collectAvailability(array $paket): array
+    {
+        $jadwalModel = model(JadwalPaketWisataModel::class);
+        $result = [];
+        foreach ($paket as $p) {
+            $result[(int) $p['id']] = $jadwalModel->nextAvailability((int) $p['id']);
+        }
+
+        return $result;
     }
 }

@@ -2135,3 +2135,310 @@ textarea.lexical-field {
 .swal2-title {
   font-family: var(--font-heading);
 }
+
+/* ----------------------------------------------------------------------- */
+/* Katalog — pencarian & kartu ketersediaan                                */
+/* ----------------------------------------------------------------------- */
+.katalog-filter {
+  margin-bottom: 1.5rem;
+}
+
+.katalog-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 30rem;
+  margin-inline: auto;
+  position: relative;
+}
+
+.katalog-search > i {
+  position: absolute;
+  left: 0.9rem;
+  color: var(--sepia);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.katalog-search input {
+  padding-left: 2.4rem;
+  border-radius: 999px;
+}
+
+.katalog-count {
+  text-align: center;
+  color: var(--sepia);
+  font-size: 0.92rem;
+  margin: -0.5rem 0 1.5rem;
+}
+
+.card-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.badge-available {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.badge-soldout {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.card-avail {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.7rem;
+  font-size: 0.83rem;
+  color: var(--sepia);
+  padding-top: 0.6rem;
+  border-top: 1px dashed var(--cream-dark);
+}
+
+.card-avail i {
+  color: var(--olive);
+}
+
+.card-avail i.fa-circle-xmark {
+  color: #b45309;
+}
+
+/* ----------------------------------------------------------------------- */
+/* Kalender ketersediaan (halaman detail)                                  */
+/* ----------------------------------------------------------------------- */
+.avail-calendar {
+  margin-top: 2.25rem;
+  padding-top: 1.75rem;
+  border-top: 1px solid var(--cream-dark);
+}
+
+.avail-calendar-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.avail-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  font-size: 0.85rem;
+  color: var(--sepia);
+}
+
+.avail-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.avail-legend-item .dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.dot.is-available {
+  background: var(--olive);
+}
+
+.dot.is-full {
+  background: var(--terracotta);
+}
+
+.dot.is-none {
+  background: var(--cream-dark);
+}
+
+.avail-months {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15.5rem, 1fr));
+  gap: 1.25rem;
+}
+
+.avail-month-title {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--deep);
+  margin-bottom: 0.55rem;
+}
+
+.avail-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--sepia);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.3rem;
+}
+
+.avail-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.3rem;
+}
+
+.avail-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.1rem;
+  aspect-ratio: 1;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  cursor: default;
+  padding: 0.2rem;
+  color: var(--deep);
+  background: transparent;
+  transition:
+    background 0.15s,
+    transform 0.1s;
+}
+
+.avail-day.is-empty {
+  background: transparent;
+  border-color: transparent;
+}
+
+.avail-day.is-past {
+  color: #b0a08f;
+  opacity: 0.55;
+}
+
+.avail-day.is-none {
+  background: #f2e8d7;
+  color: #b0a08f;
+}
+
+.avail-day.is-full {
+  background: rgba(193, 80, 46, 0.14);
+  color: var(--terracotta);
+}
+
+.avail-day.is-available {
+  background: rgba(122, 132, 80, 0.18);
+  cursor: pointer;
+}
+
+.avail-day.is-available:hover {
+  background: var(--olive);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+.avail-day.is-selected {
+  outline: 2px solid var(--deep);
+}
+
+.avail-day[disabled] {
+  cursor: default;
+}
+
+.avail-day-num {
+  line-height: 1;
+}
+
+.avail-day-tag {
+  font-size: 0.55rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.avail-hint {
+  margin: 1rem 0 0;
+  font-size: 0.85rem;
+  color: var(--sepia);
+}
+
+/* ----------------------------------------------------------------------- */
+/* Halaman status transaksi publik                                         */
+/* ----------------------------------------------------------------------- */
+.status-card {
+  background: var(--white);
+  border: 1px solid var(--cream-dark);
+  border-radius: 14px;
+  padding: 1.5rem clamp(1.25rem, 4vw, 2rem);
+  box-shadow: 0 10px 30px rgba(74, 50, 34, 0.06);
+}
+
+.status-card-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.status-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.badge-reservasi {
+  background: rgba(201, 166, 107, 0.22);
+  color: var(--deep);
+}
+
+.status-panel {
+  margin-bottom: 1.25rem;
+  padding: 1.1rem 1.2rem;
+  border: 1px solid var(--cream-dark);
+  border-radius: 10px;
+}
+
+.status-panel h2 {
+  font-size: 1.15rem;
+  margin: 0 0 0.85rem;
+}
+
+.status-link {
+  font-size: 0.8rem;
+  margin-left: 0.35rem;
+}
+
+.status-total {
+  padding-top: 0.7rem;
+  margin-top: 0.2rem;
+  border-top: 1px dashed var(--cream-dark);
+}
+
+.status-total-value {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--terracotta);
+}
+
+/* Pesan ketersediaan di panel estimasi beranda (hero gelap) */
+.home-estimate .availability-msg {
+  font-size: 0.85rem;
+  margin: 0.6rem 0 0;
+  line-height: 1.45;
+}
+
+.home-estimate .availability-msg.ok {
+  color: #b6f0cb;
+}
+
+.home-estimate .availability-msg.err {
+  color: #ffd9d0;
+}

@@ -213,4 +213,74 @@ class JadwalPaketWisataModel extends Model
             ->set('kuota_terpakai', 'kuota_terpakai - ' . (int) $jumlah, false)
             ->update();
     }
+
+    /**
+     * Ringkasan ketersediaan mendatang untuk sebuah paket.
+     *
+     * @return array{total:int,available:int,remaining:?string}
+     */
+    public function nextAvailability(int $paketId): array
+    {
+        $rows = $this->where('paket_wisata_id', $paketId)
+            ->where('tanggal >=', date('Y-m-d'))
+            ->orderBy('tanggal', 'ASC')
+            ->findAll();
+
+        $available = 0;
+        $remaining = null;
+        foreach ($rows as $row) {
+            $sisa = (int) $row['kuota'] - (int) $row['kuota_terpakai'];
+            if ($sisa > 0) {
+                $available++;
+                if ($remaining === null) {
+                    $remaining = $row['tanggal'];
+                }
+            }
+        }
+
+        return [
+            'total' => count($rows),
+            'available' => $available,
+            'remaining' => $remaining,
+        ];
+    }
+
+    /**
+     * Status ketersediaan tiap tanggal dalam rentang [from, to] untuk kalender publik.
+     *
+     * @return array<string, string> tanggal => available|full|none|past
+     */
+    public function availabilityMap(int $paketId, string $from, string $toInclusive): array
+    {
+        $today = date('Y-m-d');
+        $end = (new DateTimeImmutable($toInclusive))->modify('+1 day');
+        $period = new DatePeriod(new DateTimeImmutable($from), new DateInterval('P1D'), $end);
+
+        $rows = $this->where('paket_wisata_id', $paketId)
+            ->where('tanggal >=', $from)
+            ->where('tanggal <=', $toInclusive)
+            ->findAll();
+
+        $byDate = [];
+        foreach ($rows as $row) {
+            $byDate[$row['tanggal']] = $row;
+        }
+
+        $map = [];
+        foreach ($period as $day) {
+            $tgl = $day->format('Y-m-d');
+            if ($tgl < $today) {
+                $map[$tgl] = 'past';
+                continue;
+            }
+            if (!isset($byDate[$tgl])) {
+                $map[$tgl] = 'none';
+                continue;
+            }
+            $sisa = (int) $byDate[$tgl]['kuota'] - (int) $byDate[$tgl]['kuota_terpakai'];
+            $map[$tgl] = $sisa > 0 ? 'available' : 'full';
+        }
+
+        return $map;
+    }
 }

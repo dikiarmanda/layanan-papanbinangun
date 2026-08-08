@@ -56,8 +56,8 @@ $fiturProduk = fitur_produk_aktif();
                   <tr>
                     <td><?= esc($r['kode_reservasi']) ?></td>
                     <td><?= esc($r['paket_nama']) ?></td>
-                    <td><?= esc($r['status_pembayaran']) ?></td>
-                    <td><?= esc($r['status_reservasi']) ?></td>
+                    <td><span class="akun-badge"><?= esc(label_status_pembayaran((string) $r['status_pembayaran'])) ?></span></td>
+                    <td><?= esc(label_status_reservasi((string) $r['status_reservasi'])) ?></td>
                     <td><a href="<?= site_url('akun/reservasi/' . $r['id']) ?>">Detail</a></td>
                   </tr>
                 <?php endforeach; ?>

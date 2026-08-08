@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\JadwalPaketWisataModel;
 use App\Models\PaketWisataModel;
 use App\Models\ProdukModel;
 
@@ -87,14 +88,22 @@ class Home extends BaseController
             ];
         }, $menginap);
 
+        $featured = array_slice($paketAll, 0, 6);
+        $jadwalModel = model(JadwalPaketWisataModel::class);
+        $ketersediaan = [];
+        foreach ($featured as $p) {
+            $ketersediaan[(int) $p['id']] = $jadwalModel->nextAvailability((int) $p['id']);
+        }
+
         return view('home/index', [
             'title'            => 'Layanan Desa Wisata',
-            'paket'            => array_slice($paketAll, 0, 6),
+            'paket'            => $featured,
             'produk'           => array_slice($produkAll, 0, 6),
             'heroSlides'       => $heroSlides,
             'heroBackgrounds'  => $heroBackgrounds,
             'estimateWisata'   => $estimateWisata,
             'estimateMenginap' => $estimateMenginap,
+            'ketersediaan'     => $ketersediaan,
         ]);
     }
 }

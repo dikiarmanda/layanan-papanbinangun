@@ -16,29 +16,36 @@ $paket = $paket ?? null; ?>
           <dl class="akun-dl">
             <div>
               <dt>Pembayaran</dt>
-              <dd><?= esc($r['status_pembayaran']) ?></dd>
+              <dd><span class="badge <?= esc((string) $r['status_pembayaran']) ?>"><?= esc(label_status_pembayaran((string) $r['status_pembayaran'])) ?></span></dd>
             </div>
             <div>
               <dt>Status reservasi</dt>
-              <dd><?= esc($r['status_reservasi']) ?></dd>
+              <dd><span class="badge badge-reservasi"><?= esc(label_status_reservasi((string) $r['status_reservasi'])) ?></span></dd>
             </div>
             <div>
               <dt>Jumlah tamu</dt>
-              <dd><?= (int) $r['jumlah_tamu'] ?></dd>
+              <dd><?= (int) $r['jumlah_tamu'] ?> orang</dd>
             </div>
             <?php if (!empty($r['check_in'])): ?>
               <div>
                 <dt>Check-in</dt>
-                <dd><?= esc($r['check_in']) ?></dd>
+                <dd><?= esc(format_tanggal($r['check_in'])) ?></dd>
               </div>
               <div>
                 <dt>Check-out</dt>
-                <dd><?= esc($r['check_out'] ?? '—') ?></dd>
+                <dd><?= esc(format_tanggal($r['check_out'] ?? null)) ?></dd>
               </div>
               <div>
                 <dt>Malam</dt>
                 <dd><?= (int) ($r['jumlah_malam'] ?? 0) ?></dd>
               </div>
+            <?php else: ?>
+              <?php if (!empty($jadwal['tanggal'])): ?>
+                <div>
+                  <dt>Tanggal kegiatan</dt>
+                  <dd><?= esc(format_tanggal($jadwal['tanggal'])) ?></dd>
+                </div>
+              <?php endif; ?>
             <?php endif; ?>
             <div>
               <dt>Total</dt>

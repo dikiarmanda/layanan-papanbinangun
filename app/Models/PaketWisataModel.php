@@ -24,7 +24,7 @@ class PaketWisataModel extends Model
     ];
     protected $useTimestamps = true;
 
-    public function findPublished(?int $limit = null, ?string $jenis = null): array
+    public function findPublished(?int $limit = null, ?string $jenis = null, ?string $q = null): array
     {
         $builder = $this->where('status', 'publish')->orderBy('created_at', 'DESC');
         if ($jenis !== null && $jenis !== '') {
@@ -33,6 +33,12 @@ class PaketWisataModel extends Model
             } else {
                 $builder->where('jenis', $jenis);
             }
+        }
+        if ($q !== null && trim($q) !== '') {
+            $builder->groupStart()
+                ->like('nama', trim($q))
+                ->orLike('deskripsi', trim($q))
+                ->groupEnd();
         }
         if ($limit) {
             $builder->limit($limit);

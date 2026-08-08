@@ -67,12 +67,17 @@ class AkunController extends BaseController
         }
 
         $paket = model(PaketWisataModel::class)->find((int) $row['paket_wisata_id']);
+        $jadwal = null;
+        if (!empty($row['jadwal_id'])) {
+            $jadwal = model(\App\Models\JadwalPaketWisataModel::class)->find((int) $row['jadwal_id']);
+        }
 
         return view('akun/reservasi_detail', [
             'title' => $row['kode_reservasi'],
             'pelanggan' => $this->currentPelanggan(),
             'reservasi' => $row,
             'paket' => $paket,
+            'jadwal' => $jadwal,
             'aktifMenu' => 'reservasi',
         ]);
     }

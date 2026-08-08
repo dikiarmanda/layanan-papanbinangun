@@ -275,6 +275,71 @@ if (!function_exists('pelanggan_logged_in')) {
     }
 }
 
+if (!function_exists('label_status_pembayaran')) {
+    function label_status_pembayaran(string $status): string
+    {
+        return match ($status) {
+            'pending' => 'Menunggu Pembayaran',
+            'paid' => 'Lunas',
+            'failed' => 'Gagal',
+            'expired' => 'Kedaluwarsa',
+            default => $status,
+        };
+    }
+}
+
+if (!function_exists('label_status_reservasi')) {
+    function label_status_reservasi(string $status): string
+    {
+        return match ($status) {
+            'menunggu_pembayaran' => 'Menunggu Pembayaran',
+            'dikonfirmasi' => 'Dikonfirmasi',
+            'selesai' => 'Selesai',
+            'dibatalkan' => 'Dibatalkan',
+            default => $status,
+        };
+    }
+}
+
+if (!function_exists('format_tanggal')) {
+    /**
+     * Format tanggal Y-m-d / datetime ke format Indonesia.
+     */
+    function format_tanggal(?string $tanggal, bool $withTime = false): string
+    {
+        if ($tanggal === null || $tanggal === '') {
+            return '—';
+        }
+
+        $t = strtotime($tanggal);
+        if ($t === false) {
+            return $tanggal;
+        }
+
+        $bulan = [
+            1 => 'Januari',
+            2 => 'Februari',
+            3 => 'Maret',
+            4 => 'April',
+            5 => 'Mei',
+            6 => 'Juni',
+            7 => 'Juli',
+            8 => 'Agustus',
+            9 => 'September',
+            10 => 'Oktober',
+            11 => 'November',
+            12 => 'Desember',
+        ];
+
+        $hasil = date('j', $t) . ' ' . ($bulan[(int) date('n', $t)] ?? date('m', $t)) . ' ' . date('Y', $t);
+        if ($withTime) {
+            $hasil .= ', ' . date('H:i', $t);
+        }
+
+        return $hasil;
+    }
+}
+
 if (!function_exists('pelanggan_aktif')) {
     /**
      * Data sesi pelanggan yang sedang login (tanpa password).
