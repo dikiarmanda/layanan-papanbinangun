@@ -40,8 +40,10 @@
   function initSelect2(root) {
     if (!$ || !$.fn || !$.fn.select2) return;
 
-    $(root || document)
-      .find("select.select2, select.js-select2")
+    const $root = $(root || document);
+    $root
+      .filter("select.select2, select.js-select2")
+      .add($root.find("select.select2, select.js-select2"))
       .each(function () {
         const $el = $(this);
         if ($el.hasClass("select2-hidden-accessible")) return;
@@ -51,10 +53,24 @@
           placeholder: $el.data("placeholder") || "Pilih…",
           allowClear: $el.data("allow-clear") === true || $el.data("allow-clear") === 1,
           language: "id",
+          minimumResultsForSearch: $el.data("minimum-results-for-search"),
           dropdownParent: $el.data("dropdown-parent")
             ? $($el.data("dropdown-parent"))
             : undefined,
         });
+      });
+  }
+
+  function destroySelect2(root) {
+    if (!$ || !$.fn || !$.fn.select2) return;
+
+    const $root = $(root || document);
+    $root
+      .filter("select.select2, select.js-select2")
+      .add($root.find("select.select2, select.js-select2"))
+      .each(function () {
+        const $el = $(this);
+        if ($el.hasClass("select2-hidden-accessible")) $el.select2("destroy");
       });
   }
 
@@ -93,6 +109,7 @@
     boot: boot,
     initDropify: initDropify,
     initSelect2: initSelect2,
+    destroySelect2: destroySelect2,
     initLexical: initLexical,
     initSweetAlert: initSweetAlert,
   };

@@ -67,7 +67,8 @@ $fiturProduk = fitur_produk_aktif();
         <div class="home-estimate-fields" id="estimateFields">
           <div class="home-estimate-field home-estimate-field--paket">
             <label for="estimatePaket">Paket</label>
-            <select id="estimatePaket" class="home-estimate-select"></select>
+            <select id="estimatePaket" class="home-estimate-select js-select2" data-placeholder="Pilih paket…"
+              data-dropdown-parent=".home-estimate" data-minimum-results-for-search="8"></select>
           </div>
 
           <div class="home-estimate-row" id="estimateControls">
@@ -283,6 +284,7 @@ $fiturProduk = fitur_produk_aktif();
     const estimateNote = document.getElementById('estimateNote');
     const estimateBreakdown = document.getElementById('estimateBreakdown');
     const estimateAvailMsg = document.getElementById('estimateAvailMsg');
+    const { formatRupiah: rupiah, nightsBetween } = window.AppUtils;
     let availTimer = null;
     const carousel = document.getElementById('heroCarousel');
     const slides = carousel ? Array.from(carousel.querySelectorAll('.hero-carousel-slide')) : [];
@@ -291,16 +293,6 @@ $fiturProduk = fitur_produk_aktif();
     let timer = null;
     let activeJenis = 'wisata';
     let rangeFp = null;
-
-    const rupiah = (n) => 'Rp ' + Math.round(n).toLocaleString('id-ID');
-
-    function nightsFromDates(start, end) {
-      if (!start || !end) return 0;
-      const a = new Date(start.getFullYear(), start.getMonth(), start.getDate());
-      const b = new Date(end.getFullYear(), end.getMonth(), end.getDate());
-      const diff = Math.round((b - a) / 86400000);
-      return diff > 0 ? diff : 0;
-    }
 
     function defaultRangeDates() {
       const start = new Date();
@@ -313,7 +305,7 @@ $fiturProduk = fitur_produk_aktif();
     function syncNightsFromFp() {
       if (!estimateNights || !rangeFp) return;
       const dates = rangeFp.selectedDates || [];
-      const nights = dates.length === 2 ? nightsFromDates(dates[0], dates[1]) : 0;
+      const nights = dates.length === 2 ? nightsBetween(dates[0], dates[1]) : 0;
       estimateNights.value = String(Math.max(0, nights));
     }
 
@@ -371,32 +363,10 @@ $fiturProduk = fitur_produk_aktif();
       }
     }
 
-    function destroyEstimateSelect2() {
-      if (!estimateSelect || typeof jQuery === 'undefined') return;
-      const $el = jQuery(estimateSelect);
-      if ($el.hasClass('select2-hidden-accessible')) {
-        $el.select2('destroy');
-      }
-    }
-
-    function initEstimateSelect2() {
-      if (!estimateSelect || typeof jQuery === 'undefined' || typeof jQuery.fn.select2 !== 'function') return;
-      destroyEstimateSelect2();
-      const $el = jQuery(estimateSelect);
-      const $parent = $el.closest('.home-estimate');
-      $el.select2({
-        width: '100%',
-        minimumResultsForSearch: 8,
-        dropdownParent: $parent.length ? $parent : jQuery(document.body),
-        language: 'id',
-        placeholder: 'Pilih paket…',
-      });
-    }
-
     function fillEstimate(mode) {
       const list = estimateData[mode] || [];
       if (!estimateSelect) return;
-      destroyEstimateSelect2();
+      window.VendorInit?.destroySelect2(estimateSelect);
       estimateSelect.innerHTML = '';
       if (!list.length) {
         const opt = document.createElement('option');
@@ -406,7 +376,7 @@ $fiturProduk = fitur_produk_aktif();
         if (estimateTotal) estimateTotal.textContent = 'Rp 0';
         if (estimateBreakdown) estimateBreakdown.textContent = '—';
         setMenginapMode(mode === 'menginap');
-        initEstimateSelect2();
+        window.VendorInit?.initSelect2(estimateSelect);
         return;
       }
       list.forEach((item, i) => {
@@ -423,7 +393,7 @@ $fiturProduk = fitur_produk_aktif();
       });
       if (estimateQty) delete estimateQty.dataset.touched;
       setMenginapMode(mode === 'menginap');
-      initEstimateSelect2();
+      window.VendorInit?.initSelect2(estimateSelect);
       calcEstimate();
     }
 
@@ -480,13 +450,12 @@ $fiturProduk = fitur_produk_aktif();
 
       if (isMenginap && !estimateNightsWrap?.hidden) {
         const nights = Math.max(0, Number(estimateNights?.value || 0));
-        const rumahTxt = qty + ' rumah';
         if (nights < 1) {
           total = 0;
-          breakdown = rumahTxt + ' · pilih tanggal menginap';
+          breakdown = 'pilih tanggal menginap';
         } else {
           total = harga * qty * nights;
-          breakdown = rumahTxt + ' · ' + nights + ' malam · ' + rupiah(harga) + '/malam';
+          breakdown = nights + ' malam · ' + rupiah(harga) + '/malam';
         }
       }
 

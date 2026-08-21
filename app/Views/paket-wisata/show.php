@@ -319,25 +319,8 @@ $hariNama = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
     const elLabel = document.getElementById('estimasi-label');
     const btn = document.getElementById('btn-submit');
     const agreeEl = document.getElementById('setuju_kebijakan');
+    const { formatRupiah: formatRp, nightsBetween, addDays } = window.AppUtils;
     let availabilityOk = !isHomestay;
-
-    function formatRp(n) {
-      return 'Rp ' + Math.round(Number(n)).toLocaleString('id-ID');
-    }
-
-    function nightsBetween(a, b) {
-      if (!a || !b) return 0;
-      const start = new Date(a + 'T00:00:00');
-      const end = new Date(b + 'T00:00:00');
-      const diff = (end - start) / 86400000;
-      return diff > 0 ? Math.floor(diff) : 0;
-    }
-
-    function addDays(dateStr, n) {
-      const d = new Date(dateStr + 'T00:00:00');
-      d.setDate(d.getDate() + n);
-      return d.toISOString().slice(0, 10);
-    }
 
     function syncSubmit() {
       if (!btn) return;

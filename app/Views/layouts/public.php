@@ -147,8 +147,22 @@
 
   <?php if (!empty($site['no_whatsapp'])): ?>
     <a href="<?= wa_link($site['no_whatsapp'], 'Halo, saya ingin bertanya tentang layanan ' . $brandName) ?>"
-      class="wa-float" target="_blank" rel="noopener" aria-label="Chat WhatsApp"><i class="fa-brands fa-whatsapp text-white"></i></a>
+      class="wa-float" target="_blank" rel="noopener" aria-label="Chat WhatsApp"><i
+        class="fa-brands fa-whatsapp text-white"></i></a>
   <?php endif; ?>
+
+  <script src="<?= base_url('assets/vendor/jquery/jquery.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/select2/js/select2.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/select2/js/i18n/id.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/dropify/js/dropify.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/sweetalert2/js/sweetalert2.all.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/flatpickr/flatpickr.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/flatpickr/l10n/id.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/lexical/lexical-editor.min.js') ?>"></script>
+  <script src="<?= base_url('assets/js/swal-helper.js') ?>"></script>
+  <script src="<?= base_url('assets/js/format-date-number.js') ?>"></script>
+  <script src="<?= base_url('assets/js/datepicker.js') ?>"></script>
+  <script src="<?= base_url('assets/js/vendor-init.js') ?>"></script>
 
   <script>
     (() => {
@@ -162,18 +176,7 @@
       });
     })();
   </script>
-  <script src="<?= base_url('assets/vendor/jquery/jquery.min.js') ?>"></script>
-  <script src="<?= base_url('assets/vendor/select2/js/select2.min.js') ?>"></script>
-  <script src="<?= base_url('assets/vendor/select2/js/i18n/id.js') ?>"></script>
-  <script src="<?= base_url('assets/vendor/dropify/js/dropify.min.js') ?>"></script>
-  <script src="<?= base_url('assets/vendor/sweetalert2/js/sweetalert2.all.min.js') ?>"></script>
-  <script src="<?= base_url('assets/vendor/flatpickr/flatpickr.min.js') ?>"></script>
-  <script src="<?= base_url('assets/vendor/flatpickr/l10n/id.js') ?>"></script>
-  <script src="<?= base_url('assets/vendor/lexical/lexical-editor.min.js') ?>"></script>
-  <script src="<?= base_url('assets/js/swal-helper.js') ?>"></script>
   <?= $this->renderSection('scripts') ?>
-  <script src="<?= base_url('assets/js/datepicker.js') ?>"></script>
-  <script src="<?= base_url('assets/js/vendor-init.js') ?>"></script>
 </body>
 
 </html>

@@ -153,10 +153,7 @@
     const subtotal = <?= (float) $subtotal ?>;
     const isCatering = <?= $isCatering ? 'true' : 'false' ?>;
     const ongkirReady = <?= !empty($ongkirReady) ? 'true' : 'false' ?>;
-
-    function formatRp(n) {
-      return 'Rp ' + Math.round(Number(n)).toLocaleString('id-ID');
-    }
+    const { formatRupiah: formatRp } = window.AppUtils;
 
     function setTotal(ongkir) {
       document.getElementById('ongkir-display').textContent = formatRp(ongkir);
