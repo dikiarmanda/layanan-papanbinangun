@@ -101,8 +101,8 @@ $fiturProduk = fitur_produk_aktif();
       </div>
 
       <div class="home-hero-actions">
-        <a class="btn btn-primary" id="heroPrimaryCta" href="<?= site_url('paket-wisata?jenis=wisata') ?>">Lihat Paket
-          Wisata</a>
+        <a class="btn btn-primary" id="heroPrimaryCta" href="<?= site_url('paket-wisata?jenis=wisata') ?>">Pesan paket
+          ini</a>
         <a class="btn btn-cream" href="<?= site_url('/') ?>#cek-status">Cek Status</a>
       </div>
     </div>
@@ -246,13 +246,13 @@ $fiturProduk = fitur_produk_aktif();
         estimate: true,
       },
       menginap: {
-        lead: 'Homestay & camping ground — harga per rumah / malam. Hitung estimasi menginap Anda.',
+        lead: 'Homestay & camping ground — harga per malam. Hitung estimasi menginap Anda.',
         cta: 'Lihat Homestay & Camping',
         href: '<?= site_url('paket-wisata?jenis=menginap') ?>',
         estimate: true,
       },
       <?php if ($fiturProduk): ?>
-      umkm: {
+        umkm: {
           lead: 'Karya UMKM desa — belanja online dengan pengiriman ekspedisi.',
           cta: 'Belanja UMKM',
           href: '<?= site_url('toko?jenis=umkm') ?>',
@@ -298,7 +298,7 @@ $fiturProduk = fitur_produk_aktif();
       const start = new Date();
       start.setHours(0, 0, 0, 0);
       const end = new Date(start);
-      end.setDate(end.getDate() + 2);
+      end.setDate(end.getDate() + 1);
       return [start, end];
     }
 
@@ -344,14 +344,13 @@ $fiturProduk = fitur_produk_aktif();
         estimateNightsWrap.setAttribute('aria-hidden', on ? 'false' : 'true');
       }
       if (estimateFields) estimateFields.classList.toggle('is-menginap', !!on);
-      if (estimateQtyLabel) estimateQtyLabel.textContent = on ? 'Rumah' : 'Orang';
       if (estimateNote) {
         estimateNote.textContent = on
           ? 'Pilih tanggal check-in & check-out, lalu atur jumlah rumah.'
           : 'Pilih paket, lalu atur jumlah orang.';
       }
       if (estimateQty && !estimateQty.dataset.touched) {
-        estimateQty.value = on ? '1' : '2';
+        estimateQty.value = on ? '1' : '1';
       }
       if (on) {
         initRangePicker();
@@ -481,7 +480,21 @@ $fiturProduk = fitur_produk_aktif();
       const opt = estimateSelect.selectedOptions[0];
       const slug = opt?.dataset?.slug;
       if (slug && (activeJenis === 'wisata' || activeJenis === 'menginap')) {
-        primary.setAttribute('href', '<?= site_url('paket-wisata') ?>/' + encodeURIComponent(slug));
+        const params = new URLSearchParams();
+        params.set('paket_id', opt.value);
+        params.set('qty', estimateQty?.value || '1');
+        
+        if (activeJenis === 'menginap' && !estimateNightsWrap?.hidden) {
+          const dates = rangeFp?.selectedDates || [];
+          if (dates.length === 2) {
+            const fmt = (d) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+            params.set('check_in', fmt(dates[0]));
+            params.set('check_out', fmt(dates[1]));
+            params.set('nights', estimateNights?.value || '0');
+          }
+        }
+        
+        primary.setAttribute('href', '<?= site_url('paket-wisata') ?>/' + encodeURIComponent(slug) + '?' + params.toString());
         primary.textContent = 'Pesan paket ini';
       }
     }

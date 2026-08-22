@@ -203,10 +203,10 @@ if (!function_exists('satuan_label')) {
     function satuan_label(string $jenis, ?string $satuan = null): string
     {
         if ($jenis === 'homestay' || $jenis === 'camping' || $satuan === 'per_rumah') {
-            return 'rumah / malam';
+            return 'malam';
+        } else {
+            return 'orang';
         }
-
-        return 'orang';
     }
 }
 
