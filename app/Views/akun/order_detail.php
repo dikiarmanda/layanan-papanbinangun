@@ -70,7 +70,7 @@ $items = $items ?? []; ?>
               <?php endforeach; ?>
             </ul>
           <?php endif; ?>
-          <a class="btn btn-primary" style="margin-top:1rem" href="<?= site_url('status/' . $o['kode_order']) ?>">Lihat
+          <a class="btn btn-primary akun-actions-single" href="<?= site_url('status/' . $o['kode_order']) ?>">Lihat
             status publik</a>
         </div>
       </div>

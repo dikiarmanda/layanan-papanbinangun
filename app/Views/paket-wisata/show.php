@@ -20,6 +20,22 @@ while ($calCursor < $calEnd) {
   $calCursor = $calCursor->modify('first day of next month');
 }
 $hariNama = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+
+$prefillQty = (int) old('jumlah_tamu');
+if ($prefillQty < 1) {
+  $prefillQty = (int) (request()->getGet('qty') ?: 1);
+}
+$prefillQty = max(1, min(999, $prefillQty));
+
+$prefillCheckIn = (string) (old('check_in') ?: request()->getGet('check_in') ?? '');
+$prefillCheckOut = (string) (old('check_out') ?: request()->getGet('check_out') ?? '');
+if ($prefillCheckIn !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $prefillCheckIn)) {
+  $prefillCheckIn = '';
+}
+if ($prefillCheckOut !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $prefillCheckOut)) {
+  $prefillCheckOut = '';
+}
+$hasPrefill = $prefillQty > 1 || $prefillCheckIn !== '' || $prefillCheckOut !== '';
 ?>
 <section class="section container">
   <div class="booking-layout">
@@ -63,10 +79,10 @@ $hariNama = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
                 <?php for ($i = 0; $i < $leading; $i++): ?><span class="avail-day is-empty"></span><?php endfor; ?>
                 <?php for ($d = 1; $d <= $daysInMonth; $d++): ?>
                   <?php
-                    $tgl = $calKey . '-' . str_pad((string) $d, 2, '0', STR_PAD_LEFT);
-                    $state = $availabilityMap[$tgl] ?? 'none';
-                    $isClickable = $state === 'available';
-                    ?>
+                  $tgl = $calKey . '-' . str_pad((string) $d, 2, '0', STR_PAD_LEFT);
+                  $state = $availabilityMap[$tgl] ?? 'none';
+                  $isClickable = $state === 'available';
+                  ?>
                   <button type="button" class="avail-day is-<?= $state ?>" data-tanggal="<?= $tgl ?>"
                     data-state="<?= $state ?>" <?= $isClickable ? '' : 'disabled' ?>>
                     <span class="avail-day-num"><?= $d ?></span>
@@ -213,20 +229,20 @@ $hariNama = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
             <div class="form-group">
               <label>Check-in</label>
               <input type="text" name="check_in" id="check_in" class="form-control datepicker" required
-                placeholder="Pilih tanggal check-in" data-min="<?= date('Y-m-d') ?>"
-                value="<?= esc(old('check_in') ?: '') ?>" autocomplete="off">
+                placeholder="Pilih tanggal check-in" data-min="<?= date('Y-m-d') ?>" value="<?= esc($prefillCheckIn) ?>"
+                autocomplete="off">
             </div>
             <div class="form-group">
               <label>Check-out</label>
               <input type="text" name="check_out" id="check_out" class="form-control datepicker" required
                 placeholder="Pilih tanggal check-out" data-min="<?= date('Y-m-d', strtotime('+1 day')) ?>"
-                value="<?= esc(old('check_out') ?: '') ?>" autocomplete="off">
+                value="<?= esc($prefillCheckOut) ?>" autocomplete="off">
             </div>
             <p id="avail-msg" class="availability-msg" aria-live="polite"></p>
             <div class="form-group">
               <label>Jumlah tamu (opsional)</label>
               <input type="number" name="jumlah_tamu" id="jumlah_tamu" class="form-control" min="1"
-                value="<?= esc(old('jumlah_tamu') ?: '1') ?>">
+                value="<?= esc((string) $prefillQty) ?>">
             </div>
           <?php else: ?>
             <div class="form-group">
@@ -234,8 +250,7 @@ $hariNama = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
               <select name="jadwal_id" id="jadwal_id" class="form-control" required>
                 <?php foreach ($jadwal as $j): ?>
                   <?php $sisa = (int) $j['kuota'] - (int) $j['kuota_terpakai']; ?>
-                  <option value="<?= (int) $j['id'] ?>" data-tanggal="<?= $j['tanggal'] ?>"
-                    data-sisa="<?= $sisa ?>" <?= $sisa <= 0 ? 'disabled' : '' ?>>
+                  <option value="<?= (int) $j['id'] ?>" data-tanggal="<?= $j['tanggal'] ?>" data-sisa="<?= $sisa ?>" <?= $sisa <= 0 ? 'disabled' : '' ?>>
                     <?= esc(format_tanggal($j['tanggal'])) ?> — sisa <?= $sisa ?>/<?= (int) $j['kuota'] ?>
                   </option>
                 <?php endforeach; ?>
@@ -244,7 +259,7 @@ $hariNama = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
             <div class="form-group">
               <label>Jumlah Tamu</label>
               <input type="number" name="jumlah_tamu" id="jumlah_tamu" class="form-control" min="1" max="999"
-                value="<?= esc(old('jumlah_tamu') ?: '1') ?>" required>
+                value="<?= esc((string) $prefillQty) ?>" required>
             </div>
           <?php endif; ?>
 
@@ -320,6 +335,7 @@ $hariNama = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
     const btn = document.getElementById('btn-submit');
     const agreeEl = document.getElementById('setuju_kebijakan');
     const { formatRupiah: formatRp, nightsBetween, addDays } = window.AppUtils;
+    const hasPrefill = <?= $hasPrefill ? 'true' : 'false' ?>;
     let availabilityOk = !isHomestay;
 
     function syncSubmit() {
@@ -417,16 +433,55 @@ $hariNama = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
 
     agreeEl?.addEventListener('change', syncSubmit);
 
+    function applyPrefillAfterDatepicker() {
+      const params = new URLSearchParams(window.location.search);
+      const qty = params.get('qty');
+      const jumEl = document.getElementById('jumlah_tamu');
+      if (qty && jumEl) {
+        const n = Math.max(1, parseInt(qty, 10) || 1);
+        jumEl.value = String(n);
+      }
+
+      if (isHomestay) {
+        const checkIn = params.get('check_in');
+        const checkOut = params.get('check_out');
+        const cin = document.getElementById('check_in');
+        const cout = document.getElementById('check_out');
+        if (checkIn && cin) {
+          if (cin._flatpickr) cin._flatpickr.setDate(checkIn, true);
+          else cin.value = checkIn;
+        }
+        if (checkOut && cout) {
+          if (cout._flatpickr) cout._flatpickr.setDate(checkOut, true);
+          else cout.value = checkOut;
+        }
+        updateHomestay();
+      } else {
+        updateWisata();
+      }
+
+      if (hasPrefill || params.has('qty') || params.has('check_in')) {
+        const form = document.getElementById('form-reservasi');
+        if (form) {
+          form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    }
+
     if (isHomestay) {
       window.__onHomestayDatesChange = updateHomestay;
       document.getElementById('check_in')?.addEventListener('change', updateHomestay);
       document.getElementById('check_out')?.addEventListener('change', updateHomestay);
-      updateHomestay();
     } else {
       const jumEl = document.getElementById('jumlah_tamu');
       jumEl?.addEventListener('input', updateWisata);
       document.getElementById('jadwal_id')?.addEventListener('change', updateWisata);
-      updateWisata();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', applyPrefillAfterDatepicker);
+    } else {
+      applyPrefillAfterDatepicker();
     }
 
     syncSubmit();

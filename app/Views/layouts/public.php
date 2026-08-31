@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#4a3222">
   <?php
   $site = pengaturan();
   $brandName = $site['nama_desa'] ?: 'Wisata Binangun';
@@ -169,10 +170,23 @@
       const toggle = document.getElementById('navToggle');
       const nav = document.getElementById('siteNav');
       if (!toggle || !nav) return;
-      toggle.addEventListener('click', () => {
-        const open = nav.classList.toggle('is-open');
+
+      const setOpen = (open) => {
+        nav.classList.toggle('is-open', open);
+        document.body.classList.toggle('nav-open', open);
         toggle.setAttribute('aria-expanded', String(open));
+        toggle.setAttribute('aria-label', open ? 'Tutup menu' : 'Buka menu');
         toggle.textContent = open ? '×' : '☰';
+      };
+
+      toggle.addEventListener('click', () => setOpen(!nav.classList.contains('is-open')));
+
+      nav.querySelectorAll('a').forEach((link) => {
+        link.addEventListener('click', () => setOpen(false));
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.matchMedia('(min-width: 768px)').matches) setOpen(false);
       });
     })();
   </script>

@@ -41,7 +41,7 @@ $fiturProduk = fitur_produk_aktif();
           <p class="akun-empty">Belum ada reservasi. <a href="<?= site_url('paket-wisata') ?>">Jelajahi paket</a></p>
         <?php else: ?>
           <div class="akun-table-wrap">
-            <table class="akun-table">
+            <table class="akun-table akun-table--cards">
               <thead>
                 <tr>
                   <th>Kode</th>
@@ -54,11 +54,12 @@ $fiturProduk = fitur_produk_aktif();
               <tbody>
                 <?php foreach ($reservasi as $r): ?>
                   <tr>
-                    <td><?= esc($r['kode_reservasi']) ?></td>
-                    <td><?= esc($r['paket_nama']) ?></td>
-                    <td><span class="akun-badge"><?= esc(label_status_pembayaran((string) $r['status_pembayaran'])) ?></span></td>
-                    <td><?= esc(label_status_reservasi((string) $r['status_reservasi'])) ?></td>
-                    <td><a href="<?= site_url('akun/reservasi/' . $r['id']) ?>">Detail</a></td>
+                    <td data-label="Kode"><?= esc($r['kode_reservasi']) ?></td>
+                    <td data-label="Paket"><?= esc($r['paket_nama']) ?></td>
+                    <td data-label="Pembayaran"><span
+                        class="akun-badge"><?= esc(label_status_pembayaran((string) $r['status_pembayaran'])) ?></span></td>
+                    <td data-label="Status"><?= esc(label_status_reservasi((string) $r['status_reservasi'])) ?></td>
+                    <td data-label=""><a href="<?= site_url('akun/reservasi/' . $r['id']) ?>">Detail</a></td>
                   </tr>
                 <?php endforeach; ?>
               </tbody>
@@ -77,7 +78,7 @@ $fiturProduk = fitur_produk_aktif();
             <p class="akun-empty">Belum ada pesanan. <a href="<?= site_url('toko') ?>">Belanja di toko</a></p>
           <?php else: ?>
             <div class="akun-table-wrap">
-              <table class="akun-table">
+              <table class="akun-table akun-table--cards">
                 <thead>
                   <tr>
                     <th>Kode</th>
@@ -90,11 +91,11 @@ $fiturProduk = fitur_produk_aktif();
                 <tbody>
                   <?php foreach ($orders as $o): ?>
                     <tr>
-                      <td><?= esc($o['kode_order']) ?></td>
-                      <td><?= format_rupiah($o['total_harga']) ?></td>
-                      <td><?= esc($o['status_pembayaran']) ?></td>
-                      <td><?= esc($o['status_order']) ?></td>
-                      <td><a href="<?= site_url('akun/order/' . $o['id']) ?>">Detail</a></td>
+                      <td data-label="Kode"><?= esc($o['kode_order']) ?></td>
+                      <td data-label="Total"><?= format_rupiah($o['total_harga']) ?></td>
+                      <td data-label="Pembayaran"><?= esc($o['status_pembayaran']) ?></td>
+                      <td data-label="Status"><?= esc($o['status_order']) ?></td>
+                      <td data-label=""><a href="<?= site_url('akun/order/' . $o['id']) ?>">Detail</a></td>
                     </tr>
                   <?php endforeach; ?>
                 </tbody>

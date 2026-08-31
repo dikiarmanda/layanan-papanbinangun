@@ -16,11 +16,15 @@ $paket = $paket ?? null; ?>
           <dl class="akun-dl">
             <div>
               <dt>Pembayaran</dt>
-              <dd><span class="badge <?= esc((string) $r['status_pembayaran']) ?>"><?= esc(label_status_pembayaran((string) $r['status_pembayaran'])) ?></span></dd>
+              <dd><span
+                  class="badge <?= esc((string) $r['status_pembayaran']) ?>"><?= esc(label_status_pembayaran((string) $r['status_pembayaran'])) ?></span>
+              </dd>
             </div>
             <div>
               <dt>Status reservasi</dt>
-              <dd><span class="badge badge-reservasi"><?= esc(label_status_reservasi((string) $r['status_reservasi'])) ?></span></dd>
+              <dd><span
+                  class="badge badge-reservasi"><?= esc(label_status_reservasi((string) $r['status_reservasi'])) ?></span>
+              </dd>
             </div>
             <div>
               <dt>Jumlah tamu</dt>
@@ -67,11 +71,12 @@ $paket = $paket ?? null; ?>
           <h2>Aksi</h2>
           <p class="akun-meta" style="margin-bottom:1rem">Gunakan kode di atas untuk cek status publik atau lanjut
             pembayaran.</p>
-          <a class="btn btn-primary" href="<?= site_url('status/' . $r['kode_reservasi']) ?>">Lihat status publik</a>
-          <?php if (!empty($paket['slug'])): ?>
-            <a class="btn btn-outline" style="margin-left:0.5rem"
-              href="<?= site_url('paket-wisata/' . $paket['slug']) ?>">Lihat paket</a>
-          <?php endif; ?>
+          <div class="akun-actions">
+            <a class="btn btn-primary" href="<?= site_url('status/' . $r['kode_reservasi']) ?>">Lihat status publik</a>
+            <?php if (!empty($paket['slug'])): ?>
+              <a class="btn btn-outline" href="<?= site_url('paket-wisata/' . $paket['slug']) ?>">Lihat paket</a>
+            <?php endif; ?>
+          </div>
         </div>
       </div>
     </div>

@@ -1,4 +1,5 @@
 @import "./custom.css";
+@import "./mobile-first.css";
 
 @tailwind base;
 @tailwind components;

@@ -3,6 +3,7 @@ module.exports = {
   content: ['./app/Views/**/*.php', './app/Controllers/**/*.php'],
   corePlugins: {
     preflight: false,
+    container: false,
   },
   theme: {
     extend: {

@@ -9,7 +9,7 @@
         <p class="akun-empty">Belum ada pesanan. <a href="<?= site_url('toko') ?>">Belanja di toko</a></p>
       <?php else: ?>
         <div class="akun-table-wrap">
-          <table class="akun-table">
+          <table class="akun-table akun-table--cards">
             <thead>
               <tr>
                 <th>Kode</th>
@@ -22,14 +22,15 @@
             <tbody>
               <?php foreach ($list as $o): ?>
                 <tr>
-                  <td><?= esc($o['kode_order']) ?></td>
-                  <td><?= date('d M Y', strtotime((string) $o['created_at'])) ?></td>
-                  <td><?= format_rupiah($o['total_harga']) ?></td>
-                  <td>
+                  <td data-label="Kode"><?= esc($o['kode_order']) ?></td>
+                  <td data-label="Tanggal"><?= date('d M Y', strtotime((string) $o['created_at'])) ?></td>
+                  <td data-label="Total"><?= format_rupiah($o['total_harga']) ?></td>
+                  <td data-label="Status">
                     <span class="akun-badge"><?= esc($o['status_pembayaran']) ?></span>
                     <div class="akun-meta"><?= esc($o['status_order']) ?></div>
                   </td>
-                  <td><a class="btn btn-sm btn-outline" href="<?= site_url('akun/order/' . $o['id']) ?>">Detail</a></td>
+                  <td data-label=""><a class="btn btn-sm btn-outline"
+                      href="<?= site_url('akun/order/' . $o['id']) ?>">Detail</a></td>
                 </tr>
               <?php endforeach; ?>
             </tbody>

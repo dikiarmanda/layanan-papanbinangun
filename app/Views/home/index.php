@@ -252,7 +252,7 @@ $fiturProduk = fitur_produk_aktif();
         estimate: true,
       },
       <?php if ($fiturProduk): ?>
-        umkm: {
+          umkm: {
           lead: 'Karya UMKM desa — belanja online dengan pengiriman ekspedisi.',
           cta: 'Belanja UMKM',
           href: '<?= site_url('toko?jenis=umkm') ?>',
@@ -329,9 +329,11 @@ $fiturProduk = fitur_produk_aktif();
           if (selectedDates.length === 2) {
             syncNightsFromFp();
             calcEstimate();
+            syncEstimateCta();
           } else if (selectedDates.length < 2) {
             if (estimateNights) estimateNights.value = '0';
             calcEstimate();
+            syncEstimateCta();
           }
         },
       });
@@ -473,6 +475,7 @@ $fiturProduk = fitur_produk_aktif();
       el.value = String(next);
       el.dataset.touched = '1';
       calcEstimate();
+      syncEstimateCta();
     }
 
     function syncEstimateCta() {
@@ -483,7 +486,7 @@ $fiturProduk = fitur_produk_aktif();
         const params = new URLSearchParams();
         params.set('paket_id', opt.value);
         params.set('qty', estimateQty?.value || '1');
-        
+
         if (activeJenis === 'menginap' && !estimateNightsWrap?.hidden) {
           const dates = rangeFp?.selectedDates || [];
           if (dates.length === 2) {
@@ -493,7 +496,7 @@ $fiturProduk = fitur_produk_aktif();
             params.set('nights', estimateNights?.value || '0');
           }
         }
-        
+
         primary.setAttribute('href', '<?= site_url('paket-wisata') ?>/' + encodeURIComponent(slug) + '?' + params.toString());
         primary.textContent = 'Pesan paket ini';
       }
@@ -604,6 +607,7 @@ $fiturProduk = fitur_produk_aktif();
     estimateQty?.addEventListener('input', () => {
       if (estimateQty) estimateQty.dataset.touched = '1';
       calcEstimate();
+      syncEstimateCta();
     });
     document.querySelectorAll('.home-estimate-step').forEach((btn) => {
       btn.addEventListener('click', () => {
