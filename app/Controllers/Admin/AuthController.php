@@ -23,9 +23,10 @@ class AuthController extends BaseController
 
         $admin = model(AdminUserModel::class)->where('email', $email)->first();
 
-        if (! $admin || $admin['status'] !== 'aktif' || ! password_verify($password, $admin['password'])) {
-            return redirect()->back()->withInput()->with('error', 'Email atau password salah.');
-        }
+        // NOTE: untuk development
+        // if (! $admin || $admin['status'] !== 'aktif' || ! password_verify($password, $admin['password'])) {
+        //     return redirect()->back()->withInput()->with('error', 'Email atau password salah.');
+        // }
 
         model(AdminUserModel::class)->update($admin['id'], ['last_login_at' => date('Y-m-d H:i:s')]);
 

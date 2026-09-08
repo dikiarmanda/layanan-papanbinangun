@@ -252,7 +252,7 @@ $fiturProduk = fitur_produk_aktif();
         estimate: true,
       },
       <?php if ($fiturProduk): ?>
-          umkm: {
+            umkm: {
           lead: 'Karya UMKM desa — belanja online dengan pengiriman ekspedisi.',
           cta: 'Belanja UMKM',
           href: '<?= site_url('toko?jenis=umkm') ?>',
@@ -367,7 +367,7 @@ $fiturProduk = fitur_produk_aktif();
     function fillEstimate(mode) {
       const list = estimateData[mode] || [];
       if (!estimateSelect) return;
-      window.VendorInit?.destroySelect2(estimateSelect);
+      window.Select2Init?.destroy(estimateSelect);
       estimateSelect.innerHTML = '';
       if (!list.length) {
         const opt = document.createElement('option');
@@ -377,7 +377,7 @@ $fiturProduk = fitur_produk_aktif();
         if (estimateTotal) estimateTotal.textContent = 'Rp 0';
         if (estimateBreakdown) estimateBreakdown.textContent = '—';
         setMenginapMode(mode === 'menginap');
-        window.VendorInit?.initSelect2(estimateSelect);
+        window.Select2Init?.init(estimateSelect);
         return;
       }
       list.forEach((item, i) => {
@@ -394,7 +394,7 @@ $fiturProduk = fitur_produk_aktif();
       });
       if (estimateQty) delete estimateQty.dataset.touched;
       setMenginapMode(mode === 'menginap');
-      window.VendorInit?.initSelect2(estimateSelect);
+      window.Select2Init?.init(estimateSelect);
       calcEstimate();
     }
 

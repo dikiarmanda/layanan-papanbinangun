@@ -67,9 +67,11 @@
           <tbody>
             <?php if (empty($reservasiBaru)): ?>
               <tr>
-                <td colspan="4" class="empty-state">
-                  <i class="fa-solid fa-inbox"></i>
-                  Belum ada reservasi.
+                <td colspan="4" class="empty-state text-center">
+                  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <i class="fa-solid fa-inbox" style="font-size: 2em;"></i>
+                    <span>Belum ada reservasi.</span>
+                  </div>
                 </td>
               </tr>
             <?php else: ?>
@@ -131,9 +133,11 @@
         <tbody>
           <?php if (empty($orderBaru)): ?>
             <tr>
-              <td colspan="5" class="empty-state">
-                <i class="fa-solid fa-inbox"></i>
-                Belum ada order.
+              <td colspan="5" class="empty-state text-center">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                  <i class="fa-solid fa-inbox" style="font-size: 2em;"></i>
+                  <span>Belum ada order.</span>
+                </div>
               </td>
             </tr>
           <?php else: ?>

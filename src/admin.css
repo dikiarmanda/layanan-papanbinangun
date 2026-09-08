@@ -2,7 +2,6 @@
  * Admin Panel — Layanan Papanbinangun
  * Gaya diselaraskan dengan panel CMS desa (sidebar + konten cream).
  */
-
 :root {
   --admin-cream: #f4e9d8;
   --admin-cream-dark: #e8d9c0;
@@ -58,7 +57,6 @@ body.admin-body {
 }
 
 /* Sidebar */
-
 .admin-sidebar {
   width: var(--admin-sidebar-width);
   background: linear-gradient(180deg, #3f2a1d 0%, var(--admin-sidebar) 100%);
@@ -201,7 +199,6 @@ body.admin-body {
 }
 
 /* Main */
-
 .admin-main {
   flex: 1;
   margin-left: var(--admin-sidebar-width);
@@ -265,7 +262,6 @@ body.admin-body {
 }
 
 /* Buttons */
-
 .btn {
   display: inline-flex;
   align-items: center;
@@ -377,7 +373,6 @@ body.admin-body {
 }
 
 /* Stats */
-
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
@@ -450,7 +445,6 @@ a.stat-card:hover {
 }
 
 /* Cards / panels */
-
 .grid-2 {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -560,7 +554,6 @@ a.stat-card:hover {
 }
 
 /* Badges */
-
 .badge {
   display: inline-block;
   padding: 0.2rem 0.55rem;
@@ -602,7 +595,6 @@ a.stat-card:hover {
 }
 
 /* Activity */
-
 .activity-list {
   list-style: none;
   padding: 0;
@@ -649,7 +641,6 @@ a.stat-card:hover {
 }
 
 /* Forms inside admin */
-
 .admin-main .form-group label {
   color: var(--admin-muted);
   font-size: 0.85rem;
@@ -661,7 +652,6 @@ a.stat-card:hover {
 }
 
 /* Select2 — selaras form-control admin */
-
 .admin-main .select2-container {
   width: 100% !important;
   font-family: inherit;

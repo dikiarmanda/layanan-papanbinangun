@@ -17,8 +17,8 @@ Stack: CodeIgniter 4 + MySQL + Midtrans Snap + RajaOngkir + Tailwind (tema vinta
      - `rajaongkir.origin` = destination ID asal (contoh Pandaan: `60224`)
      - `rajaongkir.couriers` = `jne:jnt:pos`
 4. Buka: http://localhost/layanan-papanbinangun/public/
-5. Admin: http://localhost/layanan-papanbinangun/public/admin/login  
-   - Email: `superadmin@layanan.papanbinangun.id`  
+5. Admin: http://localhost/layanan-papanbinangun/public/admin/login
+   - Email: `superadmin@layanan.papanbinangun.id`
    - Password: `admin123` (**ganti sebelum production**)
 
 ## Webhook Midtrans
@@ -40,6 +40,15 @@ URL notifikasi (Sandbox → Production setelah go-live):
 
 ## Build CSS
 
+Sumber di `src/` → output di `public/assets/css/`:
+
+| Sumber                    | Output                |
+| ------------------------- | --------------------- |
+| `src/input.css`           | `app.css`             |
+| `src/admin.css`           | `admin.css`           |
+| `src/admin-dashboard.css` | `admin-dashboard.css` |
+
 ```bash
-npm run build
+npm run dev    # watch ketiga file
+npm run build  # minify production
 ```

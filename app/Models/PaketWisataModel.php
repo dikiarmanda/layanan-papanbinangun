@@ -23,6 +23,8 @@ class PaketWisataModel extends Model
         'admin_id',
     ];
     protected $useTimestamps = true;
+    protected $useSoftDeletes = true;
+    protected $deletedField = 'deleted_at';
 
     public function findPublished(?int $limit = null, ?string $jenis = null, ?string $q = null): array
     {

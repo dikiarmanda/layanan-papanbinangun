@@ -3,7 +3,7 @@
  *
  * Selector:
  * - Dropify  : input.dropify
- * - Select2  : select.select2 / select.js-select2
+ * - Select2  : select.select2 / select.js-select2  → Select2Init
  * - Lexical  : textarea.lexical-field
  * - SweetAlert flash : .swal-flash[data-type][data-message]
  * - SweetAlert confirm form : form.js-swal-confirm
@@ -37,41 +37,12 @@
       });
   }
 
-  function initSelect2(root) {
-    if (!$ || !$.fn || !$.fn.select2) return;
-
-    const $root = $(root || document);
-    $root
-      .filter("select.select2, select.js-select2")
-      .add($root.find("select.select2, select.js-select2"))
-      .each(function () {
-        const $el = $(this);
-        if ($el.hasClass("select2-hidden-accessible")) return;
-
-        $el.select2({
-          width: $el.data("width") || "100%",
-          placeholder: $el.data("placeholder") || "Pilih…",
-          allowClear: $el.data("allow-clear") === true || $el.data("allow-clear") === 1,
-          language: "id",
-          minimumResultsForSearch: $el.data("minimum-results-for-search"),
-          dropdownParent: $el.data("dropdown-parent")
-            ? $($el.data("dropdown-parent"))
-            : undefined,
-        });
-      });
+  function initSelect2(root, overrides) {
+    if (window.Select2Init) return window.Select2Init.init(root, overrides);
   }
 
   function destroySelect2(root) {
-    if (!$ || !$.fn || !$.fn.select2) return;
-
-    const $root = $(root || document);
-    $root
-      .filter("select.select2, select.js-select2")
-      .add($root.find("select.select2, select.js-select2"))
-      .each(function () {
-        const $el = $(this);
-        if ($el.hasClass("select2-hidden-accessible")) $el.select2("destroy");
-      });
+    if (window.Select2Init) window.Select2Init.destroy(root);
   }
 
   function initLexical(root) {

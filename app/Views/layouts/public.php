@@ -163,6 +163,7 @@
   <script src="<?= base_url('assets/js/swal-helper.js') ?>"></script>
   <script src="<?= base_url('assets/js/format-date-number.js') ?>"></script>
   <script src="<?= base_url('assets/js/datepicker.js') ?>"></script>
+  <script src="<?= base_url('assets/js/select2-init.js') ?>"></script>
   <script src="<?= base_url('assets/js/vendor-init.js') ?>"></script>
 
   <script>

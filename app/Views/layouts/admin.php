@@ -29,14 +29,14 @@
       </div>
 
       <?php
-        $uri = uri_string();
-        $navActive = static function (string $prefix) use ($uri): string {
-            if ($prefix === 'admin/dashboard') {
-                return ($uri === 'admin/dashboard' || $uri === 'admin') ? 'active' : '';
-            }
+      $uri = uri_string();
+      $navActive = static function (string $prefix) use ($uri): string {
+        if ($prefix === 'admin/dashboard') {
+          return ($uri === 'admin/dashboard' || $uri === 'admin') ? 'active' : '';
+        }
 
-            return str_starts_with($uri, $prefix) ? 'active' : '';
-        };
+        return str_starts_with($uri, $prefix) ? 'active' : '';
+      };
       ?>
 
       <nav class="sidebar-nav" id="adminNav">
@@ -74,16 +74,13 @@
         <a href="<?= site_url('admin/logout') ?>" class="btn-logout">
           <i class="fa-solid fa-right-from-bracket"></i> Logout
         </a>
-        <a href="<?= site_url('/') ?>" class="btn-site" target="_blank" rel="noopener">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Lihat Situs
-        </a>
       </div>
     </aside>
 
     <main class="admin-main">
       <div class="admin-topbar-mobile">
-        <button type="button" class="admin-nav-toggle" id="adminNavToggle" aria-label="Buka menu"
-          aria-expanded="false" aria-controls="adminSidebar">
+        <button type="button" class="admin-nav-toggle" id="adminNavToggle" aria-label="Buka menu" aria-expanded="false"
+          aria-controls="adminSidebar">
           <i class="fa-solid fa-bars"></i>
         </button>
         <strong><?= esc(pengaturan()['nama_desa'] ?? 'Wisata Binangun') ?></strong>
@@ -102,10 +99,12 @@
       </header>
 
       <?php if (session()->getFlashdata('success')): ?>
-        <div class="swal-flash" data-type="success" data-message="<?= esc(session()->getFlashdata('success'), 'attr') ?>" hidden></div>
+        <div class="swal-flash" data-type="success" data-message="<?= esc(session()->getFlashdata('success'), 'attr') ?>"
+          hidden></div>
       <?php endif; ?>
       <?php if (session()->getFlashdata('error')): ?>
-        <div class="swal-flash" data-type="error" data-message="<?= esc(session()->getFlashdata('error'), 'attr') ?>" hidden></div>
+        <div class="swal-flash" data-type="error" data-message="<?= esc(session()->getFlashdata('error'), 'attr') ?>"
+          hidden></div>
       <?php endif; ?>
 
       <?= $this->renderSection('content') ?>
@@ -121,10 +120,12 @@
   <script src="<?= base_url('assets/vendor/flatpickr/l10n/id.js') ?>"></script>
   <script src="<?= base_url('assets/vendor/lexical/lexical-editor.min.js') ?>"></script>
   <script src="<?= base_url('assets/js/swal-helper.js') ?>"></script>
-  <?= $this->renderSection('scripts') ?>
   <script src="<?= base_url('assets/js/datepicker.js') ?>"></script>
+  <script src="<?= base_url('assets/js/select2-init.js') ?>"></script>
   <script src="<?= base_url('assets/js/vendor-init.js') ?>"></script>
   <script src="<?= base_url('assets/js/admin.js') ?>"></script>
+
+  <?= $this->renderSection('scripts') ?>
 </body>
 
 </html>
