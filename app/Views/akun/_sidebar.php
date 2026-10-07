@@ -2,6 +2,7 @@
 $aktifMenu = $aktifMenu ?? 'dashboard';
 $pelanggan = $pelanggan ?? [];
 $fiturProduk = fitur_produk_aktif();
+$fiturReservasi = fitur_reservasi_aktif();
 ?>
 <aside class="akun-sidebar" aria-label="Menu akun">
   <div class="akun-sidebar-head">
@@ -11,8 +12,10 @@ $fiturProduk = fitur_produk_aktif();
   </div>
   <nav class="akun-nav">
     <a href="<?= site_url('akun') ?>" class="<?= $aktifMenu === 'dashboard' ? 'is-active' : '' ?>">Ringkasan</a>
-    <a href="<?= site_url('akun/reservasi') ?>"
-      class="<?= $aktifMenu === 'reservasi' ? 'is-active' : '' ?>">Reservasi</a>
+    <?php if ($fiturReservasi): ?>
+      <a href="<?= site_url('akun/reservasi') ?>"
+        class="<?= $aktifMenu === 'reservasi' ? 'is-active' : '' ?>">Reservasi</a>
+    <?php endif; ?>
     <?php if ($fiturProduk): ?>
       <a href="<?= site_url('akun/order') ?>" class="<?= $aktifMenu === 'order' ? 'is-active' : '' ?>">Pesanan</a>
     <?php endif; ?>

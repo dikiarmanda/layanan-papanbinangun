@@ -8,12 +8,20 @@
   <?php
   $site = pengaturan();
   $brandName = $site['nama_desa'] ?: 'Wisata Binangun';
-  $pageTitle = ($title ?? (fitur_produk_aktif() ? 'Layanan Reservasi & Toko UMKM' : 'Layanan Reservasi Wisata & Homestay')) . ' — ' . $brandName;
+  $fiturReservasi = fitur_reservasi_aktif();
+  $fiturProduk = fitur_produk_aktif();
+  $subTagline = match (true) {
+    $fiturReservasi && $fiturProduk => 'Layanan Reservasi & Toko UMKM',
+    $fiturProduk => 'Toko UMKM & Catering',
+    $fiturReservasi => 'Layanan Wisata & Homestay',
+    default => 'Layanan Desa',
+  };
+  $pageTitle = ($title ?? $subTagline) . ' — ' . $brandName;
   $description = $meta_description
     ?? (strip_tags((string) ($site['deskripsi_singkat'] ?: $site['tagline'])) ?: (
-      fitur_produk_aktif()
+      $fiturProduk && $fiturReservasi
       ? 'Pesan paket wisata, homestay, dan produk UMKM secara mudah dan aman.'
-      : 'Pesan paket wisata dan homestay desa secara mudah dan aman.'
+      : ($fiturProduk ? 'Belanja produk UMKM dan catering desa secara mudah dan aman.' : 'Pesan paket wisata dan homestay desa secara mudah dan aman.')
     ));
   $ogImage = base_url('assets/images/og-image.png');
   $uri = uri_string();
@@ -46,16 +54,18 @@
         <span class="brand-text">
           <strong><?= esc($brandName) ?></strong>
           <small
-            class="brand-tagline"><?= fitur_produk_aktif() ? 'Layanan Reservasi &amp; Toko UMKM' : 'Layanan Wisata &amp; Homestay' ?></small>
+            class="brand-tagline"><?= esc($subTagline) ?></small>
         </span>
       </a>
       <button class="nav-toggle" type="button" aria-label="Buka menu" aria-expanded="false" aria-controls="siteNav"
         id="navToggle">☰</button>
       <nav class="site-nav" id="siteNav">
         <a href="<?= site_url('/') ?>" class="<?= $uri === '' ? 'active' : '' ?>">Beranda</a>
-        <a href="<?= site_url('paket-wisata') ?>"
-          class="<?= str_starts_with($uri, 'paket-wisata') ? 'active' : '' ?>">Wisata &amp; Homestay</a>
-        <?php if (fitur_produk_aktif()): ?>
+        <?php if ($fiturReservasi): ?>
+          <a href="<?= site_url('paket-wisata') ?>"
+            class="<?= str_starts_with($uri, 'paket-wisata') ? 'active' : '' ?>">Wisata &amp; Homestay</a>
+        <?php endif; ?>
+        <?php if ($fiturProduk): ?>
           <a href="<?= site_url('toko') ?>" class="<?= str_starts_with($uri, 'toko') ? 'active' : '' ?>">Toko &amp;
             Catering</a>
           <a href="<?= site_url('keranjang') ?>"
@@ -95,8 +105,10 @@
       <div>
         <h4>Navigasi</h4>
         <ul class="footer-links">
-          <li><a href="<?= site_url('paket-wisata') ?>">Wisata &amp; Homestay</a></li>
-          <?php if (fitur_produk_aktif()): ?>
+          <?php if ($fiturReservasi): ?>
+            <li><a href="<?= site_url('paket-wisata') ?>">Wisata &amp; Homestay</a></li>
+          <?php endif; ?>
+          <?php if ($fiturProduk): ?>
             <li><a href="<?= site_url('toko') ?>">Toko UMKM &amp; Catering</a></li>
             <li><a href="<?= site_url('keranjang') ?>">Keranjang Belanja</a></li>
           <?php endif; ?>

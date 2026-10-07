@@ -15,7 +15,7 @@ class Home extends BaseController
         $paketModel = model(PaketWisataModel::class);
         $produkModel = model(ProdukModel::class);
 
-        $paketAll  = $paketModel->findPublished(20);
+        $paketAll  = fitur_reservasi_aktif() ? $paketModel->findPublished(20) : [];
         $produkAll = fitur_produk_aktif() ? $produkModel->findPublished(20) : [];
 
         $wisata = array_values(array_filter($paketAll, static fn ($p) => ($p['jenis'] ?? '') === 'wisata'));
@@ -57,10 +57,11 @@ class Home extends BaseController
             }
         }
 
-        $heroBackgrounds = [
-            'wisata'   => unsplash_by_jenis('wisata', 0),
-            'menginap' => unsplash_by_jenis('homestay', 0),
-        ];
+        $heroBackgrounds = [];
+        if (fitur_reservasi_aktif()) {
+            $heroBackgrounds['wisata']   = unsplash_by_jenis('wisata', 0);
+            $heroBackgrounds['menginap'] = unsplash_by_jenis('homestay', 0);
+        }
         if (fitur_produk_aktif()) {
             $heroBackgrounds['umkm']     = unsplash_by_jenis('umkm', 0);
             $heroBackgrounds['catering'] = unsplash_by_jenis('catering', 0);

@@ -14,12 +14,15 @@ class AkunController extends BaseController
     {
         $pelangganId = (int) session()->get('pelanggan_id');
 
-        $reservasi = model(ReservasiModel::class)
-            ->select('reservasi.*, paket_wisata.nama as paket_nama, paket_wisata.jenis as paket_jenis')
-            ->join('paket_wisata', 'paket_wisata.id = reservasi.paket_wisata_id')
-            ->where('reservasi.pelanggan_id', $pelangganId)
-            ->orderBy('reservasi.created_at', 'DESC')
-            ->findAll(5);
+        $reservasi = [];
+        if (fitur_reservasi_aktif()) {
+            $reservasi = model(ReservasiModel::class)
+                ->select('reservasi.*, paket_wisata.nama as paket_nama, paket_wisata.jenis as paket_jenis')
+                ->join('paket_wisata', 'paket_wisata.id = reservasi.paket_wisata_id')
+                ->where('reservasi.pelanggan_id', $pelangganId)
+                ->orderBy('reservasi.created_at', 'DESC')
+                ->findAll(5);
+        }
 
         $orders = [];
         if (fitur_produk_aktif()) {
@@ -40,6 +43,7 @@ class AkunController extends BaseController
 
     public function reservasi()
     {
+        assert_fitur_reservasi();
         $pelangganId = (int) session()->get('pelanggan_id');
 
         $list = model(ReservasiModel::class)
@@ -59,6 +63,7 @@ class AkunController extends BaseController
 
     public function showReservasi(int $id)
     {
+        assert_fitur_reservasi();
         $pelangganId = (int) session()->get('pelanggan_id');
         $row = model(ReservasiModel::class)->find($id);
 

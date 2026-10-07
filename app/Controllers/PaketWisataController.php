@@ -10,6 +10,7 @@ class PaketWisataController extends BaseController
     public function index()
     {
         helper('layanan');
+        assert_fitur_reservasi();
         $jenis = $this->request->getGet('jenis');
         if (! in_array($jenis, ['wisata', 'homestay', 'camping', 'menginap'], true)) {
             $jenis = null;
@@ -41,6 +42,7 @@ class PaketWisataController extends BaseController
     public function show(string $slug)
     {
         helper('layanan');
+        assert_fitur_reservasi();
         $paket = model(PaketWisataModel::class)->findBySlug($slug);
 
         if (!$paket || $paket['status'] !== 'publish') {

@@ -12,17 +12,21 @@ $bgWisata = $heroBackgrounds['wisata'] ?? unsplash_by_jenis('wisata');
 $bgMenginap = $heroBackgrounds['menginap'] ?? unsplash_by_jenis('homestay');
 $bgUmkm = $heroBackgrounds['umkm'] ?? unsplash_by_jenis('umkm');
 $bgCatering = $heroBackgrounds['catering'] ?? unsplash_by_jenis('catering');
+$fiturReservasi = fitur_reservasi_aktif();
 $fiturProduk = fitur_produk_aktif();
+$defaultService = $fiturReservasi ? 'wisata' : ($fiturProduk ? 'umkm' : 'none');
 ?>
 
-<section class="home-hero" id="homeHero" data-active="wisata" aria-label="Beranda layanan">
+<section class="home-hero" id="homeHero" data-active="<?= esc($defaultService, 'attr') ?>" aria-label="Beranda layanan">
   <div class="home-hero-bg" aria-hidden="true">
-    <div class="home-hero-photo is-active" data-bg="wisata"
-      style="background-image:url('<?= esc($bgWisata, 'attr') ?>')"></div>
-    <div class="home-hero-photo" data-bg="menginap" style="background-image:url('<?= esc($bgMenginap, 'attr') ?>')">
-    </div>
+    <?php if ($fiturReservasi): ?>
+      <div class="home-hero-photo is-active" data-bg="wisata"
+        style="background-image:url('<?= esc($bgWisata, 'attr') ?>')"></div>
+      <div class="home-hero-photo" data-bg="menginap" style="background-image:url('<?= esc($bgMenginap, 'attr') ?>')">
+      </div>
+    <?php endif; ?>
     <?php if ($fiturProduk): ?>
-      <div class="home-hero-photo" data-bg="umkm" style="background-image:url('<?= esc($bgUmkm, 'attr') ?>')"></div>
+      <div class="home-hero-photo <?= !$fiturReservasi ? 'is-active' : '' ?>" data-bg="umkm" style="background-image:url('<?= esc($bgUmkm, 'attr') ?>')"></div>
       <div class="home-hero-photo" data-bg="catering" style="background-image:url('<?= esc($bgCatering, 'attr') ?>')">
       </div>
     <?php endif; ?>
@@ -39,24 +43,28 @@ $fiturProduk = fitur_produk_aktif();
     <div class="home-hero-copy">
       <p class="home-hero-brand"><?= esc($brand) ?></p>
       <h1 class="home-hero-title"><?= esc($tagline) ?></h1>
-      <p class="home-hero-lead" id="heroLead">Paket wisata desa — harga per orang, hitung estimasi sebelum pesan.</p>
+      <p class="home-hero-lead" id="heroLead"><?= $fiturReservasi ? 'Paket wisata desa — harga per orang, hitung estimasi sebelum pesan.' : 'Belanja produk UMKM &amp; Catering khas desa.' ?></p>
 
-      <div class="home-service-rail" role="tablist" aria-label="Pilih jenis layanan">
-        <button type="button" class="home-service-tab is-active" role="tab" aria-selected="true" data-service="wisata">
-          <span class="home-service-tab-label">Paket Wisata</span>
-        </button>
-        <button type="button" class="home-service-tab" role="tab" aria-selected="false" data-service="menginap">
-          <span class="home-service-tab-label">Homestay &amp; Camping</span>
-        </button>
-        <?php if ($fiturProduk): ?>
-          <button type="button" class="home-service-tab" role="tab" aria-selected="false" data-service="umkm">
-            <span class="home-service-tab-label">UMKM</span>
-          </button>
-          <button type="button" class="home-service-tab" role="tab" aria-selected="false" data-service="catering">
-            <span class="home-service-tab-label">Catering</span>
-          </button>
-        <?php endif; ?>
-      </div>
+      <?php if ($fiturReservasi || $fiturProduk): ?>
+        <div class="home-service-rail" role="tablist" aria-label="Pilih jenis layanan">
+          <?php if ($fiturReservasi): ?>
+            <button type="button" class="home-service-tab is-active" role="tab" aria-selected="true" data-service="wisata">
+              <span class="home-service-tab-label">Paket Wisata</span>
+            </button>
+            <button type="button" class="home-service-tab" role="tab" aria-selected="false" data-service="menginap">
+              <span class="home-service-tab-label">Homestay &amp; Camping</span>
+            </button>
+          <?php endif; ?>
+          <?php if ($fiturProduk): ?>
+            <button type="button" class="home-service-tab <?= !$fiturReservasi ? 'is-active' : '' ?>" role="tab" aria-selected="<?= !$fiturReservasi ? 'true' : 'false' ?>" data-service="umkm">
+              <span class="home-service-tab-label">UMKM</span>
+            </button>
+            <button type="button" class="home-service-tab" role="tab" aria-selected="false" data-service="catering">
+              <span class="home-service-tab-label">Catering</span>
+            </button>
+          <?php endif; ?>
+        </div>
+      <?php endif; ?>
 
       <div class="home-estimate" id="heroEstimate" data-mode="wisata" hidden>
         <div class="home-estimate-head">
@@ -145,45 +153,47 @@ $fiturProduk = fitur_produk_aktif();
   </a>
 </section>
 
-<section class="section container" id="paket-unggulan">
-  <h2 class="section-title">Paket Unggulan</h2>
-  <?php if (empty($paket)): ?>
-    <p class="text-center" style="color:var(--sepia)">Belum ada paket dipublikasikan.</p>
-  <?php else: ?>
-    <div class="card-grid">
-      <?php foreach ($paket as $p): ?>
-        <?php
-        $jenisPaket = $p['jenis'] ?? 'wisata';
-        $badgeClass = match ($jenisPaket) {
-          'homestay' => 'badge-homestay',
-          'camping' => 'badge-camping',
-          default => 'badge-wisata',
-        };
-        $avail = $ketersediaan[(int) $p['id']] ?? ['total' => 0, 'available' => 0, 'remaining' => null];
-        ?>
-        <a class="card" href="<?= site_url('paket-wisata/' . $p['slug']) ?>">
-          <img class="card-img" src="<?= esc(cover_url($p['gambar_cover'] ?? null, $jenisPaket)) ?>"
-            alt="<?= esc($p['nama']) ?>">
-          <div class="card-body">
-            <div class="card-badges">
-              <span class="badge-jenis <?= $badgeClass ?>"><?= esc(label_jenis_paket($jenisPaket)) ?></span>
-              <?php if ((int) $avail['available'] > 0): ?>
-                <span class="badge badge-available">Tersedia</span>
-              <?php else: ?>
-                <span class="badge badge-soldout">Penuh</span>
-              <?php endif; ?>
+<?php if ($fiturReservasi): ?>
+  <section class="section container" id="paket-unggulan">
+    <h2 class="section-title">Paket Unggulan</h2>
+    <?php if (empty($paket)): ?>
+      <p class="text-center" style="color:var(--sepia)">Belum ada paket dipublikasikan.</p>
+    <?php else: ?>
+      <div class="card-grid">
+        <?php foreach ($paket as $p): ?>
+          <?php
+          $jenisPaket = $p['jenis'] ?? 'wisata';
+          $badgeClass = match ($jenisPaket) {
+            'homestay' => 'badge-homestay',
+            'camping' => 'badge-camping',
+            default => 'badge-wisata',
+          };
+          $avail = $ketersediaan[(int) $p['id']] ?? ['total' => 0, 'available' => 0, 'remaining' => null];
+          ?>
+          <a class="card" href="<?= site_url('paket-wisata/' . $p['slug']) ?>">
+            <img class="card-img" src="<?= esc(cover_url($p['gambar_cover'] ?? null, $jenisPaket)) ?>"
+              alt="<?= esc($p['nama']) ?>">
+            <div class="card-body">
+              <div class="card-badges">
+                <span class="badge-jenis <?= $badgeClass ?>"><?= esc(label_jenis_paket($jenisPaket)) ?></span>
+                <?php if ((int) $avail['available'] > 0): ?>
+                  <span class="badge badge-available">Tersedia</span>
+                <?php else: ?>
+                  <span class="badge badge-soldout">Penuh</span>
+                <?php endif; ?>
+              </div>
+              <h3><?= esc($p['nama']) ?></h3>
+              <div class="price"><?= format_rupiah($p['harga']) ?>
+                <small style="font-weight:400;color:var(--sepia)">/
+                  <?= esc(satuan_label($jenisPaket, $p['satuan_harga'] ?? null)) ?></small>
+              </div>
             </div>
-            <h3><?= esc($p['nama']) ?></h3>
-            <div class="price"><?= format_rupiah($p['harga']) ?>
-              <small style="font-weight:400;color:var(--sepia)">/
-                <?= esc(satuan_label($jenisPaket, $p['satuan_harga'] ?? null)) ?></small>
-            </div>
-          </div>
-        </a>
-      <?php endforeach; ?>
-    </div>
-  <?php endif; ?>
-</section>
+          </a>
+        <?php endforeach; ?>
+      </div>
+    <?php endif; ?>
+  </section>
+<?php endif; ?>
 
 <?php if ($fiturProduk): ?>
   <section class="section container">
@@ -219,10 +229,22 @@ $fiturProduk = fitur_produk_aktif();
   <form method="get"
     onsubmit="event.preventDefault(); const k=this.kode.value.trim(); if(k) location.href='<?= site_url('status') ?>/'+encodeURIComponent(k);"
     style="max-width:480px;margin:0 auto">
+    <?php
+    $placeholderKode = match (true) {
+      $fiturReservasi && $fiturProduk => 'RSV-xxxx atau ORD-xxxx',
+      $fiturProduk => 'ORD-xxxx',
+      default => 'RSV-xxxx',
+    };
+    $labelKode = match (true) {
+      $fiturReservasi && $fiturProduk => 'Kode transaksi (RSV-… atau ORD-…)',
+      $fiturProduk => 'Kode transaksi (ORD-…)',
+      default => 'Kode transaksi (RSV-…)',
+    };
+    ?>
     <div class="form-group">
-      <label for="kode">Kode transaksi (RSV-…<?= $fiturProduk ? ' atau ORD-…' : '' ?>)</label>
+      <label for="kode"><?= esc($labelKode) ?></label>
       <input class="form-control" type="text" name="kode" id="kode"
-        placeholder="RSV-xxxx<?= $fiturProduk ? ' atau ORD-xxxx' : '' ?>" required>
+        placeholder="<?= esc($placeholderKode) ?>" required>
     </div>
     <button class="btn btn-primary" type="submit" style="width:100%">Cek Status</button>
   </form>
@@ -239,20 +261,22 @@ $fiturProduk = fitur_produk_aktif();
     };
 
     const services = {
-      wisata: {
-        lead: 'Paket wisata desa — harga per orang, hitung estimasi sebelum pesan.',
-        cta: 'Lihat Paket Wisata',
-        href: '<?= site_url('paket-wisata?jenis=wisata') ?>',
-        estimate: true,
-      },
-      menginap: {
-        lead: 'Homestay & camping ground — harga per malam. Hitung estimasi menginap Anda.',
-        cta: 'Lihat Homestay & Camping',
-        href: '<?= site_url('paket-wisata?jenis=menginap') ?>',
-        estimate: true,
-      },
+      <?php if ($fiturReservasi): ?>
+        wisata: {
+          lead: 'Paket wisata desa — harga per orang, hitung estimasi sebelum pesan.',
+          cta: 'Lihat Paket Wisata',
+          href: '<?= site_url('paket-wisata?jenis=wisata') ?>',
+          estimate: true,
+        },
+        menginap: {
+          lead: 'Homestay & camping ground — harga per malam. Hitung estimasi menginap Anda.',
+          cta: 'Lihat Homestay & Camping',
+          href: '<?= site_url('paket-wisata?jenis=menginap') ?>',
+          estimate: true,
+        },
+      <?php endif; ?>
       <?php if ($fiturProduk): ?>
-            umkm: {
+        umkm: {
           lead: 'Karya UMKM desa — belanja online dengan pengiriman ekspedisi.',
           cta: 'Belanja UMKM',
           href: '<?= site_url('toko?jenis=umkm') ?>',

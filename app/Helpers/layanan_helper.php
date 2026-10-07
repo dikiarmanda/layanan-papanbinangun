@@ -244,6 +244,31 @@ if (!function_exists('assert_fitur_produk')) {
     }
 }
 
+if (!function_exists('fitur_reservasi_aktif')) {
+    /**
+     * Flag publik untuk fitur reservasi (paket wisata & homestay).
+     * Sembunyikan lewat .env: app.fiturReservasi = false
+     */
+    function fitur_reservasi_aktif(): bool
+    {
+        return filter_var(env('app.fiturReservasi', true), FILTER_VALIDATE_BOOLEAN);
+    }
+}
+
+if (!function_exists('assert_fitur_reservasi')) {
+    /**
+     * Blokir akses route publik reservasi jika fitur nonaktif.
+     *
+     * @throws \CodeIgniter\Exceptions\PageNotFoundException
+     */
+    function assert_fitur_reservasi(): void
+    {
+        if (!fitur_reservasi_aktif()) {
+            throw \CodeIgniter\Exceptions\PageNotFoundException::forPageNotFound();
+        }
+    }
+}
+
 if (!function_exists('upload_image')) {
     /**
      * @return string|null relative path under public/uploads

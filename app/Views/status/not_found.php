@@ -18,7 +18,11 @@
     </div>
     <div class="home-estimate-result" style="justify-content:center;padding-top:1.25rem;border-top:1px solid var(--cream-dark)">
       <a href="<?= site_url('/') ?>#cek-status" class="btn btn-primary">Coba Cek Ulang</a>
-      <a href="<?= site_url('paket-wisata') ?>" class="btn btn-outline">Jelajahi Paket</a>
+      <?php if (fitur_reservasi_aktif()): ?>
+        <a href="<?= site_url('paket-wisata') ?>" class="btn btn-outline">Jelajahi Paket</a>
+      <?php elseif (fitur_produk_aktif()): ?>
+        <a href="<?= site_url('toko') ?>" class="btn btn-outline">Jelajahi Toko</a>
+      <?php endif; ?>
     </div>
   </div>
 </section>

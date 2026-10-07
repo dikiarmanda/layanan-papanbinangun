@@ -13,6 +13,7 @@ class CheckoutReservasiController extends BaseController
     public function create()
     {
         helper('layanan');
+        assert_fitur_reservasi();
 
         $paketId = (int) $this->request->getPost('paket_wisata_id');
         $paket = model(PaketWisataModel::class)->find($paketId);
