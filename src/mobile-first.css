@@ -44,8 +44,6 @@ body {
 .home-service-tab,
 .home-estimate-step,
 .filter-tabs a,
-.hero-carousel-nav,
-.hero-carousel-dot,
 .avail-day:not(.is-empty) {
   min-height: 44px;
 }
