@@ -13,27 +13,33 @@ class DashboardController extends BaseController
         helper('layanan');
 
         $db = db_connect();
+        $fiturReservasi = fitur_reservasi_aktif();
 
         $stats = [
-            'reservasi_pending' => $db->table('reservasi')->where('status_pembayaran', 'pending')->countAllResults(),
-            'reservasi_paid'    => $db->table('reservasi')->where('status_pembayaran', 'paid')->countAllResults(),
             'order_pending'     => $db->table('order')->where('status_pembayaran', 'pending')->countAllResults(),
             'order_paid'        => $db->table('order')->where('status_pembayaran', 'paid')->countAllResults(),
             'order_proses'      => $db->table('order')->where('status_order', 'diproses')->countAllResults(),
         ];
 
-        $reservasiBaru = model(ReservasiModel::class)->withDetails(6);
+        if ($fiturReservasi) {
+            $stats['reservasi_pending'] = $db->table('reservasi')->where('status_pembayaran', 'pending')->countAllResults();
+            $stats['reservasi_paid']    = $db->table('reservasi')->where('status_pembayaran', 'paid')->countAllResults();
+        }
+
+        $reservasiBaru = $fiturReservasi ? model(ReservasiModel::class)->withDetails(6) : [];
         $orderBaru = model(OrderModel::class)->withDetails(6);
 
         $aktivitas = [];
-        foreach ($reservasiBaru as $r) {
-            $aktivitas[] = [
-                'judul'     => $r['kode_reservasi'],
-                'deskripsi' => 'Reservasi ' . ($r['paket_nama'] ?? '') . ' · ' . ($r['status_pembayaran'] ?? ''),
-                'waktu'     => date('d M Y · H:i', strtotime((string) $r['created_at'])),
-                'url'       => site_url('admin/reservasi/' . $r['id']),
-                'sort'      => strtotime((string) $r['created_at']),
-            ];
+        if ($fiturReservasi) {
+            foreach ($reservasiBaru as $r) {
+                $aktivitas[] = [
+                    'judul'     => $r['kode_reservasi'],
+                    'deskripsi' => 'Reservasi ' . ($r['paket_nama'] ?? '') . ' · ' . ($r['status_pembayaran'] ?? ''),
+                    'waktu'     => date('d M Y · H:i', strtotime((string) $r['created_at'])),
+                    'url'       => site_url('admin/reservasi/' . $r['id']),
+                    'sort'      => strtotime((string) $r['created_at']),
+                ];
+            }
         }
         foreach ($orderBaru as $o) {
             $aktivitas[] = [
@@ -49,11 +55,12 @@ class DashboardController extends BaseController
         $aktivitas = array_slice($aktivitas, 0, 10);
 
         return view('admin/dashboard', [
-            'title'         => 'Dashboard',
-            'stats'         => $stats,
-            'reservasiBaru' => $reservasiBaru,
-            'orderBaru'     => $orderBaru,
-            'aktivitas'     => $aktivitas,
+            'title'          => 'Dashboard',
+            'stats'          => $stats,
+            'reservasiBaru'  => $reservasiBaru,
+            'orderBaru'      => $orderBaru,
+            'aktivitas'      => $aktivitas,
+            'fiturReservasi' => $fiturReservasi,
         ]);
     }
 }

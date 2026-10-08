@@ -7,9 +7,18 @@ use App\Libraries\WhatsappService;
 use App\Models\JadwalPaketWisataModel;
 use App\Models\PelangganModel;
 use App\Models\ReservasiModel;
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
 class ReservasiAdminController extends BaseController
 {
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
+    {
+        parent::initController($request, $response, $logger);
+        assert_fitur_reservasi();
+    }
+
     public function index()
     {
         helper('layanan');

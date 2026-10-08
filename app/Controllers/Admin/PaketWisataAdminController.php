@@ -5,9 +5,18 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Models\JadwalPaketWisataModel;
 use App\Models\PaketWisataModel;
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+use Psr\Log\LoggerInterface;
 
 class PaketWisataAdminController extends BaseController
 {
+    public function initController(RequestInterface $request, ResponseInterface $response, LoggerInterface $logger)
+    {
+        parent::initController($request, $response, $logger);
+        assert_fitur_reservasi();
+    }
+
     public function index()
     {
         helper('layanan');

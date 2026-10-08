@@ -30,6 +30,7 @@
 
       <?php
       $uri = uri_string();
+      $fiturReservasi = fitur_reservasi_aktif();
       $navActive = static function (string $prefix) use ($uri): string {
         if ($prefix === 'admin/dashboard') {
           return ($uri === 'admin/dashboard' || $uri === 'admin') ? 'active' : '';
@@ -43,18 +44,22 @@
         <a class="<?= $navActive('admin/dashboard') ?>" href="<?= site_url('admin/dashboard') ?>">
           <i class="fa-solid fa-gauge-high"></i> Dashboard
         </a>
-        <a class="<?= $navActive('admin/paket-wisata') ?>" href="<?= site_url('admin/paket-wisata') ?>">
-          <i class="fa-solid fa-mountain-sun"></i> Wisata &amp; Homestay
-        </a>
+        <?php if ($fiturReservasi): ?>
+          <a class="<?= $navActive('admin/paket-wisata') ?>" href="<?= site_url('admin/paket-wisata') ?>">
+            <i class="fa-solid fa-mountain-sun"></i> Wisata &amp; Homestay
+          </a>
+        <?php endif; ?>
         <a class="<?= $navActive('admin/produk') ?>" href="<?= site_url('admin/produk') ?>">
           <i class="fa-solid fa-store"></i> Produk &amp; Catering
         </a>
         <a class="<?= $navActive('admin/zona-antar') ?>" href="<?= site_url('admin/zona-antar') ?>">
           <i class="fa-solid fa-map-location-dot"></i> Zona Antar Lokal
         </a>
-        <a class="<?= $navActive('admin/reservasi') ?>" href="<?= site_url('admin/reservasi') ?>">
-          <i class="fa-solid fa-calendar-check"></i> Reservasi
-        </a>
+        <?php if ($fiturReservasi): ?>
+          <a class="<?= $navActive('admin/reservasi') ?>" href="<?= site_url('admin/reservasi') ?>">
+            <i class="fa-solid fa-calendar-check"></i> Reservasi
+          </a>
+        <?php endif; ?>
         <a class="<?= $navActive('admin/order') ?>" href="<?= site_url('admin/order') ?>">
           <i class="fa-solid fa-bag-shopping"></i> Order
         </a>
