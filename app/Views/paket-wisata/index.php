@@ -63,7 +63,7 @@ $ketersediaan = $ketersediaan ?? [];
               <?php endif; ?>
             </div>
             <h3><?= esc($p['nama']) ?></h3>
-            <p style="color:var(--sepia);font-size:0.9rem"><?= esc(mb_substr(strip_tags($p['deskripsi']), 0, 90)) ?>…</p>
+            <p style="color:var(--sepia);font-size:0.9rem"><?= esc(mb_substr(teks_plain($p['deskripsi']), 0, 90)) ?>…</p>
             <div class="price">
               <?= format_rupiah($p['harga']) ?>
               <small style="font-weight:400;color:var(--sepia)">/ <?= esc(satuan_label($jenisPaket, $p['satuan_harga'] ?? null)) ?></small>

@@ -385,3 +385,101 @@ if (!function_exists('pelanggan_aktif')) {
         ];
     }
 }
+
+if (!function_exists('sanitize_html')) {
+    /**
+     * Rapikan HTML hasil penyunting teks (Summernote) untuk ditampilkan ke publik.
+     *
+     * Tag di luar whitelist dibuang, atribut berbahaya (event handler,
+     * javascript:/data: URL, css expression) dihapus.
+     */
+    function sanitize_html(?string $html): string
+    {
+        $html = trim((string) $html);
+        if ($html === '') {
+            return '';
+        }
+
+        $tagDiizinkan = [
+            'p', 'br', 'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'sub', 'sup',
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'ul', 'ol', 'li', 'blockquote', 'hr', 'pre', 'code',
+            'a', 'img', 'span', 'div',
+            'table', 'thead', 'tbody', 'tfoot', 'tr', 'th', 'td',
+        ];
+        $html = strip_tags($html, '<' . implode('><', $tagDiizinkan) . '>');
+        if (strpos($html, '<') === false) {
+            return nl2br(esc($html));
+        }
+
+        $dom = new DOMDocument();
+        $modeSebelumnya = libxml_use_internal_errors(true);
+        $dom->loadHTML(
+            '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>' . $html . '</body></html>'
+        );
+        libxml_clear_errors();
+        libxml_use_internal_errors($modeSebelumnya);
+
+        $atributDiizinkan = ['href', 'src', 'alt', 'title', 'width', 'height', 'colspan', 'rowspan', 'start', 'class', 'style'];
+
+        $xpath = new DOMXPath($dom);
+        foreach ($xpath->query('//body//*') as $el) {
+            if (!$el instanceof DOMElement) {
+                continue;
+            }
+
+            for ($i = $el->attributes->length - 1; $i >= 0; $i--) {
+                $attr = $el->attributes->item($i);
+                if ($attr === null) {
+                    continue;
+                }
+
+                $nama  = strtolower($attr->nodeName);
+                $nilai = (string) $attr->nodeValue;
+
+                if (!in_array($nama, $atributDiizinkan, true)) {
+                    $el->removeAttribute($attr->nodeName);
+                    continue;
+                }
+
+                if (in_array($nama, ['href', 'src'], true)) {
+                    $bersih = strtolower((string) preg_replace('/[\s\x00-\x1F]+/', '', $nilai));
+                    if (preg_match('#^(javascript|vbscript|data|blob):#i', $bersih)) {
+                        $el->removeAttribute($attr->nodeName);
+                    }
+                    continue;
+                }
+
+                if ($nama === 'style'
+                    && preg_match('/expression\s*\(|javascript:|behaviou?r\s*:|url\s*\(/i', $nilai)) {
+                    $el->removeAttribute($attr->nodeName);
+                }
+            }
+        }
+
+        $body = $dom->getElementsByTagName('body')->item(0);
+        if ($body === null) {
+            return '';
+        }
+
+        $hasil = '';
+        foreach ($body->childNodes as $child) {
+            $hasil .= $dom->saveHTML($child);
+        }
+
+        return trim($hasil);
+    }
+}
+
+if (!function_exists('teks_plain')) {
+    /**
+     * Ubah HTML jadi teks biasa — dipakai untuk ringkasan singkat di kartu katalog.
+     */
+    function teks_plain(?string $html): string
+    {
+        $html = (string) $html;
+        $html = (string) preg_replace('#<br\s*/?>|</(?:p|li|h[1-6]|blockquote|div|tr|table)>#i', ' ', $html);
+
+        return trim((string) preg_replace('/\s+/u', ' ', strip_tags($html)));
+    }
+}

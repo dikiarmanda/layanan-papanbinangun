@@ -1717,7 +1717,7 @@ input.form-control.flatpickr-input {
   border-top: 1px solid var(--cream-dark);
 }
 
-/* Vendor: Select2, Dropify, Lexical — selaras tema */
+/* Vendor: Select2, Dropify, Summernote — selaras tema */
 .select2-container {
   width: 100% !important;
   font-family: var(--font-body);
@@ -2188,44 +2188,230 @@ input.form-control.flatpickr-input {
   color: var(--gold);
 }
 
-.lexical-shell {
+/* ----------------------------------------------------------------------- */
+/* Summernote — penyunting deskripsi (tema vintage)                          */
+/* ----------------------------------------------------------------------- */
+.note-editor {
   border: 1px solid var(--cream-dark);
   border-radius: 8px;
   background: var(--white);
+  box-shadow: none;
   overflow: hidden;
 }
 
-.lexical-shell .lexical-toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.25rem;
-  padding: 0.45rem 0.55rem;
-  border-bottom: 1px solid var(--cream-dark);
-  background: rgba(244, 233, 216, 0.45);
+.note-frame {
+  border: 0;
 }
 
-.lexical-shell .lexical-toolbar button {
+.note-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.4rem 0.5rem;
+  background: rgba(244, 233, 216, 0.45);
+  border-bottom: 1px solid var(--cream-dark);
+}
+
+.note-toolbar button,
+.note-toolbar .note-btn {
   border: 0;
   background: transparent;
   color: var(--deep);
   border-radius: 4px;
-  padding: 0.25rem 0.45rem;
-  cursor: pointer;
+  padding: 0.28rem 0.45rem;
+  font-size: 0.9rem;
+  line-height: 1.25;
 }
 
-.lexical-shell .lexical-toolbar button:hover,
-.lexical-shell .lexical-toolbar button.is-active {
-  background: rgba(201, 166, 107, 0.28);
-}
-
-.lexical-shell .lexical-editor {
-  min-height: 160px;
-  padding: 0.75rem 0.9rem;
+.note-toolbar button:hover,
+.note-toolbar button:focus,
+.note-toolbar .note-btn:hover,
+.note-toolbar .note-btn:focus,
+.note-toolbar .note-btn.active,
+.note-toolbar .note-btn-group.show > .note-btn {
+  background: rgba(201, 166, 107, 0.3);
+  color: var(--deep);
+  box-shadow: none;
   outline: none;
 }
 
-textarea.lexical-field {
-  /* textarea asli disembunyikan setelah Lexical siap; tetap tersedia untuk submit */
+.note-btn-group {
+  margin-right: 0.15rem;
+}
+
+.note-btn {
+  font-family: var(--font-body);
+}
+
+.note-editable {
+  min-height: 160px;
+  padding: 0.8rem 0.95rem;
+  color: var(--deep);
+  font-family: var(--font-body);
+  font-size: 0.98rem;
+  line-height: 1.7;
+  background: var(--white);
+  outline: none;
+}
+
+.note-editable p:last-child {
+  margin-bottom: 0;
+}
+
+.note-placeholder {
+  color: var(--sepia);
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.note-statusbar {
+  background: rgba(244, 233, 216, 0.4);
+  border-top: 1px solid var(--cream-dark);
+  color: var(--sepia);
+  font-size: 0.75rem;
+}
+
+.note-statusbar .note-resizebar {
+  border-top: 1px solid var(--cream-dark);
+}
+
+.note-dropdown-menu {
+  background: var(--white);
+  border: 1px solid var(--cream-dark);
+  border-radius: 8px;
+  box-shadow: 0 8px 22px rgba(74, 50, 34, 0.15);
+  padding: 0.3rem;
+  min-width: 9rem;
+}
+
+.note-dropdown-item {
+  color: var(--deep);
+  border-radius: 5px;
+  padding: 0.35rem 0.65rem;
+  font-size: 0.92rem;
+}
+
+.note-dropdown-item:hover,
+.note-dropdown-item:focus {
+  background: rgba(201, 166, 107, 0.28);
+  color: var(--deep);
+}
+
+.note-popover {
+  background: var(--white);
+  border: 1px solid var(--cream-dark);
+  border-radius: 8px;
+  box-shadow: 0 8px 22px rgba(74, 50, 34, 0.15);
+}
+
+.note-codable {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 0.9rem;
+  padding: 0.8rem;
+  color: var(--deep);
+  background: var(--white);
+  outline: none;
+}
+
+/* Hasil editor yang ditampilkan ke publik */
+.deskripsi-editor {
+  color: var(--deep);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.deskripsi-editor > :first-child {
+  margin-top: 0;
+}
+
+.deskripsi-editor > :last-child {
+  margin-bottom: 0;
+}
+
+.deskripsi-editor p {
+  margin: 0 0 0.85rem;
+}
+
+.deskripsi-editor ul,
+.deskripsi-editor ol {
+  margin: 0 0 0.85rem;
+  padding-left: 1.35rem;
+}
+
+.deskripsi-editor li {
+  margin-bottom: 0.3rem;
+}
+
+.deskripsi-editor h1,
+.deskripsi-editor h2,
+.deskripsi-editor h3,
+.deskripsi-editor h4,
+.deskripsi-editor h5,
+.deskripsi-editor h6 {
+  font-family: var(--font-heading);
+  color: var(--deep);
+  line-height: 1.25;
+  margin: 1.1rem 0 0.5rem;
+}
+
+.deskripsi-editor h1 { font-size: 1.35rem; }
+.deskripsi-editor h2 { font-size: 1.2rem; }
+.deskripsi-editor h3 { font-size: 1.1rem; }
+.deskripsi-editor h4,
+.deskripsi-editor h5,
+.deskripsi-editor h6 { font-size: 1rem; }
+
+.deskripsi-editor blockquote {
+  margin: 0 0 0.9rem;
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--gold);
+  background: rgba(244, 233, 216, 0.55);
+  color: var(--sepia);
+}
+
+.deskripsi-editor a {
+  color: var(--terracotta);
+  text-decoration: underline;
+}
+
+.deskripsi-editor img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+.deskripsi-editor hr {
+  border: 0;
+  border-top: 1px solid var(--cream-dark);
+  margin: 1.1rem 0;
+}
+
+.deskripsi-editor pre {
+  background: #f7f1e6;
+  border: 1px solid var(--cream-dark);
+  border-radius: 8px;
+  padding: 0.7rem 0.85rem;
+  overflow-x: auto;
+  font-size: 0.88rem;
+}
+
+.deskripsi-editor table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 0.9rem;
+}
+
+.deskripsi-editor th,
+.deskripsi-editor td {
+  border: 1px solid var(--cream-dark);
+  padding: 0.45rem 0.6rem;
+  font-size: 0.92rem;
+  text-align: left;
+}
+
+.deskripsi-editor th {
+  background: rgba(244, 233, 216, 0.55);
 }
 
 .swal2-popup {

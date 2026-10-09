@@ -20,7 +20,7 @@
           checkout.
         </div>
       <?php endif; ?>
-      <div style="white-space:pre-wrap;margin:1rem 0"><?= esc($produk['deskripsi']) ?></div>
+      <div class="deskripsi-editor" style="margin:1rem 0"><?= sanitize_html($produk['deskripsi']) ?></div>
     </div>
 
     <div class="booking-card">

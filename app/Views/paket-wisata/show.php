@@ -50,7 +50,7 @@ $hasPrefill = $prefillQty > 1 || $prefillCheckIn !== '' || $prefillCheckOut !== 
         <?= format_rupiah($hargaSatuan) ?>
         <small style="font-weight:400;color:var(--sepia)">/ <?= esc($labelSatuan) ?></small>
       </div>
-      <div style="white-space:pre-wrap"><?= esc($paket['deskripsi']) ?></div>
+      <div class="deskripsi-editor"><?= sanitize_html($paket['deskripsi']) ?></div>
 
       <div class="avail-calendar" id="kalender-ketersediaan">
         <div class="avail-calendar-head">

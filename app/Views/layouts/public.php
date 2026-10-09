@@ -171,7 +171,6 @@
   <script src="<?= base_url('assets/vendor/sweetalert2/js/sweetalert2.all.min.js') ?>"></script>
   <script src="<?= base_url('assets/vendor/flatpickr/flatpickr.min.js') ?>"></script>
   <script src="<?= base_url('assets/vendor/flatpickr/l10n/id.js') ?>"></script>
-  <script src="<?= base_url('assets/vendor/lexical/lexical-editor.min.js') ?>"></script>
   <script src="<?= base_url('assets/js/swal-helper.js') ?>"></script>
   <script src="<?= base_url('assets/js/format-date-number.js') ?>"></script>
   <script src="<?= base_url('assets/js/datepicker.js') ?>"></script>
