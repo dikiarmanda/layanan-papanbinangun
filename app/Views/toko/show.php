@@ -12,7 +12,7 @@
         <?= $isCatering ? 'Catering' : 'Produk UMKM' ?>
       </span>
       <h1 style="margin-top:0.5rem"><?= esc($produk['nama']) ?></h1>
-      <div class="price" style="margin-bottom:0.75rem"><?= format_rupiah($produk['harga']) ?></div>
+      <div class="price" style="margin-bottom:0.75rem"><?= format_rupiah(harga_produk_akhir($produk['harga'])) ?></div>
       <p style="color:var(--sepia)">Stok: <?= (int) $produk['stok'] ?></p>
       <?php if ($isCatering): ?>
         <div class="alert alert-info" style="margin-top:1rem">

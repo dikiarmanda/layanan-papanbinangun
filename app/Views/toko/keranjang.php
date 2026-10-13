@@ -30,7 +30,7 @@
           <tr>
             <td><?= esc($item['produk']['nama']) ?></td>
             <td><?= esc($item['produk']['jenis'] ?? 'umkm') ?></td>
-            <td><?= format_rupiah($item['produk']['harga']) ?></td>
+            <td><?= format_rupiah(harga_produk_akhir($item['produk']['harga'])) ?></td>
             <td>
               <form method="post" action="<?= site_url('keranjang/update') ?>" style="display:flex;gap:0.4rem">
                 <?= csrf_field() ?>

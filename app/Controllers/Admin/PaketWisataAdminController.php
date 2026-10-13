@@ -42,7 +42,7 @@ class PaketWisataAdminController extends BaseController
         try {
             $nama = (string) $this->request->getPost('nama');
             $slug = slugify($nama);
-            $img = upload_image('gambar_cover', 'paket');
+            $img = upload_cropped_image('gambar_cover_cropped', 'paket') ?? upload_image('gambar_cover', 'paket');
             $jenisPost = (string) $this->request->getPost('jenis');
             $jenis = in_array($jenisPost, ['wisata', 'homestay', 'camping'], true) ? $jenisPost : 'wisata';
             $satuan = is_paket_menginap($jenis) ? 'per_rumah' : 'per_orang';
@@ -109,7 +109,7 @@ class PaketWisataAdminController extends BaseController
                 'status' => $this->request->getPost('status'),
             ];
 
-            $img = upload_image('gambar_cover', 'paket');
+            $img = upload_cropped_image('gambar_cover_cropped', 'paket') ?? upload_image('gambar_cover', 'paket');
             if ($img) {
                 $data['gambar_cover'] = $img;
             }

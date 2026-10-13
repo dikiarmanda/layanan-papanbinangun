@@ -215,7 +215,7 @@ $defaultService = $fiturReservasi ? 'wisata' : ($fiturProduk ? 'umkm' : 'none');
               <span class="badge-jenis <?= $isCatering ? 'badge-catering' : 'badge-umkm' ?>">
                 <?= $isCatering ? 'Catering' : 'UMKM' ?>
               </span>
-              <div class="price"><?= format_rupiah($pr['harga']) ?></div>
+              <div class="price"><?= format_rupiah(harga_produk_akhir($pr['harga'])) ?></div>
             </div>
           </a>
         <?php endforeach; ?>

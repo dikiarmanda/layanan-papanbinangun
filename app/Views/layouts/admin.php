@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="<?= base_url('assets/vendor/dropify/css/dropify.min.css') ?>">
   <link rel="stylesheet" href="<?= base_url('assets/vendor/sweetalert2/css/sweetalert2.min.css') ?>">
   <link rel="stylesheet" href="<?= base_url('assets/vendor/summernote/summernote-lite.min.css') ?>">
+  <link rel="stylesheet" href="<?= base_url('assets/vendor/cropperjs/css/cropper.min.css') ?>">
   <?= $this->renderSection('styles') ?>
 </head>
 
@@ -126,6 +127,8 @@
   <script src="<?= base_url('assets/vendor/flatpickr/l10n/id.js') ?>"></script>
   <script src="<?= base_url('assets/vendor/summernote/summernote-lite.min.js') ?>"></script>
   <script src="<?= base_url('assets/vendor/summernote/lang_summernote-id-ID.min.js') ?>"></script>
+  <script src="<?= base_url('assets/vendor/cropperjs/js/cropper.min.js') ?>"></script>
+  <script src="<?= base_url('assets/js/image-cropper.js') ?>"></script>
   <script src="<?= base_url('assets/js/swal-helper.js') ?>"></script>
   <script src="<?= base_url('assets/js/datepicker.js') ?>"></script>
   <script src="<?= base_url('assets/js/select2-init.js') ?>"></script>

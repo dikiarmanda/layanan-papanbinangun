@@ -70,7 +70,7 @@ class ProdukController extends BaseController
             if ($jenis === null) {
                 $jenis = $pJenis;
             }
-            $line = (float) $produk['harga'] * (int) $qty;
+            $line = harga_produk_akhir($produk['harga']) * (int) $qty;
             $subtotal += $line;
             $items[] = [
                 'produk' => $produk,

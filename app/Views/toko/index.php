@@ -50,7 +50,7 @@
             <span
               class="badge-jenis <?= $isCatering ? 'badge-catering' : 'badge-umkm' ?>"><?= $isCatering ? 'Catering' : 'UMKM' ?></span>
             <h3><?= esc($pr['nama']) ?></h3>
-            <div class="price"><?= format_rupiah($pr['harga']) ?></div>
+            <div class="price"><?= format_rupiah(harga_produk_akhir($pr['harga'])) ?></div>
             <small style="color:var(--sepia)">Stok: <?= (int) $pr['stok'] ?></small>
           </div>
         </a>

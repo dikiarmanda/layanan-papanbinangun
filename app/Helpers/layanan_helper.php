@@ -80,6 +80,26 @@ if (!function_exists('format_rupiah')) {
     }
 }
 
+if (!function_exists('admin_fee')) {
+    /**
+     * Biaya admin per produk dari .env: app.adminFee (default 0).
+     */
+    function admin_fee(): float
+    {
+        return (float) (env('app.adminFee') ?: 0);
+    }
+}
+
+if (!function_exists('harga_produk_akhir')) {
+    /**
+     * Harga produk akhir = harga asli + biaya admin per produk.
+     */
+    function harga_produk_akhir(float|int|string $harga): float
+    {
+        return (float) $harga + admin_fee();
+    }
+}
+
 if (!function_exists('generate_kode')) {
     function generate_kode(string $prefix): string
     {
@@ -288,6 +308,45 @@ if (!function_exists('upload_image')) {
 
         $newName = $file->getRandomName();
         $file->move($dir, $newName);
+
+        return 'uploads/' . $folder . '/' . $newName;
+    }
+}
+
+if (!function_exists('upload_cropped_image')) {
+    /**
+     * Simpan gambar hasil crop (base64 data URI) ke public/uploads.
+     *
+     * @return string|null relative path under public/uploads
+     */
+    function upload_cropped_image(string $field, string $folder = 'umum'): ?string
+    {
+        $data = (string) service('request')->getPost($field);
+
+        if ($data === '' || !str_starts_with($data, 'data:image/')) {
+            return null;
+        }
+
+        $parts = explode(',', $data, 2);
+        if (count($parts) !== 2) {
+            return null;
+        }
+
+        $decoded = base64_decode($parts[1], true);
+        if ($decoded === false) {
+            return null;
+        }
+
+        preg_match('#data:image/(\w+);#', $parts[0], $m);
+        $ext = ($m[1] ?? 'jpg') === 'jpeg' ? 'jpg' : ($m[1] ?? 'jpg');
+
+        $dir = FCPATH . 'uploads/' . $folder;
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $newName = time() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+        file_put_contents($dir . DIRECTORY_SEPARATOR . $newName, $decoded);
 
         return 'uploads/' . $folder . '/' . $newName;
     }

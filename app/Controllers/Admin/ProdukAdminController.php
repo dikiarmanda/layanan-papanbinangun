@@ -38,7 +38,7 @@ class ProdukAdminController extends BaseController
 
         try {
             $nama = (string) $this->request->getPost('nama');
-            $img = upload_image('gambar', 'produk');
+            $img = upload_cropped_image('gambar_cropped', 'produk') ?? upload_image('gambar', 'produk');
             $jenis = $this->request->getPost('jenis') === 'catering' ? 'catering' : 'umkm';
 
             model(ProdukModel::class)->insert([
@@ -100,7 +100,7 @@ class ProdukAdminController extends BaseController
                 'status' => $this->request->getPost('status'),
             ];
 
-            $img = upload_image('gambar', 'produk');
+            $img = upload_cropped_image('gambar_cropped', 'produk') ?? upload_image('gambar', 'produk');
             if ($img) {
                 $data['gambar'] = $img;
             }

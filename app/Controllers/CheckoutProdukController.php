@@ -211,14 +211,15 @@ class CheckoutProdukController extends BaseController
                 continue;
             }
 
-            $line = (float) $produk['harga'] * (int) $qty;
+            $hargaSatuan = harga_produk_akhir($produk['harga']);
+            $line = $hargaSatuan * (int) $qty;
             $subtotal += $line;
             $weight += ((int) ($produk['berat'] ?? 1000)) * (int) $qty;
             $items[] = ['produk' => $produk, 'jumlah' => (int) $qty, 'subtotal' => $line];
             $lineItems[] = [
                 'produk_id' => (int) $produkId,
                 'nama_produk' => $produk['nama'],
-                'harga_satuan' => (float) $produk['harga'],
+                'harga_satuan' => $hargaSatuan,
                 'jumlah' => (int) $qty,
                 'subtotal' => $line,
             ];

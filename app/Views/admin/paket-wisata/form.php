@@ -46,8 +46,15 @@
     </div>
     <div class="form-group">
       <label>Gambar cover</label>
-      <input type="file" name="gambar_cover" accept="image/*" class="dropify"
-        data-default-file="<?= ! empty($paket['gambar_cover']) ? esc(media_url($paket['gambar_cover']), 'attr') : '' ?>">
+      <div class="image-cropper-wrap">
+        <input type="file" accept="image/*" class="image-cropper-input"
+          data-default="<?= ! empty($paket['gambar_cover']) ? esc(media_url($paket['gambar_cover']), 'attr') : '' ?>">
+        <input type="hidden" name="gambar_cover_cropped">
+        <div class="image-cropper-preview">
+          <img src="" alt="">
+          <button type="button" class="image-cropper-remove" aria-label="Hapus">&times;</button>
+        </div>
+      </div>
     </div>
     <div class="actions">
       <button class="btn btn-primary" type="submit"><i class="fa-solid fa-floppy-disk"></i> Simpan</button>

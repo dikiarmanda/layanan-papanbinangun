@@ -754,3 +754,120 @@ a.stat-card:hover {
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Image Cropper ─────────────────────────────────────────── */
+.image-cropper-wrap {
+  margin-top: 0.25rem;
+}
+
+.image-cropper-input {
+  display: block;
+  width: 100%;
+  padding: 0.5rem;
+  border: 2px dashed var(--sepia, #7a6b5a);
+  border-radius: 8px;
+  cursor: pointer;
+  background: var(--cream, #faf7f2);
+  transition: border-color 0.2s;
+}
+
+.image-cropper-input:hover {
+  border-color: var(--terracotta, #b05c3e);
+}
+
+.image-cropper-preview {
+  display: none;
+  margin-top: 0.75rem;
+  position: relative;
+  max-width: 360px;
+}
+
+.image-cropper-preview img {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid #e0d6c8;
+}
+
+.image-cropper-remove {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.cropper-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.65);
+  align-items: center;
+  justify-content: center;
+}
+
+.cropper-modal-overlay.is-open {
+  display: flex;
+}
+
+.cropper-modal-dialog {
+  background: #fff;
+  border-radius: 12px;
+  width: 90vw;
+  max-width: 700px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+.cropper-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e0d6c8;
+}
+
+.cropper-modal-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--sepia, #7a6b5a);
+  line-height: 1;
+}
+
+.cropper-modal-body {
+  flex: 1;
+  overflow: hidden;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 60vh;
+}
+
+.cropper-modal-body img {
+  max-width: 100%;
+  display: block;
+}
+
+.cropper-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid #e0d6c8;
+}
