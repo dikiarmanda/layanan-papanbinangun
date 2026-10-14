@@ -97,7 +97,10 @@ class AuthPelangganController extends BaseController
             'pelanggan_email' => $data['email'],
         ]);
 
-        return redirect()->to('/akun')->with('success', 'Akun berhasil dibuat. Selamat datang!');
+        $redirect = (string) (session()->getTempdata('redirect_after_login') ?: '/akun');
+        session()->removeTempdata('redirect_after_login');
+
+        return redirect()->to($redirect)->with('success', 'Akun berhasil dibuat. Selamat datang!');
     }
 
     public function logout()

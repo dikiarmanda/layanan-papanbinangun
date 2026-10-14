@@ -146,6 +146,10 @@ class ProdukController extends BaseController
 
         session()->set('cart', $cart);
 
+        if ($this->request->isAJAX()) {
+            return $this->cartJsonResponse($cart);
+        }
+
         return redirect()->to('/keranjang');
     }
 
@@ -158,7 +162,43 @@ class ProdukController extends BaseController
         unset($cart[$produkId]);
         session()->set('cart', $cart);
 
+        if ($this->request->isAJAX()) {
+            return $this->cartJsonResponse($cart);
+        }
+
         return redirect()->to('/keranjang');
+    }
+
+    private function cartJsonResponse(array $cart)
+    {
+        helper('layanan');
+        $items = [];
+        $subtotal = 0;
+
+        foreach ($cart as $pid => $qty) {
+            $produk = model(ProdukModel::class)->find($pid);
+            if (!$produk || $produk['status'] !== 'publish') {
+                continue;
+            }
+            $harga = harga_produk_akhir($produk['harga']);
+            $line = $harga * (int) $qty;
+            $subtotal += $line;
+            $items[] = [
+                'produk_id' => (int) $pid,
+                'jumlah'    => (int) $qty,
+                'harga'     => $harga,
+                'subtotal'  => $line,
+                'subtotal_fmt' => format_rupiah($line),
+            ];
+        }
+
+        return $this->response->setJSON([
+            'success'      => true,
+            'items'        => $items,
+            'subtotal'     => $subtotal,
+            'subtotal_fmt' => format_rupiah($subtotal),
+            'count'        => count($items),
+        ]);
     }
 
     public function provinces()

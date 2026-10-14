@@ -2,12 +2,14 @@
 
 namespace App\Controllers;
 
+use App\Libraries\EmailService;
 use App\Libraries\MidtransService;
 use App\Libraries\WhatsappService;
 use App\Models\JadwalPaketWisataModel;
 use App\Models\MidtransLogModel;
 use App\Models\OrderItemModel;
 use App\Models\OrderModel;
+use App\Models\PaketWisataModel;
 use App\Models\PelangganModel;
 use App\Models\ProdukModel;
 use App\Models\ReservasiModel;
@@ -111,6 +113,18 @@ class MidtransWebhookController extends BaseController
                     "Reservasi {$reservasi['kode_reservasi']} dikonfirmasi. Pembayaran berhasil. Terima kasih!",
                     (int) $reservasi['id']
                 );
+
+                $updatedReservasi = $model->find($reservasi['id']);
+                $paket = model(PaketWisataModel::class)->find($reservasi['paket_wisata_id']);
+                $paketNama = $paket['nama'] ?? 'Paket Wisata';
+
+                $emailService = new EmailService();
+                $emailService->sendReservasiReceipt(
+                    $pelanggan['email'],
+                    $pelanggan['nama'],
+                    $updatedReservasi,
+                    $paketNama
+                );
             }
 
             return;
@@ -163,6 +177,17 @@ class MidtransWebhookController extends BaseController
                     $pelanggan['no_hp'],
                     "Pesanan {$order['kode_order']} berhasil dibayar dan sedang diproses.",
                     (int) $order['id']
+                );
+
+                $updatedOrder = $model->find($order['id']);
+                $items = model(OrderItemModel::class)->forOrder((int) $order['id']);
+
+                $emailService = new EmailService();
+                $emailService->sendOrderReceipt(
+                    $pelanggan['email'],
+                    $pelanggan['nama'],
+                    $updatedOrder,
+                    $items
                 );
             }
 

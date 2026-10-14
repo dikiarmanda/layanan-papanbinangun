@@ -23,9 +23,12 @@
             value="<?= esc(old('email', $pDb['email'] ?? $pLogin['email'] ?? '')) ?>">
         </div>
         <div class="form-group">
-          <label>No. HP</label>
-          <input type="text" name="no_hp" class="form-control" required
+          <label>No. HP / WhatsApp</label>
+          <input type="tel" name="no_hp" id="no_hp" class="form-control" required
+            inputmode="numeric" pattern="[0-9]{8,15}" minlength="8" maxlength="15"
+            placeholder="Contoh: 081234567890"
             value="<?= esc(old('no_hp', $pDb['no_hp'] ?? '')) ?>">
+          <small class="hint" id="no-hp-hint" style="display:none;color:#991b1b">Hanya angka, 8-15 digit.</small>
         </div>
 
         <?php if ($isCatering): ?>
@@ -92,11 +95,10 @@
 
           <?php if ($ongkirReady): ?>
             <div class="form-group">
-              <label>Cari kecamatan / kelurahan tujuan</label>
-              <input type="text" id="dest-search" class="form-control" placeholder="Contoh: Surabaya, Menteng, Pandaan…"
-                autocomplete="off">
-              <select id="destination" name="kota_tujuan_id" class="form-control" required style="margin-top:0.5rem">
-                <option value="">— Ketik pencarian di atas, lalu pilih —</option>
+              <label>Kecamatan / kelurahan tujuan</label>
+              <select id="destination" name="kota_tujuan_id" class="form-control" required
+                data-placeholder="Ketik nama kecamatan / kelurahan...">
+                <option value=""></option>
               </select>
               <input type="hidden" name="kota_tujuan_nama" id="kota_tujuan_nama">
             </div>
@@ -121,7 +123,7 @@
           <?php endif; ?>
         <?php endif; ?>
 
-        <button type="submit" class="btn btn-primary" style="width:100%">Bayar via Midtrans</button>
+        <button type="submit" class="btn btn-primary" style="width:100%">Pilih Metode Pembayaran</button>
       </form>
     </div>
 
@@ -154,6 +156,16 @@
     const isCatering = <?= $isCatering ? 'true' : 'false' ?>;
     const ongkirReady = <?= !empty($ongkirReady) ? 'true' : 'false' ?>;
     const { formatRupiah: formatRp } = window.AppUtils;
+
+    const noHpEl = document.getElementById('no_hp');
+    const noHpHint = document.getElementById('no-hp-hint');
+    if (noHpEl) {
+      noHpEl.addEventListener('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        const valid = /^[0-9]{8,15}$/.test(this.value);
+        noHpHint.style.display = (this.value.length > 0 && !valid) ? '' : 'none';
+      });
+    }
 
     function setTotal(ongkir) {
       document.getElementById('ongkir-display').textContent = formatRp(ongkir);
@@ -190,44 +202,33 @@
     }
 
     const weight = <?= (int) $weight ?>;
-    const searchEl = document.getElementById('dest-search');
-    const destEl = document.getElementById('destination');
+    const destEl = $('#destination');
     const ongkirEl = document.getElementById('ongkir');
-    let searchTimer = null;
 
-    searchEl?.addEventListener('input', () => {
-      clearTimeout(searchTimer);
-      const q = searchEl.value.trim();
-      if (q.length < 2) return;
-      searchTimer = setTimeout(async () => {
-        destEl.innerHTML = '<option value="">Mencari…</option>';
-        try {
-          const res = await fetch('<?= site_url('api/destinations') ?>?q=' + encodeURIComponent(q));
-          const list = await res.json();
-          destEl.innerHTML = '<option value="">— Pilih destinasi —</option>';
-          (list || []).forEach(d => {
-            const opt = document.createElement('option');
-            opt.value = d.id;
-            opt.textContent = d.label;
-            opt.dataset.nama = d.label;
-            destEl.appendChild(opt);
-          });
-          if (!list || !list.length) {
-            destEl.innerHTML = '<option value="">Tidak ditemukan — coba kata lain</option>';
-          }
-        } catch (e) {
-          destEl.innerHTML = '<option value="">Gagal memuat destinasi</option>';
-        }
-      }, 400);
+    destEl.select2({
+      placeholder: 'Ketik nama kecamatan / kelurahan...',
+      allowClear: true,
+      minimumInputLength: 2,
+      language: 'id',
+      ajax: {
+        url: '<?= site_url('api/destinations') ?>',
+        dataType: 'json',
+        delay: 400,
+        data: params => ({ q: params.term }),
+        processResults: data => ({
+          results: (data || []).map(d => ({ id: d.id, text: d.label, nama: d.label }))
+        }),
+        cache: true
+      }
     });
 
-    destEl?.addEventListener('change', async () => {
-      const selected = destEl.options[destEl.selectedIndex];
-      document.getElementById('kota_tujuan_nama').value = selected.dataset.nama || selected.textContent;
-      if (!destEl.value) return;
+    destEl.on('select2:select', async function(e) {
+      const d = e.params.data;
+      document.getElementById('kota_tujuan_nama').value = d.nama || d.text;
+      if (!d.id) return;
       ongkirEl.innerHTML = '<option value="">Menghitung ongkir…</option>';
       try {
-        const res = await fetch('<?= site_url('api/ongkir') ?>?destination=' + destEl.value + '&weight=' + weight);
+        const res = await fetch('<?= site_url('api/ongkir') ?>?destination=' + d.id + '&weight=' + weight);
         const list = await res.json();
         ongkirEl.innerHTML = '<option value="">— Pilih layanan —</option>';
         (list || []).forEach(row => {
@@ -248,6 +249,12 @@
       } catch (e) {
         ongkirEl.innerHTML = '<option value="">Gagal menghitung ongkir</option>';
       }
+    });
+
+    destEl.on('select2:clear', function() {
+      document.getElementById('kota_tujuan_nama').value = '';
+      ongkirEl.innerHTML = '<option value="">— Pilih destinasi dulu —</option>';
+      setTotal(0);
     });
 
     ongkirEl?.addEventListener('change', () => {

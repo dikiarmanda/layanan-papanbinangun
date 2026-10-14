@@ -17,6 +17,12 @@ class CheckoutProdukController extends BaseController
         helper('layanan');
         assert_fitur_produk();
 
+        if (!pelanggan_logged_in()) {
+            session()->setTempdata('redirect_after_login', current_url(), 300);
+
+            return redirect()->to('/masuk')->with('error', 'Silakan login terlebih dahulu untuk melanjutkan checkout.');
+        }
+
         $cart = session()->get('cart') ?? [];
 
         if ($cart === []) {
@@ -46,6 +52,12 @@ class CheckoutProdukController extends BaseController
     {
         helper('layanan');
         assert_fitur_produk();
+
+        if (!pelanggan_logged_in()) {
+            session()->setTempdata('redirect_after_login', site_url('checkout-produk'), 300);
+
+            return redirect()->to('/masuk')->with('error', 'Silakan login terlebih dahulu untuk melanjutkan checkout.');
+        }
 
         $cart = session()->get('cart') ?? [];
         if ($cart === []) {
