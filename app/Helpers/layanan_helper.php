@@ -313,6 +313,40 @@ if (!function_exists('upload_image')) {
     }
 }
 
+if (!function_exists('upload_multiple_images')) {
+    /**
+     * @return list<string> relative paths under public/uploads
+     */
+    function upload_multiple_images(string $field, string $folder = 'umum', int $max = 5): array
+    {
+        $files = service('request')->getFileMultiple($field);
+        if (!$files) {
+            return [];
+        }
+
+        $dir = FCPATH . 'uploads/' . $folder;
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $paths = [];
+        $count = 0;
+        foreach ($files as $file) {
+            if ($count >= $max) {
+                break;
+            }
+            if ($file && $file->isValid() && !$file->hasMoved()) {
+                $newName = $file->getRandomName();
+                $file->move($dir, $newName);
+                $paths[] = 'uploads/' . $folder . '/' . $newName;
+                $count++;
+            }
+        }
+
+        return $paths;
+    }
+}
+
 if (!function_exists('upload_cropped_image')) {
     /**
      * Simpan gambar hasil crop (base64 data URI) ke public/uploads.

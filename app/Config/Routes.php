@@ -51,7 +51,7 @@ $routes->group('keranjang', static function ($routes) {
     $routes->get('/', 'ProdukController::keranjang');
     $routes->post('add', 'ProdukController::addCart');
     $routes->post('update', 'ProdukController::updateCart');
-    $routes->get('remove/(:num)', 'ProdukController::removeCart/$1');
+    $routes->get('remove/(:segment)', 'ProdukController::removeCart/$1');
 });
 
 $routes->get('checkout-produk', 'CheckoutProdukController::index');
@@ -137,6 +137,12 @@ $routes->group('admin', ['filter' => 'adminauth'], static function ($routes) {
         $routes->get('/', 'Admin\OrderAdminController::index');
         $routes->get('(:num)', 'Admin\OrderAdminController::show/$1');
         $routes->post('(:num)/status', 'Admin\OrderAdminController::updateStatus/$1');
+    });
+
+    // Pelanggan / Akun User
+    $routes->group('pelanggan', static function ($routes) {
+        $routes->get('/', 'Admin\PelangganAdminController::index');
+        $routes->get('(:num)', 'Admin\PelangganAdminController::show/$1');
     });
 
     // Superadmin — kelola user

@@ -161,7 +161,7 @@
   <?php if (!empty($site['no_whatsapp'])): ?>
     <a href="<?= wa_link($site['no_whatsapp'], 'Halo, saya ingin bertanya tentang layanan ' . $brandName) ?>"
       class="wa-float" target="_blank" rel="noopener" aria-label="Chat WhatsApp"><i
-        class="fa-brands fa-whatsapp text-white"></i></a>
+        class="fa-brands fa-whatsapp text-white text-xl"></i></a>
   <?php endif; ?>
 
   <script src="<?= base_url('assets/vendor/jquery/jquery.min.js') ?>"></script>

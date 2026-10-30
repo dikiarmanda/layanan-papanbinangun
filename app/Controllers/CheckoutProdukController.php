@@ -199,7 +199,7 @@ class CheckoutProdukController extends BaseController
     }
 
     /**
-     * @param array<int, int> $cart
+     * @param array<string|int, int> $cart
      * @return array{items:list<array>, subtotal:float, weight:int, jenis:?string, lineItems:list<array>}
      */
     protected function buildCartItems(array $cart): array
@@ -210,8 +210,12 @@ class CheckoutProdukController extends BaseController
         $weight = 0;
         $jenis = null;
 
-        foreach ($cart as $produkId => $qty) {
-            $produk = model(ProdukModel::class)->find($produkId);
+        foreach ($cart as $itemKey => $qty) {
+            [$pid, $var] = array_pad(explode('__', (string) $itemKey, 2), 2, null);
+            $pid = (int) $pid;
+            $var = $var !== null ? urldecode($var) : null;
+
+            $produk = model(ProdukModel::class)->find($pid);
             if (!$produk || $produk['status'] !== 'publish') {
                 continue;
             }
@@ -224,16 +228,43 @@ class CheckoutProdukController extends BaseController
             }
 
             $hargaSatuan = harga_produk_akhir($produk['harga']);
+            $itemWeight = (int) ($produk['berat'] ?? 1000);
+            $namaProduk = $produk['nama'];
+
+            if (!empty($var) && !empty($produk['opsi_varian'])) {
+                $vList = json_decode($produk['opsi_varian'], true) ?: [];
+                foreach ($vList as $vl) {
+                    if ($vl['nama'] === $var) {
+                        if (!empty($vl['harga']) && (float) $vl['harga'] > 0) {
+                            $hargaSatuan = (float) $vl['harga'];
+                        }
+                        if (!empty($vl['berat'])) {
+                            $itemWeight = (int) $vl['berat'];
+                        }
+                        break;
+                    }
+                }
+                $namaProduk .= ' (' . $var . ')';
+            }
+
             $line = $hargaSatuan * (int) $qty;
             $subtotal += $line;
-            $weight += ((int) ($produk['berat'] ?? 1000)) * (int) $qty;
-            $items[] = ['produk' => $produk, 'jumlah' => (int) $qty, 'subtotal' => $line];
-            $lineItems[] = [
-                'produk_id' => (int) $produkId,
-                'nama_produk' => $produk['nama'],
+            $weight += $itemWeight * (int) $qty;
+            $items[] = [
+                'cart_key'     => (string) $itemKey,
+                'produk'       => $produk,
+                'varian'       => $var,
+                'nama_produk'  => $namaProduk,
                 'harga_satuan' => $hargaSatuan,
-                'jumlah' => (int) $qty,
-                'subtotal' => $line,
+                'jumlah'       => (int) $qty,
+                'subtotal'     => $line,
+            ];
+            $lineItems[] = [
+                'produk_id'    => (int) $pid,
+                'nama_produk'  => $namaProduk,
+                'harga_satuan' => $hargaSatuan,
+                'jumlah'       => (int) $qty,
+                'subtotal'     => $line,
             ];
         }
 

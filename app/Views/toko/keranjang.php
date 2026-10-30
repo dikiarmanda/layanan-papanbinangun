@@ -30,10 +30,10 @@
     <div class="keranjang-list" id="keranjang-list">
       <?php if (!empty($items)): ?>
         <?php foreach ($items as $item): ?>
-          <div class="keranjang-item" data-produk-id="<?= (int) $item['produk']['id'] ?>" data-harga="<?= harga_produk_akhir($item['produk']['harga']) ?>">
+          <div class="keranjang-item" data-cart-key="<?= esc($item['cart_key']) ?>" data-harga="<?= (float) $item['harga_satuan'] ?>">
             <div class="keranjang-item-img">
-              <?php if (!empty($item['produk']['foto'])): ?>
-                <img src="<?= base_url('uploads/produk/' . $item['produk']['foto']) ?>"
+              <?php if (!empty($item['produk']['gambar'])): ?>
+                <img src="<?= media_url($item['produk']['gambar']) ?>"
                      alt="<?= esc($item['produk']['nama']) ?>">
               <?php else: ?>
                 <div class="keranjang-item-img-placeholder">
@@ -45,12 +45,24 @@
               <div class="keranjang-item-top">
                 <div style="min-width:0">
                   <h4 class="keranjang-item-name"><?= esc($item['produk']['nama']) ?></h4>
-                  <span class="badge-jenis badge-<?= esc($item['produk']['jenis'] ?? 'umkm') ?>" style="font-size:0.7rem">
-                    <?= ($item['produk']['jenis'] ?? 'umkm') === 'catering' ? 'Catering' : 'UMKM' ?>
-                  </span>
-                  <span class="keranjang-item-price"><?= format_rupiah(harga_produk_akhir($item['produk']['harga'])) ?></span>
+                  <div style="display:flex;gap:0.4rem;align-items:center;flex-wrap:wrap;margin-top:2px">
+                    <span class="badge-jenis badge-<?= esc($item['produk']['jenis'] ?? 'umkm') ?>" style="font-size:0.68rem">
+                      <?= ($item['produk']['jenis'] ?? 'umkm') === 'catering' ? 'Catering' : 'UMKM' ?>
+                    </span>
+                    <?php if (!empty($item['varian'])): ?>
+                      <span class="badge" style="background:#0d6efd;color:#fff;font-size:0.68rem;padding:2px 6px;border-radius:4px">
+                        Ukuran: <?= esc($item['varian']) ?>
+                      </span>
+                    <?php endif; ?>
+                    <?php if (!empty($item['min_beli']) && (int) $item['min_beli'] > 1): ?>
+                      <span class="badge" style="background:#ffc107;color:#212529;font-size:0.68rem;padding:2px 6px;border-radius:4px">
+                        Min <?= (int) $item['min_beli'] ?> pcs
+                      </span>
+                    <?php endif; ?>
+                  </div>
+                  <span class="keranjang-item-price" style="margin-left:0;display:block;margin-top:3px"><?= format_rupiah($item['harga_satuan']) ?></span>
                 </div>
-                <button type="button" class="keranjang-remove" title="Hapus" data-produk-id="<?= (int) $item['produk']['id'] ?>">
+                <button type="button" class="keranjang-remove" title="Hapus" data-cart-key="<?= esc($item['cart_key']) ?>">
                   <i class="fas fa-trash-alt"></i>
                 </button>
               </div>
@@ -59,13 +71,15 @@
                   <button type="button" class="keranjang-qty-btn" data-action="minus">
                     <i class="fas fa-minus"></i>
                   </button>
-                  <input type="number" value="<?= (int) $item['jumlah'] ?>" min="1"
-                         class="form-control keranjang-qty-input" data-produk-id="<?= (int) $item['produk']['id'] ?>">
+                  <input type="number" value="<?= (int) $item['jumlah'] ?>"
+                         min="<?= (int) ($item['min_beli'] ?? 1) ?>"
+                         data-min="<?= (int) ($item['min_beli'] ?? 1) ?>"
+                         class="form-control keranjang-qty-input" data-cart-key="<?= esc($item['cart_key']) ?>">
                   <button type="button" class="keranjang-qty-btn" data-action="plus">
                     <i class="fas fa-plus"></i>
                   </button>
                 </div>
-                <div class="keranjang-item-subtotal" data-produk-id="<?= (int) $item['produk']['id'] ?>">
+                <div class="keranjang-item-subtotal" data-cart-key="<?= esc($item['cart_key']) ?>">
                   <?= format_rupiah($item['subtotal']) ?>
                 </div>
               </div>
@@ -321,22 +335,26 @@
     if (totalEl) totalEl.textContent = formatRupiah(total);
   }
 
-  function ajaxUpdate(produkId, jumlah) {
-    var row = document.querySelector('.keranjang-item[data-produk-id="' + produkId + '"]');
+  function getCsrfToken() {
+    var match = document.cookie.match(new RegExp('(^|;\\s*)csrf_cookie_name=([^;]*)'));
+    return match ? decodeURIComponent(match[2]) : csrfHash;
+  }
+
+  function ajaxUpdate(cartKey, jumlah) {
+    var row = document.querySelector('.keranjang-item[data-cart-key="' + cartKey + '"]');
     if (row) row.classList.add('is-updating');
 
-    var formData = new FormData();
-    formData.append('produk_id', produkId);
-    formData.append('jumlah', jumlah);
-    formData.append(csrfName, csrfHash);
+    var currentToken = getCsrfToken();
 
     $.ajax({
       url: updateUrl,
       method: 'POST',
-      data: {produk_id: produkId, jumlah: jumlah, [csrfName]: csrfHash},
+      data: {cart_key: cartKey, jumlah: jumlah, [csrfName]: currentToken},
+      headers: {'X-Requested-With': 'XMLHttpRequest', 'X-CSRF-TOKEN': currentToken},
       dataType: 'json',
       success: function(data) {
         if (data.csrf_token) csrfHash = data.csrf_token;
+        if (data.csrf_hash) csrfHash = data.csrf_hash;
         if (row) row.classList.remove('is-updating');
 
         if (jumlah <= 0 && row) {
@@ -347,7 +365,7 @@
           }, 300);
         } else {
           data.items.forEach(function(it) {
-            var subEl = document.querySelector('.keranjang-item-subtotal[data-produk-id="' + it.produk_id + '"]');
+            var subEl = document.querySelector('.keranjang-item-subtotal[data-cart-key="' + it.cart_key + '"]');
             if (subEl) subEl.textContent = it.subtotal_fmt;
           });
           updateSummary(data);
@@ -360,8 +378,8 @@
     });
   }
 
-  function ajaxRemove(produkId) {
-    var row = document.querySelector('.keranjang-item[data-produk-id="' + produkId + '"]');
+  function ajaxRemove(cartKey) {
+    var row = document.querySelector('.keranjang-item[data-cart-key="' + cartKey + '"]');
 
     Swal.fire({
       title: 'Hapus produk?',
@@ -377,12 +395,13 @@
       if (row) row.classList.add('is-removing');
 
       $.ajax({
-        url: removeUrl + '/' + produkId,
+        url: removeUrl + '/' + encodeURIComponent(cartKey),
         method: 'GET',
         dataType: 'json',
         headers: {'X-Requested-With': 'XMLHttpRequest'},
         success: function(data) {
           if (data.csrf_token) csrfHash = data.csrf_token;
+          if (data.csrf_hash) csrfHash = data.csrf_hash;
           setTimeout(function() {
             if (row) row.remove();
             updateSummary(data);
@@ -396,10 +415,10 @@
     });
   }
 
-  function debouncedUpdate(produkId, jumlah) {
-    if (debounceTimers[produkId]) clearTimeout(debounceTimers[produkId]);
-    debounceTimers[produkId] = setTimeout(function() {
-      ajaxUpdate(produkId, jumlah);
+  function debouncedUpdate(cartKey, jumlah) {
+    if (debounceTimers[cartKey]) clearTimeout(debounceTimers[cartKey]);
+    debounceTimers[cartKey] = setTimeout(function() {
+      ajaxUpdate(cartKey, jumlah);
     }, 400);
   }
 
@@ -409,46 +428,57 @@
     var form = btn.closest('.keranjang-qty-form');
     var input = form.find('.keranjang-qty-input');
     var val = parseInt(input.val()) || 0;
+    var min = parseInt(input.data('min')) || 1;
     var row = btn.closest('.keranjang-item');
-    var produkId = row.data('produk-id');
+    var cartKey = row.data('cart-key');
 
     if (action === 'minus') {
-      val = Math.max(0, val - 1);
+      if (val - 1 < min) {
+        ajaxRemove(cartKey);
+        return;
+      }
+      val = val - 1;
     } else {
       val = val + 1;
     }
     input.val(val);
 
-    if (val <= 0) {
-      ajaxRemove(produkId);
-      input.val(1);
-      return;
-    }
-
     updateSubtotalLocal(row[0]);
-    debouncedUpdate(produkId, val);
+    debouncedUpdate(cartKey, val);
   });
 
   $(document).on('change', '.keranjang-qty-input', function() {
     var input = $(this);
     var val = parseInt(input.val()) || 0;
+    var min = parseInt(input.data('min')) || 1;
     var row = input.closest('.keranjang-item');
-    var produkId = row.data('produk-id');
+    var cartKey = row.data('cart-key');
 
-    if (val <= 0) {
-      ajaxRemove(produkId);
-      input.val(1);
-      return;
+    if (val < min) {
+      if (val <= 0) {
+        ajaxRemove(cartKey);
+        input.val(min);
+        return;
+      }
+      Swal.fire({
+        icon: 'warning',
+        title: 'Minimal Pembelian',
+        text: 'Minimal pembelian untuk produk ini adalah ' + min + ' pcs.',
+        timer: 2000,
+        showConfirmButton: false
+      });
+      val = min;
+      input.val(min);
     }
 
     updateSubtotalLocal(row[0]);
-    debouncedUpdate(produkId, val);
+    debouncedUpdate(cartKey, val);
   });
 
   $(document).on('click', '.keranjang-remove', function(e) {
     e.preventDefault();
-    var produkId = $(this).data('produk-id');
-    ajaxRemove(produkId);
+    var cartKey = $(this).data('cart-key');
+    ajaxRemove(cartKey);
   });
 })();
 </script>

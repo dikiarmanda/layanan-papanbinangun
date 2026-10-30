@@ -17,15 +17,18 @@ class ProdukModel extends Model
         'deskripsi',
         'harga',
         'stok',
+        'min_beli',
         'berat',
+        'opsi_varian',
         'gambar',
+        'foto_tambahan',
         'kategori_id',
         'status',
         'admin_id',
     ];
     protected $useTimestamps = true;
 
-    public function findPublished(?int $limit = null, ?int $kategoriId = null, ?string $jenis = null): array
+    public function findPublished(?int $limit = null, ?int $kategoriId = null, ?string $jenis = null, ?string $q = null): array
     {
         $builder = $this->where('status', 'publish')->orderBy('created_at', 'DESC');
         if ($kategoriId) {
@@ -33,6 +36,12 @@ class ProdukModel extends Model
         }
         if ($jenis !== null && $jenis !== '') {
             $builder->where('jenis', $jenis);
+        }
+        if ($q !== null && $q !== '') {
+            $builder->groupStart()
+                ->like('nama', $q)
+                ->orLike('deskripsi', $q)
+                ->groupEnd();
         }
         if ($limit) {
             $builder->limit($limit);
