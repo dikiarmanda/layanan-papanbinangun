@@ -131,7 +131,7 @@
       <h2 style="font-size:1.25rem;margin-top:0">Ringkasan</h2>
       <ul style="padding-left:1.1rem;margin:0 0 1rem">
         <?php foreach ($items as $item): ?>
-          <li style="margin-bottom:0.35rem"><?= esc($item['produk']['nama']) ?> × <?= (int) $item['jumlah'] ?> —
+          <li style="margin-bottom:0.35rem"><?= esc($item['nama_produk'] ?? $item['produk']['nama']) ?> × <?= (int) $item['jumlah'] ?> —
             <?= format_rupiah($item['subtotal']) ?>
           </li>
         <?php endforeach; ?>

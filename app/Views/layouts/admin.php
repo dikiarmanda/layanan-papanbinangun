@@ -65,6 +65,9 @@
         <a class="<?= $navActive('admin/order') ?>" href="<?= site_url('admin/order') ?>">
           <i class="fa-solid fa-bag-shopping"></i> Order
         </a>
+        <a class="<?= $navActive('admin/pelanggan') ?>" href="<?= site_url('admin/pelanggan') ?>">
+          <i class="fa-solid fa-users"></i> Pelanggan
+        </a>
         <a class="<?= $navActive('admin/pembayaran') ?>" href="<?= site_url('admin/pembayaran') ?>">
           <i class="fa-solid fa-credit-card"></i> Log Midtrans
         </a>

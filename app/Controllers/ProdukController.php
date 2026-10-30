@@ -17,20 +17,39 @@ class ProdukController extends BaseController
 
         $kategoriId = $this->request->getGet('kategori');
         $jenis = $this->request->getGet('jenis');
+        $q = trim((string) $this->request->getGet('q'));
+
         if (!in_array($jenis, ['umkm', 'catering'], true)) {
             $jenis = null;
         }
 
+        $produk = model(ProdukModel::class)->findPublished(
+            null,
+            $kategoriId ? (int) $kategoriId : null,
+            $jenis,
+            $q !== '' ? $q : null
+        );
+
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'success' => true,
+                'count' => count($produk),
+                'html' => view('toko/_grid', [
+                    'produk' => $produk,
+                    'q' => $q,
+                    'activeJenis' => $jenis,
+                    'activeKat' => $kategoriId,
+                ]),
+            ]);
+        }
+
         return view('toko/index', [
-            'title' => $jenis === 'catering' ? 'Catering Desa' : 'Toko UMKM Desa',
-            'produk' => model(ProdukModel::class)->findPublished(
-                null,
-                $kategoriId ? (int) $kategoriId : null,
-                $jenis
-            ),
+            'title' => $jenis === 'catering' ? 'Catering Wisata Binangun' : 'Toko UMKM Wisata Binangun',
+            'produk' => $produk,
             'kategori' => model(KategoriProdukModel::class)->findAll(),
             'activeKat' => $kategoriId,
             'activeJenis' => $jenis,
+            'q' => $q,
         ]);
     }
 
@@ -61,8 +80,12 @@ class ProdukController extends BaseController
         $subtotal = 0;
         $jenis = null;
 
-        foreach ($cart as $produkId => $qty) {
-            $produk = model(ProdukModel::class)->find($produkId);
+        foreach ($cart as $cartKey => $qty) {
+            [$pid, $var] = array_pad(explode('__', (string) $cartKey, 2), 2, null);
+            $pid = (int) $pid;
+            $var = $var !== null ? urldecode($var) : null;
+
+            $produk = model(ProdukModel::class)->find($pid);
             if (!$produk || $produk['status'] !== 'publish') {
                 continue;
             }
@@ -70,10 +93,26 @@ class ProdukController extends BaseController
             if ($jenis === null) {
                 $jenis = $pJenis;
             }
-            $line = harga_produk_akhir($produk['harga']) * (int) $qty;
+
+            $harga = harga_produk_akhir($produk['harga']);
+            if (!empty($var) && !empty($produk['opsi_varian'])) {
+                $vList = json_decode($produk['opsi_varian'], true) ?: [];
+                foreach ($vList as $vl) {
+                    if ($vl['nama'] === $var && !empty($vl['harga']) && (float) $vl['harga'] > 0) {
+                        $harga = (float) $vl['harga'];
+                        break;
+                    }
+                }
+            }
+
+            $line = $harga * (int) $qty;
             $subtotal += $line;
             $items[] = [
+                'cart_key' => (string) $cartKey,
                 'produk' => $produk,
+                'varian' => $var,
+                'harga_satuan' => $harga,
+                'min_beli' => max(1, (int) ($produk['min_beli'] ?? 1)),
                 'jumlah' => (int) $qty,
                 'subtotal' => $line,
             ];
@@ -93,22 +132,37 @@ class ProdukController extends BaseController
         assert_fitur_produk();
 
         $produkId = (int) $this->request->getPost('produk_id');
-        $jumlah = max(1, (int) $this->request->getPost('jumlah'));
+        $varian = trim((string) $this->request->getPost('varian'));
         $produk = model(ProdukModel::class)->find($produkId);
 
         if (!$produk || $produk['status'] !== 'publish') {
             return redirect()->back()->with('error', 'Produk tidak ditemukan.');
         }
 
-        if ((int) $produk['stok'] < $jumlah) {
+        $minBeli = max(1, (int) ($produk['min_beli'] ?? 1));
+        $jumlah = max($minBeli, (int) $this->request->getPost('jumlah'));
+
+        $stokTersedia = (int) $produk['stok'];
+        if (!empty($varian) && !empty($produk['opsi_varian'])) {
+            $vList = json_decode($produk['opsi_varian'], true) ?: [];
+            foreach ($vList as $vl) {
+                if ($vl['nama'] === $varian && isset($vl['stok'])) {
+                    $stokTersedia = (int) $vl['stok'];
+                    break;
+                }
+            }
+        }
+
+        if ($stokTersedia < $jumlah) {
             return redirect()->back()->with('error', 'Stok tidak mencukupi.');
         }
 
         $newJenis = ($produk['jenis'] ?? 'umkm') === 'catering' ? 'catering' : 'umkm';
         $cart = session()->get('cart') ?? [];
 
-        foreach ($cart as $existingId => $_) {
-            $existing = model(ProdukModel::class)->find($existingId);
+        foreach ($cart as $existingKey => $_) {
+            [$exPid] = explode('__', (string) $existingKey, 2);
+            $existing = model(ProdukModel::class)->find((int) $exPid);
             if (!$existing) {
                 continue;
             }
@@ -123,7 +177,8 @@ class ProdukController extends BaseController
             break;
         }
 
-        $cart[$produkId] = ($cart[$produkId] ?? 0) + $jumlah;
+        $cartKey = $varian !== '' ? ($produkId . '__' . urlencode($varian)) : (string) $produkId;
+        $cart[$cartKey] = ($cart[$cartKey] ?? 0) + $jumlah;
         session()->set('cart', $cart);
 
         return redirect()->to('/keranjang')->with('success', 'Ditambahkan ke keranjang.');
@@ -134,14 +189,24 @@ class ProdukController extends BaseController
         helper('layanan');
         assert_fitur_produk();
 
-        $produkId = (int) $this->request->getPost('produk_id');
+        $cartKey = (string) ($this->request->getPost('cart_key') ?: $this->request->getPost('produk_id'));
         $jumlah = (int) $this->request->getPost('jumlah');
         $cart = session()->get('cart') ?? [];
 
+        [$pid] = explode('__', $cartKey, 2);
+        $produk = model(ProdukModel::class)->find((int) $pid);
+        $minBeli = max(1, (int) ($produk['min_beli'] ?? 1));
+
         if ($jumlah <= 0) {
-            unset($cart[$produkId]);
+            unset($cart[$cartKey]);
+            if (is_numeric($cartKey)) {
+                unset($cart[(int) $cartKey]);
+            }
         } else {
-            $cart[$produkId] = $jumlah;
+            if ($jumlah < $minBeli) {
+                $jumlah = $minBeli;
+            }
+            $cart[$cartKey] = $jumlah;
         }
 
         session()->set('cart', $cart);
@@ -153,13 +218,16 @@ class ProdukController extends BaseController
         return redirect()->to('/keranjang');
     }
 
-    public function removeCart(int $produkId)
+    public function removeCart(string $cartKey)
     {
         helper('layanan');
         assert_fitur_produk();
 
         $cart = session()->get('cart') ?? [];
-        unset($cart[$produkId]);
+        unset($cart[$cartKey]);
+        if (is_numeric($cartKey)) {
+            unset($cart[(int) $cartKey]);
+        }
         session()->set('cart', $cart);
 
         if ($this->request->isAJAX()) {
@@ -175,29 +243,48 @@ class ProdukController extends BaseController
         $items = [];
         $subtotal = 0;
 
-        foreach ($cart as $pid => $qty) {
+        foreach ($cart as $cartKey => $qty) {
+            [$pid, $var] = array_pad(explode('__', (string) $cartKey, 2), 2, null);
+            $pid = (int) $pid;
+            $var = $var !== null ? urldecode($var) : null;
+
             $produk = model(ProdukModel::class)->find($pid);
             if (!$produk || $produk['status'] !== 'publish') {
                 continue;
             }
             $harga = harga_produk_akhir($produk['harga']);
+            if (!empty($var) && !empty($produk['opsi_varian'])) {
+                $vList = json_decode($produk['opsi_varian'], true) ?: [];
+                foreach ($vList as $vl) {
+                    if ($vl['nama'] === $var && !empty($vl['harga']) && (float) $vl['harga'] > 0) {
+                        $harga = (float) $vl['harga'];
+                        break;
+                    }
+                }
+            }
+
             $line = $harga * (int) $qty;
             $subtotal += $line;
             $items[] = [
+                'cart_key' => (string) $cartKey,
                 'produk_id' => (int) $pid,
-                'jumlah'    => (int) $qty,
-                'harga'     => $harga,
-                'subtotal'  => $line,
+                'varian' => $var,
+                'min_beli' => max(1, (int) ($produk['min_beli'] ?? 1)),
+                'jumlah' => (int) $qty,
+                'harga' => $harga,
+                'subtotal' => $line,
                 'subtotal_fmt' => format_rupiah($line),
             ];
         }
 
         return $this->response->setJSON([
-            'success'      => true,
-            'items'        => $items,
-            'subtotal'     => $subtotal,
+            'success' => true,
+            'items' => $items,
+            'subtotal' => $subtotal,
             'subtotal_fmt' => format_rupiah($subtotal),
-            'count'        => count($items),
+            'count' => count($items),
+            'csrf_token' => csrf_hash(),
+            'csrf_hash' => csrf_hash(),
         ]);
     }
 
