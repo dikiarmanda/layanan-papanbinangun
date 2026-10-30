@@ -30,17 +30,21 @@ class ProdukModel extends Model
 
     public function findPublished(?int $limit = null, ?int $kategoriId = null, ?string $jenis = null, ?string $q = null): array
     {
-        $builder = $this->where('status', 'publish')->orderBy('created_at', 'DESC');
+        $builder = $this->select('produk.*, kategori_produk.nama as kategori_nama')
+            ->join('kategori_produk', 'kategori_produk.id = produk.kategori_id', 'left')
+            ->where('produk.status', 'publish')
+            ->orderBy('produk.created_at', 'RAND');
+
         if ($kategoriId) {
-            $builder->where('kategori_id', $kategoriId);
+            $builder->where('produk.kategori_id', $kategoriId);
         }
         if ($jenis !== null && $jenis !== '') {
-            $builder->where('jenis', $jenis);
+            $builder->where('produk.jenis', $jenis);
         }
         if ($q !== null && $q !== '') {
             $builder->groupStart()
-                ->like('nama', $q)
-                ->orLike('deskripsi', $q)
+                ->like('produk.nama', $q)
+                ->orLike('produk.deskripsi', $q)
                 ->groupEnd();
         }
         if ($limit) {
